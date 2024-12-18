@@ -5,7 +5,9 @@
             @foreach ($fields as $field)
                 <th scope="col" class="text-start">{{ strtoupper(str_replace('_', ' ', $field)) }}</th>
             @endforeach
+            @if($dataType!='country_codes')
             <th scope="col" class="text-start">ACTIONS</th>
+            @endif
         </tr>
     </thead>
     <tbody>
@@ -90,10 +92,19 @@
                         selectedStatus="{{$item->status}}"
                     />
                 </tr>
+            @elseif($dataType=='country_codes')
+                <tr class="text-grey" id="delete{{$item->id}}">
+                    <td scope="row" style="text-align: center;" class="text-start !p-1">{{ $index + 1 }}</td>
+                    <td scope="row" style="text-align: center;" class="!p-1">{{$item->country_code}}</td>
+                    <td scope="row" style="text-align: center;" class="!p-1">{{$item->country_name}}</td>
+                    <td scope="row" style="text-align: center;" class="!p-1">{{$item->phone_code}}</td>
+                    <td scope="row" style="text-align: center;" class="!p-1">{{$item->phone_length}}</td>
+                </tr>
             @elseif($dataType=='states')
                 <tr class="text-grey" id="delete{{$item->id}}">
                     <td scope="row" class="text-start !p-1">{{ $index + 1 }}</td>
                     <td scope="row" class="!p-1">{{$item->name}}</td>
+                    <td scope="row" class="!p-1">{{$item->country?$item->country->country_name:""}}</td>
                     <td scope="row" class="!p-1">
                         <livewire:master-status-toggle 
                             modelName="State" 

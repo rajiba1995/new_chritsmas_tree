@@ -57,8 +57,8 @@ class LeadManagementController extends Controller
             'travel_location' => 'required|string|max:255',
             'travel_duration' => 'required|string|max:255',
             'travel_date' => 'required|date', // Use 'date' validation if this is a date field
-            'number_of_adults' => 'required|integer|min:0|max:15', // Use 'integer' and set 'min' and 'max' for range
-            'number_of_children' => 'required|integer|min:0|max:15', // Use 'integer' and set 'min' and 'max' for range
+            'number_of_adults' => 'required|integer|min:1', // Use 'integer' and set 'min' and 'max' for range
+            'number_of_children' => 'required|integer|min:1', // Use 'integer' and set 'min' and 'max' for range
         ], [
             'travel_duration.required' => 'Please select a travel duration.',
             'customer_name.required' => 'Customer name is required.',

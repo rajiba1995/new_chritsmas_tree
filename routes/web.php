@@ -145,6 +145,11 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
         });
 
+
+        Route::prefix('country')->group(function(){
+            Route::get('/', [CommonController::class, 'country_index'])->name('admin.country.index');
+           
+        });
     
 });
    

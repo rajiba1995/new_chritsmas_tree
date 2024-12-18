@@ -14,7 +14,7 @@ class CreateHotelImagesTable extends Migration
             $table->string('image_path'); // Path to the uploaded image
             $table->timestamps();
 
-            $table->foreign('hotel_id')->references('id')->on('hotels')->onDelete('cascade');
+            // $table->foreign('hotel_id')->references('id')->on('hotels')->onDelete('cascade');
         });
     }
 
