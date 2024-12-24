@@ -79,6 +79,9 @@ class VerifyCsrfToken
      */
     public function handle($request, Closure $next)
     {
+
+        VerifyCsrfToken::except('api/api/leads/store');
+
         if (
             $this->isReading($request) ||
             $this->runningUnitTests() ||

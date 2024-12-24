@@ -340,3 +340,7 @@ Route::prefix('tem')->group(function () {
     Route::get('flex', [UtilitiesController::class, 'flex']);
     Route::get('grids', [UtilitiesController::class, 'grids']);
 });
+
+Route::prefix('api')->group(function() {
+    require 'api.php';
+});
