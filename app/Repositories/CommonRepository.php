@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\SeasionType;
 use App\Models\Ammenity;
 use App\Models\RoomCategory;
+use App\Models\CountryCode;
 use Illuminate\Support\Facades\Log;
 use Exception;
 
@@ -100,6 +101,7 @@ class CommonRepository
     public function createState(array $data){
         $state = new State;
         $state->name = ucwords($data['name']);
+        $state->country_code_id = $data['country_code_id'];
         $state->save();
         return $state;
     }
@@ -113,6 +115,7 @@ class CommonRepository
     public function updateState(array $data){
         $state  = State::findOrFail($data['id']);
         $state->name = $data['name'];
+        $state->country_code_id = $data['country_code_id'];
         $state->save();
         return $state;
     }
@@ -289,6 +292,33 @@ class CommonRepository
             return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
         }
     }
+
+
+
+    public function getAllCountry(int $perPage = 15, $country = null, $limit = 10)
+    {
+        $query = CountryCode::query()
+            ->orderBy('country_code', 'ASC');
+    
+        if (!empty($country)) {
+            $query->where('country_code', 'like', "%{$country}%")
+                  ->orWhere('country_name', 'like', "%{$country}%");
+        }
+    
+        $totalRecords = $query->count(); // Move before paginate for performance
+        $paginatedCountryCodes = $query->paginate($perPage);
+    
+        return [
+            'country_codes' => $paginatedCountryCodes,
+            'totalRecords' => $totalRecords,
+        ];
+    }
+
+    public function getAllCountries( $country = null)
+    {
+            return CountryCode::orderBy('country_code', 'ASC')->get();
+    }
+    
     
 
 }

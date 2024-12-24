@@ -21,9 +21,12 @@ class CommonController extends Controller
         $update_item = $this->commonRepository->getStateById($update_id);
         $state = $request->destination??"";
         $get_destinations = $this->commonRepository->getAllState(10,$state);
+        $countries = $this->commonRepository->getAllCountries();
+        // $country_codes = $get_countries['country_codes'];
+        // dd($country_codes);
         $states = $get_destinations['states'];  // Paginated data
         $common = CustomHelper::setHeadersAndTitle('Hotel Management', 'Destinations(States)');
-        return view('admin.state.index', array_merge(compact('states','update_item'), $common));
+        return view('admin.state.index', array_merge(compact('states','update_item','countries'), $common));
     }
 
     public function state_store(Request $request){
@@ -34,7 +37,11 @@ class CommonController extends Controller
                 'max:255',
                 Rule::unique('states', 'name')->whereNull('deleted_at'), // Ignore soft-deleted records
             ],
+            'country_code_id' => [
+                'required',
+            ],
         ], [
+            'country_code_id.required' => 'Please select country name.',
             'name.required' => 'Please enter destination name.',
             'name.unique' => 'This destination name already exists.',
         ]);
@@ -55,8 +62,11 @@ class CommonController extends Controller
                 'max:255',
                 Rule::unique('states', 'name')->ignore($request->id)->whereNull('deleted_at'),
             ],
-          
+          'country_code_id' => [
+                'required',
+            ],
         ], [
+            'country_code_id.required' => 'Please select country name.',
             'name.required' => 'The name field is required.',
         ]);
           // After validation, proceed to save the data
@@ -323,6 +333,24 @@ class CommonController extends Controller
             } catch (\Exception $e) {
                 return redirect()->back()->with('error', $e->getMessage());
             }
+        }
+
+
+
+        public function country_index(Request $request){
+          
+            $country = $request->country??"";
+            $get_countries = $this->commonRepository->getAllCountry(10,$country);
+            $country_codes = $get_countries['country_codes'];  // Paginated data
+            $common = CustomHelper::setHeadersAndTitle('Master Management', 'Countries');
+            // $data['country_codes'] = $get_countries['country_codes'];
+            // $fields = [
+            //     'country_code' => 'Country Code',
+            //     'country_name' => 'Country Name',
+            //     'phone_code' => 'Phone Code',
+            // ];
+            // dd($countries);
+            return view('admin.country.index', array_merge(compact('country_codes'), $common));
         }
     
 }

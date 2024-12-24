@@ -1,5 +1,6 @@
 @extends('layouts.master')
 @section('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
 @endsection
 @section('title', $pageTitle) <!-- This sets the page title dynamically -->
 @section('content')
@@ -39,7 +40,7 @@
                 <div class="table-responsive">
                     <x-global-table 
                         :items="$states" 
-                        :fields="['state_name', 'status']" 
+                        :fields="['state_name','Country', 'status']" 
                         dataType="states" 
                         :extra="[]"
                     />
@@ -58,6 +59,18 @@
                 <form action="{{route('admin.state.update')}}" method="post" id="update_plan">
                     @csrf
                     <div class="xl:col-span-4 lf:col-span-6 md:col-span-6 sm:col-span-12 col-span-12">
+                    <x-form-field 
+                            type="select" 
+                            name="country_code_id" 
+                            label="Country" 
+                            :options="$countries->pluck('country_name', 'id')" 
+                            :value="old('country_code_id', $update_item->country_code_id ?? '')"
+                            class="js-example-basic-single"
+                        />
+                        @error('country_code_id')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                    
                     <x-form-field 
                         type="text" 
                         name="name" 
@@ -88,7 +101,20 @@
                 <form action="{{route('admin.state.store')}}" method="post">
                     @csrf
                     <div class="xl:col-span-4 lf:col-span-6 md:col-span-6 sm:col-span-12 col-span-12">
-                        <x-form-field 
+                    <x-form-field 
+                            type="select" 
+                            name="country_code_id" 
+                            label="Country" 
+                            :options="$countries->pluck('country_name', 'id')" 
+                            :value="old('country_code_id', $update_item->country_code_id ?? '')"
+                            class="js-example-basic-single"
+                            
+                        />
+                        @error('country_code_id')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                    
+                    <x-form-field 
                             type="text" 
                             name="name" 
                             label="Name" 
@@ -113,6 +139,10 @@
 
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 
+<!-- Select2 Cdn -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+@vite('resources/assets/js/select2.js')
 @endsection
 

@@ -39,7 +39,7 @@
 										<a href="{{route('admin.state.index')}}" class="side-menu__item">States</a>
 									</li> -->
 									<li class="slide">
-										<a href="{{url('index')}}" class="side-menu__item">Cities</a>
+										<a href="{{route('admin.country.index')}}" class="side-menu__item">Countries</a>
 									</li>
 								</ul>
 							</li>

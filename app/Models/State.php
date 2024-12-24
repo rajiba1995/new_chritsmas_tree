@@ -11,8 +11,14 @@ class State extends Model
     use HasFactory,SoftDeletes;
     protected $fillable = [
         'id',
+        'country_code_id',
         'name',
         'status',
     ];
+
+    public function country()
+    {
+        return $this->belongsTo(CountryCode::class, 'country_code_id', 'id');
+    }
 
 }
