@@ -129,4 +129,16 @@ class CustomHelper
         // Return the retrieved item_price or the existing price if null
         return intval($item_price ?? $existing_price);
     }
+    public static function GetHotelWiseMaxPrice($existing_price, $room_id, $item_title,$start_date,$end_date){
+       
+         // Attempt to get the item_price from the database
+        $item_price = DateWiseHotelPrice::where('room_id', $room_id)
+        ->where('item_title', $item_title)
+        ->whereBetween('date', [$start_date, $end_date])
+        ->max('item_price');
+
+        // Return the retrieved item_price or the existing price if null
+        return intval($item_price ?? $existing_price);
+       
+    }
 }

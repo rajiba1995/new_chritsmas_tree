@@ -67,16 +67,16 @@
 </div>
 @if(count($dateRange)>0)
 <div class="date-pick-row !mb-3">
-    <button class="ti-btn-primary-full !py-1 pt-0 ti-btn-wave  me-[0.375rem] active" id="go_to_step2" onclick="ShowSecondStep()"><i class="fa-solid fa-plus"></i>Upload Your Inventory (BULK)</button>
+    <button class="ti-btn-primary-full !py-1 pt-0 ti-btn-wave  me-[0.375rem] {{ $activeButtonid == 'second' ? 'active' : 'hidden' }}" id="go_to_step2" wire:click="TabChange('second')"><i class="fa-solid fa-plus"></i>Upload Your Inventory (BULK)</button>
 </div>
 @endif
 <div class="date-pick-row !mb-3">
-    <button class="ti-btn-danger-full !py-1 !px-2 ti-btn-wave  me-[0.375rem] hidden" id="back_to_step1"  onclick="ShowFirstStep()"><i class="fa-solid fa-caret-left"></i>Back</button>
+    <button class="ti-btn-danger-full !py-1 !px-2 ti-btn-wave  me-[0.375rem] {{ $activeButtonid == 'first' ? 'active' : 'hidden' }}" id="back_to_step1" wire:click="TabChange('first')"><i class="fa-solid fa-caret-left"></i>Back</button>
 </div>
 
 @if(count($dateRange)>0)
  {{-- Dynamic from here --}}
- <div id="step1" class="active">
+ <div id="step1" class="{{ $activeButtonid == 'second' ? 'active' : 'hidden' }}">
     <div class="top-cta-row">
         <div class="cta-block">
             <div class="col2">
@@ -84,11 +84,11 @@
                 <div class="cta-row">
                     <button type="button" class="yellow" id="button_test">Availability Mail</button>
                     <div class="btn-dropdown">
-                        <button type="button" class="btn-drop yellow" wire:click="BlockRequestItem('yellow')">
+                        <button type="button" class="btn-drop yellow" onclick="BlockRequestItem('yellow')">
                             Block Request
                             <img src="{{asset('build/assets/images/inventory/down-angle.png')}}">
                         </button>
-                        <div class="dropbox yellow {{ $activeBlockRequesttype == 'yellow'? 'active' : '' }}">
+                        <div id="bulk_block_request"  class="dropbox yellow">
                             <label for="yellowhardBlock1" class="radio-label">
                                 <input type="radio" id="yellowhardBlock1" name="hsblock1">
                                 Hard Block
@@ -114,11 +114,11 @@
                 <div class="cta-row">
                     <button type="button" class="green">Availability Mail</button>
                     <div class="btn-dropdown">
-                        <button type="button" class="btn-drop green" wire:click="BlockRequestItem('green')">
+                        <button type="button" class="btn-drop green" onclick="BlockRequestItem('green')">
                             Block Request
                             <img src="{{asset('build/assets/images/inventory/down-angle.png')}}">
                         </button>
-                        <div class="dropbox green {{ $activeBlockRequesttype == 'green'? 'active' : '' }}">
+                        <div id="fresh_block_request" class="dropbox green">
                             <label for="hardBlock1" class="radio-label">
                                 <input type="radio" id="hardBlock1" name="hsblock1">
                                 Hard Block
@@ -161,8 +161,8 @@
                     @endforeach
                 </ul>
                 <div id="inventory_scroll">
-                    <button id="scrollLeft" class="scroll-button" wire:click="scrollable('left')">&#11104;</button>
-                    <button id="scrollRight" class="scroll-button" wire:click="scrollable('right')">&#11106;</button>
+                    <button id="scrollLeft" class="scroll-button" onclick="scrollable('left')">&#11104;</button>
+                    <button id="scrollRight" class="scroll-button" onclick="scrollable('right')">&#11106;</button>
                 </div>
             </div>
         </div>
@@ -170,7 +170,7 @@
             @forelse ($room_category as $room)
                 <div class="accordion-item">
                     <div class="accordion-header {{ $activeAccordionId == $room->id ? 'active' : '' }}">
-                        <div class="header-left" wire:click="accordionItem({{$room->id}})" onclick="FetchLoader()">
+                        <div class="header-left" wire:click="accordionItem({{$room->id}})">
                             <span class="badge bg-primary/10 text-primary">{{$room->room_name}}</span>
                             <img src="{{asset('build/assets/images/inventory/up-arrow.png')}}" alt="">
                         </div>
@@ -203,32 +203,7 @@
                                         </div>
                                         <div class="block">
                                             @forelse ($hotel_addon_plan_title as $k =>$addon_plan_titles)
-                                                <label><span class="badge bg-outline-primary cursor-pointer" wire:click="accordionAddonItem({{$room->id}}, {{$k}})">{{$addon_plan_titles}}</span></label>
-                                                @php
-                                                $hotel_addon_plan_items = App\Models\HotelPriceChart::where('hotel_id', $selectedHotel)
-                                                    ->where('room_id', $room->id)
-                                                    ->where('plan_title', $addon_plan_titles)
-                                                    ->where('item_price', '>', 0)
-                                                    ->groupBy('plan_item', 'item_price') // Include all columns you want to group
-                                                    ->get(['plan_item', 'item_price']) // Specify the columns explicitly for grouping
-                                                    ->pluck('item_price', 'plan_item') // Use pluck to get 'plan_item' => 'item_price' mapping
-                                                    ->toArray();
-                                                @endphp
-                                                <div class="{{ $activeAccordionAddonId == $room->id && $activeAddonItem===$k? 'block' : 'hidden' }}">
-                                                    @forelse ($hotel_addon_plan_items as $addon_plan_item => $addon_plan_price)
-                                                        <label class="cursor-pointer">
-                                                            <input type="radio" name="addon_item_{{ $room->id }}" value="{{ $addon_plan_price }}" wire:change="AppendAddOnPrice({{ $room->id }}, {{ $k }}, {{ $addon_plan_price }})">
-                                                            <span class="text-dark">{{ $addon_plan_item }}</span> 
-                                                            <span class="text-muted"> - {{ $addon_plan_price }}</span>
-                                                        </label>
-                                                    @empty
-                                                        <div class="alert alert-danger">
-                                                            <p>No add-on items have been added yet.</p>
-                                                        </div>
-                                                    @endforelse
-
-                                                </div>
-                                                
+                                                <label><span class="badge bg-outline-primary cursor-pointer">{{$addon_plan_titles}}</span></label>
                                             @empty
                                                 <div class="alert alert-danger">
                                                     <p>No add-on items have beed added yet.</p>
@@ -334,7 +309,8 @@
         </div>
     </div>
  </div>
- <div id="step2" class="hidden">
+ 
+ <div id="step2" class="{{ $activeButtonid == 'first' ? 'active' : 'hidden' }}">
     <div class="grid grid-cols-12 gap-6">
         <div class="xl:col-span-12 col-span-12">
             <div class="box custom-box">
@@ -342,14 +318,14 @@
                     <div class="top-cta-row">
                         <div class="column1">
                             <div class="date-pick-row">
-                                <label for="startDate" class="customDatePicker">
-                                    <input type="date" id="startDate" class="dateInput">
-                                    <span>Start Date</span>
+                                <label for="startDate1" class="customDatePicker">
+                                    <input type="date" id="startDate1" class="dateInput">
+                                    <span>{{$start_date?date('F d, Y',strtotime($start_date)):"Start Date"}}</span>
                                 </label>
                                 &nbsp; - &nbsp;
-                                <label for="endDate" class="customDatePicker">
-                                    <input type="date" id="endDate" class="dateInput">
-                                    <span>End Date</span>
+                                <label for="endDate1" class="customDatePicker">
+                                    <input type="date" id="endDate1" class="dateInput">
+                                    <span>{{$end_date?date('F d, Y',strtotime($end_date)):"End Date"}}</span>
                                 </label>
                             </div>
                         </div>
@@ -402,11 +378,11 @@
                                     </li>
                                 </ul>
                                 <div class="extra-days">
-                                    <button type="button" class="btn-extra">
+                                    <button type="button" class="btn-extra" onclick="ShowExtraDays()">
                                         View Calendar
-                                        <img src="../../build/assets/images/inventory/down-angle.png">
+                                        <img src="{{asset('build/assets/images/inventory/down-angle.png')}}">
                                     </button>
-                                    <div class="extra-drop">
+                                    <div class="extra-drop" id="extra_drop" >
                                         <ul>
                                             <li>
                                                 <label for="exd1" class="custom-exd">
@@ -576,136 +552,123 @@
                     
                     <div class="bottom-content">
                         <div class="accordion">
-                            
-                            <div class="accordion-item">
-                                <div class="accordion-header">
-                                    <span class="badge bg-primary/10 text-primary">Standard</span>
-                                    <img src="../../build/assets/images/inventory/up-arrow.png" alt="">
-                                    <input type="text" class="green" value="2">
-                                </div>
-                                <div class="accordion-body">
-                                    <h3><span class="badge bg-primary text-white">Price Chart</span></h3>
-                                    <table>
-                                        <tr>
-                                            <td valign="top"><span class="badge gap-2 bg-primary/10 text-primary">CP</span></td>
-                                            <td>
-                                                <div class="badges-wrapper">
-                                                    <label><span class="badge bg-outline-primary">2<img src="../../build/assets/images/inventory/user.png" alt="person"></span></label>
-                                                    <label><span class="badge bg-outline-primary">1<img src="../../build/assets/images/inventory/user.png" alt="person"></span></label>
+                             @forelse ($room_category as $room)
+                                <div class="accordion-item">
+                                    <div class="accordion-header {{ $activeSecondAccordionId == $room->id ? 'active' : '' }}" wire:click="SecondAccordionItem({{$room->id}})">
+                                        <span class="badge bg-primary/10 text-primary">{{$room->room_name}}</span>
+                                        <img src="{{asset('build/assets/images/inventory/up-arrow.png')}}" alt="">
+                                        <input type="text" class="green" value="2">
+                                    </div>
+                                    <div class="accordion-body {{ $activeSecondAccordionId == $room->id ? 'active' : '' }}">
+                                        @if($hotel_seasion_times)
+                                            @if(count($room_plan_items)>0)
+                                                <h3><span class="badge bg-primary text-white">Price Chart</span></h3>
+                                                <table>
+                                                    <tr>
+                                                        <td valign="top">
+                                                            {{-- <span class="badge gap-2 bg-primary/10 text-primary">CP</span> --}}
+                                                            <select class="badge gap-2 bg-primary/10 text-primary" name="plan_items" wire:change="FilterRoomCatgeory($event.target.value)">
+                                                                @foreach ($room_plan_items as $plan_item_key =>$plan_items)
+                                                                    <option value="{{$plan_items['plan_item']}}" {{$plan_items['plan_item']=="CP"?"selected":""}}>{{$plan_items['plan_item']}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <div class="badges-wrapper">
+                                                                <label><span class="badge bg-outline-primary">2<img src="{{asset('build/assets/images/inventory/user.png')}}" alt="person"></span></label>
+                                                                <label><span class="badge bg-outline-primary">1<img src="{{asset('build/assets/images/inventory/user.png')}}" alt="person"></span></label>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <ul>
+                                                                <li><input type="text" value="{{ App\Helpers\CustomHelper::GetHotelWiseMaxPrice($selected_plan_item_price,$room->id,'2 Person', $start_date, $end_date) }}"></li>
+                                                                <li><input type="text" value="{{ App\Helpers\CustomHelper::GetHotelWiseMaxPrice($selected_plan_item_price,$room->id,'1 Person', $start_date, $end_date) }}"></li>
+                                                            </ul>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td valign="top"><span class="badge gap-2 bg-primary/10 text-primary">Add-On</span></td>
+                                                        <td>
+                                                            @forelse ($hotel_addon_plan_title as $k =>$addon_plan_titles)
+                                                                <label><span class="badge bg-outline-primary cursor-pointer" wire:click="accordionAddonItem({{$room->id}}, {{$k}})">{{$addon_plan_titles}}</span></label>
+                                                                @php
+                                                                $hotel_addon_plan_items = App\Models\HotelPriceChart::where('hotel_id', $selectedHotel)
+                                                                    ->where('room_id', $room->id)
+                                                                    ->where('plan_title', $addon_plan_titles)
+                                                                    ->where('item_price', '>', 0)
+                                                                    ->groupBy('plan_item', 'item_price') // Include all columns you want to group
+                                                                    ->get(['plan_item', 'item_price']) // Specify the columns explicitly for grouping
+                                                                    ->pluck('item_price', 'plan_item') // Use pluck to get 'plan_item' => 'item_price' mapping
+                                                                    ->toArray();
+                                                                @endphp
+                                                                <div class="{{ $activeAccordionAddonId == $room->id && $activeAddonItem===$k? 'block' : 'hidden' }}">
+                                                                    @forelse ($hotel_addon_plan_items as $addon_plan_item => $addon_plan_price)
+                                                                        <label class="cursor-pointer">
+                                                                            <input type="radio" name="addon_item_{{ $room->id }}" value="{{ $addon_plan_price }}" wire:change="AppendAddOnPrice({{ $room->id }}, {{ $k }}, {{ $addon_plan_price }})">
+                                                                            <span class="text-dark">{{ $addon_plan_item }}</span> 
+                                                                            <span class="text-muted"> - {{ $addon_plan_price }}</span>
+                                                                        </label>
+                                                                    @empty
+                                                                        <div class="alert alert-danger">
+                                                                            <p>No add-on items have been added yet.</p>
+                                                                        </div>
+                                                                    @endforelse
+
+                                                                </div>
+                                                                
+                                                            @empty
+                                                                <div class="alert alert-danger">
+                                                                    <p>No add-on items have beed added yet.</p>
+                                                                </div>
+                                                            @endforelse
+                                                        </td>
+                                                        <td>
+                                                            <ul>
+                                                                <li><input type="text" value="123"></li>
+                                                                <li><input type="text" value="123"></li>
+                                                                <li><input type="text" value="123"></li>
+                                                            </ul>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                                @else
+                                                <div class="left left-content">
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <ul>
-                                                    <li><input type="text" value="2345"></li>
-                                                    <li><input type="text" value="1234"></li>
-                                                </ul>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td valign="top"><span class="badge gap-2 bg-primary/10 text-primary">Add-On</span></td>
-                                            <td>
-                                                <label><span class="badge bg-outline-primary">Extra Adult<img src="../../build/assets/images/inventory/user.png" alt="person"></span></label>
-                                                <label><span class="badge bg-outline-primary">Child (0 - 6)</span></label>
-                                                <label><span class="badge bg-outline-primary">Child (7 - 12)</span></label>
-                                            </td>
-                                            <td>
-                                                <ul>
-                                                    <li><input type="text" value="123"></li>
-                                                    <li><input type="text" value="123"></li>
-                                                    <li><input type="text" value="123"></li>
-                                                </ul>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </div>
-                            
-                            <div class="accordion-item">
-                                <div class="accordion-header">
-                                    <span class="badge bg-primary/10 text-primary">Delux</span>
-                                    <img src="../../build/assets/images/inventory/up-arrow.png" alt="">
-                                    <input type="text" class="blue" value="3">
-                                </div>
-                                <div class="accordion-body">
-                                    <h3><span class="badge bg-primary text-white">Price Chart</span></h3>
-                                    <table>
-                                        <tr>
-                                            <td valign="top"><span class="badge gap-2 bg-primary/10 text-primary">CP</span></td>
-                                            <td>
-                                                <div class="badges-wrapper">
-                                                    <label><span class="badge bg-outline-primary">2<img src="../../build/assets/images/inventory/user.png" alt="person"></span></label>
-                                                    <label><span class="badge bg-outline-primary">1<img src="../../build/assets/images/inventory/user.png" alt="person"></span></label>
+                                                <div class="right-content">
+                                                    <div class="my-4">
+                                                            <p>No plan item selling price have been assigned to this room category: <strong>{{ $room->room_name }}</strong> 
+                                                                <a href="{{ route('admin.hotel.index', ['quick_search'=>$selectedHotel]) }}" class="badge bg-danger/10 text-danger custom_button_text">
+                                                                    Click here to add plan item price
+                                                                </a>
+                                                            </p>
+                                                    </div>
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <ul>
-                                                    <li><input type="text" value="2345"></li>
-                                                    <li><input type="text" value="1234"></li>
-                                                </ul>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td valign="top"><span class="badge gap-2 bg-primary/10 text-primary">Add-On</span></td>
-                                            <td>
-                                                <label><span class="badge bg-outline-primary">Extra Adult<img src="../../build/assets/images/inventory/user.png" alt="person"></span></label>
-                                                <label><span class="badge bg-outline-primary">Child (0 - 6)</span></label>
-                                                <label><span class="badge bg-outline-primary">Child (7 - 12)</span></label>
-                                            </td>
-                                            <td>
-                                                <ul>
-                                                    <li><input type="text" value="123"></li>
-                                                    <li><input type="text" value="123"></li>
-                                                    <li><input type="text" value="123"></li>
-                                                </ul>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </div>
-                            
-                            <div class="accordion-item">
-                                <div class="accordion-header">
-                                    <span class="badge bg-primary/10 text-primary">Premium</span>
-                                    <img src="../../build/assets/images/inventory/up-arrow.png" alt="">
-                                    <input type="text" class="green" value="2">
-                                </div>
-                                <div class="accordion-body">
-                                    <h3><span class="badge bg-primary text-white">Price Chart</span></h3>
-                                    <table>
-                                        <tr>
-                                            <td valign="top"><span class="badge gap-2 bg-primary/10 text-primary">CP</span></td>
-                                            <td>
-                                                <div class="badges-wrapper">
-                                                    <label><span class="badge bg-outline-primary">2<img src="../../build/assets/images/inventory/user.png" alt="person"></span></label>
-                                                    <label><span class="badge bg-outline-primary">1<img src="../../build/assets/images/inventory/user.png" alt="person"></span></label>
+                                            @endif
+                                        @else
+                                            <div class="left left-content">
+                                            </div>
+                                            <div class="right-content">
+                                                <div class="my-4">
+                                                        <p>No seasion dates have been assigned to this hotel yet. 
+                                                            <a href="{{ route('admin.hotel.edit', $selectedHotel) }}" class="badge bg-danger/10 text-danger custom_button_text">
+                                                                Click here to add seasion date range
+                                                            </a>
+                                                        </p>
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <ul>
-                                                    <li><input type="text" value="2345"></li>
-                                                    <li><input type="text" value="1234"></li>
-                                                </ul>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td valign="top"><span class="badge gap-2 bg-primary/10 text-primary">Add-On</span></td>
-                                            <td>
-                                                <label><span class="badge bg-outline-primary">Extra Adult<img src="../../build/assets/images/inventory/user.png" alt="person"></span></label>
-                                                <label><span class="badge bg-outline-primary">Child (0 - 6)</span></label>
-                                                <label><span class="badge bg-outline-primary">Child (7 - 12)</span></label>
-                                            </td>
-                                            <td>
-                                                <ul>
-                                                    <li><input type="text" value="123"></li>
-                                                    <li><input type="text" value="123"></li>
-                                                    <li><input type="text" value="123"></li>
-                                                </ul>
-                                            </td>
-                                        </tr>
-                                    </table>
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
+                            @empty
+                            <!-- Content to display if $room_category is empty -->
+                            <div class="alert alert-danger">
+                                <p>No room found. 
+                                    <a href="{{ route('admin.hotel.edit', $selectedHotel) }}" class="badge bg-primary/10 text-primary custom_button_text">
+                                        Click here to add a room
+                                    </a>
+                                </p>
                             </div>
-                            
+                            @endforelse
                         </div>
                     </div>
                 </div>
@@ -720,142 +683,13 @@
         </div>
     @endif
 @endif
-{{-- <div wire:loading class="loader">
+<div wire:loading class="loader">
     <div class="spinner">
     <img src="{{asset('build/assets/images/media/loader.svg')}}" alt="">
     </div>
-</div> --}}
+</div>
 </div>
 
 @section('scripts')
-<script>
-    window.addEventListener('append_addOn_price', function(event) { 
-        const room_id = event.detail[0].room_id;
-        const item = event.detail[0].item;
-        const price = event.detail[0].price;
-
-        // Construct the input field selector
-        const inputFields = document.querySelectorAll(`.addon-plan-item-price-${room_id}-${item}`);
-        // Set the value if the field is found
-        if (inputFields) {
-            inputFields.forEach(inputField=>{
-                inputField.value = price;
-            });
-        }
-    });
-
-
-    // Listen for the 'inventory-scroller' event
-    window.addEventListener('inventory-scroller', function (event) {
-        // Grab the scrollable divs and buttons
-        const scrollableDivs = document.querySelectorAll('.scrollable');
-        const scrollLeftBtn = document.getElementById('scrollLeft');
-        const scrollRightBtn = document.getElementById('scrollRight');
-
-        const syncScroll = (source) => {
-            scrollableDivs.forEach(div => {
-                if (div !== source) {
-                div.scrollLeft = source.scrollLeft;
-                }
-            });
-        };
-
-
-    scrollableDivs.forEach(div => {
-        div.addEventListener('scroll', function () {
-            syncScroll(div);
-        //   updateButtonsVisibility();
-        });
-    });
-
-    const smoothScroll = (direction) => {
-        scrollableDivs.forEach(div => {
-            const targetScrollLeft = div.scrollLeft + direction;
-            const startScrollLeft = div.scrollLeft;
-            const distance = targetScrollLeft - startScrollLeft;
-            const duration = 300;
-            const startTime = performance.now();
-            const animateScroll = (currentTime) => {
-                const timeElapsed = currentTime - startTime;
-                const progress = Math.min(timeElapsed / duration, 1);
-                const newScrollLeft = startScrollLeft + distance * progress;
-        
-                div.scrollLeft = newScrollLeft;
-        
-                if (progress < 1) {
-                    requestAnimationFrame(animateScroll);
-                }
-            };
-        
-            requestAnimationFrame(animateScroll); 
-        });
-
-        // updateButtonsVisibility();
-    };
-
-        if (scrollLeftBtn && scrollRightBtn) {
-            scrollLeftBtn.addEventListener('click', () => {
-                smoothScroll(-50);
-            });
-
-            scrollRightBtn.addEventListener('click', () => {
-                if (scrollRightBtn.id) {
-                    smoothScroll(50);
-                }
-            });
-        } else {
-            console.log('Scroll buttons not found.');
-        }
-
-    });
-
-    function ShowSecondStep() {
-        // Get the elements
-        const step1 = document.getElementById('step1');
-        const step2 = document.getElementById('step2');
-        const go_to_step2 = document.getElementById('go_to_step2');
-        const back_to_step1 = document.getElementById('back_to_step1');
-
-        // Remove 'active' class from step 1 and add 'hidden'
-        step1.classList.remove('active');
-        step1.classList.add('hidden');
-
-        go_to_step2.classList.add('hidden');
-        go_to_step2.classList.remove('active');
-
-        // Remove 'hidden' class from back_to_step1 and add 'active'
-        back_to_step1.classList.add('active');
-        back_to_step1.classList.remove('hidden');
-
-        // Add 'active' class to step 2 and remove 'hidden'
-        step2.classList.remove('hidden');
-        step2.classList.add('active');
-    }
-    function ShowFirstStep() {
-        // Get the elements
-        const step1 = document.getElementById('step1');
-        const step2 = document.getElementById('step2');
-        const go_to_step2 = document.getElementById('go_to_step2');
-        const back_to_step1 = document.getElementById('back_to_step1');
-
-        // Remove 'active' class from step 1 and add 'hidden'
-        step1.classList.add('active');
-        step1.classList.remove('hidden');
-
-        go_to_step2.classList.remove('hidden');
-        go_to_step2.classList.add('active');
-
-        // Remove 'hidden' class from back_to_step1 and add 'active'
-        back_to_step1.classList.remove('active');
-        back_to_step1.classList.add('hidden');
-
-        // Add 'active' class to step 2 and remove 'hidden'
-        step2.classList.add('hidden');
-        step2.classList.remove('active');
-    }
-
-</script>
-
-</script>
 <script src="{{asset('build/assets/libs/inventory.js')}}"></script>
 @endsection

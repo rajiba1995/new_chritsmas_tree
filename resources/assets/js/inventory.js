@@ -1,34 +1,43 @@
-document.addEventListener("DOMContentLoaded", function () {
+
+window.addEventListener('append_addOn_price', function(event) { 
+  const room_id = event.detail[0].room_id;
+  const item = event.detail[0].item;
+  const price = event.detail[0].price;
+
+  // Construct the input field selector
+  const inputFields = document.querySelectorAll(`.addon-plan-item-price-${room_id}-${item}`);
+  // Set the value if the field is found
+  if (inputFields) {
+      inputFields.forEach(inputField=>{
+          inputField.value = price;
+      });
+  }
+});
+
+
+// Listen for the 'inventory-scroller' event
+function scrollable(direction) {
+  // Grab the scrollable divs and buttons
   const scrollableDivs = document.querySelectorAll('.scrollable');
-  const accordionHeaders = document.querySelectorAll('.accordion-header');
-  
   const scrollLeftBtn = document.getElementById('scrollLeft');
   const scrollRightBtn = document.getElementById('scrollRight');
-  
+
   const syncScroll = (source) => {
       scrollableDivs.forEach(div => {
-        if (div !== source) {
+          if (div !== source) {
           div.scrollLeft = source.scrollLeft;
-        }
+          }
       });
   };
 
-  // const updateButtonsVisibility = () => {
-  //     const allDivs = Array.from(scrollableDivs);
-  //     const isScrolledToStart = allDivs.every(div => div.scrollLeft === 0);
-  //     const isScrolledToEnd = allDivs.every(div => div.scrollLeft + div.clientWidth === div.scrollWidth);
-      
-  //     scrollLeftBtn.style.display = isScrolledToStart ? 'none' : 'block';
-  //     scrollRightBtn.style.display = isScrolledToEnd ? 'none' : 'block';
-  // };
 
   scrollableDivs.forEach(div => {
       div.addEventListener('scroll', function () {
-        syncScroll(div);
+          syncScroll(div);
       //   updateButtonsVisibility();
       });
   });
-  
+
   const smoothScroll = (direction) => {
       scrollableDivs.forEach(div => {
           const targetScrollLeft = div.scrollLeft + direction;
@@ -36,7 +45,6 @@ document.addEventListener("DOMContentLoaded", function () {
           const distance = targetScrollLeft - startScrollLeft;
           const duration = 300;
           const startTime = performance.now();
-      
           const animateScroll = (currentTime) => {
               const timeElapsed = currentTime - startTime;
               const progress = Math.min(timeElapsed / duration, 1);
@@ -51,44 +59,82 @@ document.addEventListener("DOMContentLoaded", function () {
       
           requestAnimationFrame(animateScroll); 
       });
-  
+
       // updateButtonsVisibility();
   };
-  
-  scrollLeftBtn.addEventListener('click', () => {
-      smoothScroll(-50);
-  });
-  
-  scrollRightBtn.addEventListener('click', () => {
-      smoothScroll(50); 
-  });
-  
-  // updateButtonsVisibility();
 
-accordionHeaders.forEach(header => {
-  header.addEventListener('click', function () {
-    document.querySelectorAll('.accordion-header').forEach(header => header.classList.remove('active'));  
-    document.querySelectorAll('.accordion-body').forEach(body => body.classList.remove('active'));
-    const body = this.nextElementSibling;
-    this.classList.add('active');
-    body.classList.add('active');
-  });
-});
+  if (scrollLeftBtn && scrollRightBtn) {
+      scrollLeftBtn.addEventListener('click', () => {
+          smoothScroll(-50);
+      });
 
-const btnDropdowns = document.querySelectorAll('.btn-drop');
+      scrollRightBtn.addEventListener('click', () => {
+          if (scrollRightBtn.id) {
+              smoothScroll(50);
+          }
+      });
+  } else {
+      console.log('Scroll buttons not found.');
+  }
 
-btnDropdowns.forEach(drop => {
-    drop.addEventListener('click', function() {
-      //   document.querySelectorAll('.dropbox').forEach(drop => drop.classList.remove('active'));
-        const dropBox = this.nextElementSibling;
-        
-        if(dropBox && dropBox.classList.contains('active')) {
-            dropBox.classList.remove('active');
-        } else {
-            dropBox.classList.add('active');
-        }
-    });
-});
+}
+
+function ShowSecondStep() {
+  // Get the elements
+  const step1 = document.getElementById('step1');
+  const step2 = document.getElementById('step2');
+  const go_to_step2 = document.getElementById('go_to_step2');
+  const back_to_step1 = document.getElementById('back_to_step1');
+
+  // Remove 'active' class from step 1 and add 'hidden'
+  step1.classList.remove('active');
+  step1.classList.add('hidden');
+
+  go_to_step2.classList.add('hidden');
+  go_to_step2.classList.remove('active');
+
+  // Remove 'hidden' class from back_to_step1 and add 'active'
+  back_to_step1.classList.add('active');
+  back_to_step1.classList.remove('hidden');
+
+  // Add 'active' class to step 2 and remove 'hidden'
+  step2.classList.remove('hidden');
+  step2.classList.add('active');
+}
+function ShowFirstStep() {
+  // Get the elements
+  const step1 = document.getElementById('step1');
+  const step2 = document.getElementById('step2');
+  const go_to_step2 = document.getElementById('go_to_step2');
+  const back_to_step1 = document.getElementById('back_to_step1');
+
+  // Remove 'active' class from step 1 and add 'hidden'
+  step1.classList.add('active');
+  step1.classList.remove('hidden');
+
+  go_to_step2.classList.remove('hidden');
+  go_to_step2.classList.add('active');
+
+  // Remove 'hidden' class from back_to_step1 and add 'active'
+  back_to_step1.classList.remove('active');
+  back_to_step1.classList.add('hidden');
+
+  // Add 'active' class to step 2 and remove 'hidden'
+  step2.classList.add('hidden');
+  step2.classList.remove('active');
+}
+function BlockRequestItem(value) {
+  const yellow = document.getElementById('bulk_block_request');
+  const green = document.getElementById('fresh_block_request');
+  
+  if (value === "green") {
+      green.classList.toggle('active');  // Toggle 'active' class
+      green.classList.toggle('hide');   // Toggle 'hide' class
+  } else {
+      yellow.classList.toggle('active');  // Toggle 'active' class
+      yellow.classList.toggle('hide');   // Toggle 'hide' class
+  }
+}
 
 const customDatePicker = document.querySelectorAll('.customDatePicker');
 
@@ -112,8 +158,6 @@ customDatePicker.forEach(datePicker => {
       });
         
     });
-});
-
 });
 
 function formatDate(date) {

@@ -28,7 +28,9 @@ class HotelWiseInventory extends Component
     public $start_date = null;
     public $end_date = null;
     public $room_category = null;
+    public $activeButtonid = 'second';
     public $activeAccordionId = null;
+    public $activeSecondAccordionId = null;
     public $activeAccordionAddonId = null;
     public $activeAddonItem = null;
     public $activeBlockRequesttype = null;
@@ -265,22 +267,32 @@ class HotelWiseInventory extends Component
     public function FilterRoomCatgeory($hotel_seasion_item_type){
         $this->RoomCatWisePriceChart($this->selectedRoomId, $hotel_seasion_item_type);
     }
-    public function BlockRequestItem($type)
-    {
-        // Toggle active accordion item
-        if ($this->activeBlockRequesttype === $type) {
-            $this->activeBlockRequesttype = null; // Collapse if the same item is clicked again
+
+    // public function scrollable($direction)
+    // {
+    //     // You can log or process the direction if needed
+    //     $this->scroll_direction = $direction;
+    //   // Dispatch a browser event to notify the frontend to show an alert
+    //   $this->dispatch('inventory-scroller', ['message' => 'Scrolling to: ' . $direction]);
+    // }
+
+    public function TabChange($value){
+        if ($value === 'second') {
+            $this->activeButtonid = 'first'; // Collapse if the same item is clicked again
         } else {
-            $this->activeBlockRequesttype = $type; // Set the clicked item as active
+            $this->activeButtonid = 'second'; // Set the clicked item as active
         }
     }
-    public function scrollable($direction)
-    {
-        // You can log or process the direction if needed
-        $this->scroll_direction = $direction;
-
-      // Dispatch a browser event to notify the frontend to show an alert
-      $this->dispatch('inventory-scroller', ['message' => 'Scrolling to: ' . $direction]);
+    // Second Tab
+   public function SecondAccordionItem($id){
+        // Toggle active accordion item
+        if ($this->activeSecondAccordionId === $id) {
+            $this->activeSecondAccordionId = null; // Collapse if the same item is clicked again
+        } else {
+            $this->activeSecondAccordionId = $id; // Set the clicked item as active
+        }
+        $this->RoomCatWisePriceChart($id);
+        $this->RoomWiseAddonPriceChart($id);
     }
 
     public function render()

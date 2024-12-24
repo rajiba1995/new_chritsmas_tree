@@ -40,11 +40,11 @@
         {{-- <div id="loader">
             <img src="{{asset('build/assets/images/media/loader.svg')}}" alt="">
         </div> --}}
-        <div class="loader" id="loader" style="display: none;">
+        {{-- <div class="loader" id="loader" style="display: none;">
             <div class="spinner">
             <img src="{{asset('build/assets/images/media/loader.svg')}}" alt="">
             </div>
-        </div> 
+        </div>  --}}
         <!-- Loader -->
 
         <div class="page">
