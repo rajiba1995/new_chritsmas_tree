@@ -55,23 +55,23 @@
 <div class="date-pick-row !mb-3">
     <div class="inputs-wrapper">
         <label for="startDate" class="customDatePicker">
-            <input type="date" id="startDate" class="dateInput" wire:change="FilterDate($event.target.value, endDate.value, hotel.value)" value="{{$start_date}}" >
+            <input type="date" id="startDate" class="dateInput" wire:change="FilterDate($event.target.value, endDate.value, hotel.value)" value="{{$start_date}}" min="{{date('Y-m-d')}}">
             <span>{{$start_date?date('F d, Y',strtotime($start_date)):"Start Date"}}</span>
         </label>
         &nbsp; - &nbsp;
         <label for="endDate" class="customDatePicker">
-            <input type="date" id="endDate" class="dateInput" wire:change="FilterDate(startDate.value, $event.target.value, hotel.value)" value="{{$end_date}}">
+            <input type="date" id="endDate" class="dateInput" wire:change="FilterDate(startDate.value, $event.target.value, hotel.value)" value="{{$end_date}}" min="{{date('Y-m-d')}}">
             <span>{{$end_date?date('F d, Y',strtotime($end_date)):"End Date"}}</span>
         </label>
     </div>
 </div>
 @if(count($dateRange)>0)
-<div class="date-pick-row !mb-3">
-    <button class="ti-btn-primary-full !py-1 pt-0 ti-btn-wave  me-[0.375rem] {{ $activeButtonid == 'second' ? 'active' : 'hidden' }}" id="go_to_step2" wire:click="TabChange('second')"><i class="fa-solid fa-plus"></i>Upload Your Inventory (BULK)</button>
-</div>
+    <div class="date-pick-row !mb-3">
+        <button class="ti-btn-primary-full !py-1 pt-0 ti-btn-wave inventory_btn me-[0.375rem] {{ $activeButtonid == 'second' ? 'active' : 'hidden' }}" id="go_to_step2" wire:click="TabChange('second')"><i class="fa-solid fa-plus"></i>Upload Your Inventory (BULK)</button>
+    </div>
 @endif
 <div class="date-pick-row !mb-3">
-    <button class="ti-btn-danger-full !py-1 !px-2 ti-btn-wave  me-[0.375rem] {{ $activeButtonid == 'first' ? 'active' : 'hidden' }}" id="back_to_step1" wire:click="TabChange('first')"><i class="fa-solid fa-caret-left"></i>Back</button>
+    <button class="ti-btn-danger-full ti-btn-wave inventory_btn me-[0.375rem] {{ $activeButtonid == 'first' ? 'active' : 'hidden' }}" id="back_to_step1" wire:click="TabChange('first')"><i class="fa-solid fa-caret-left"></i>Back</button>
 </div>
 
 @if(count($dateRange)>0)
@@ -319,245 +319,170 @@
                         <div class="column1">
                             <div class="date-pick-row">
                                 <label for="startDate1" class="customDatePicker">
-                                    <input type="date" id="startDate1" class="dateInput">
+                                    <input type="date" id="startDate1" class="dateInput" min="{{date('Y-m-d')}}">
                                     <span>{{$start_date?date('F d, Y',strtotime($start_date)):"Start Date"}}</span>
                                 </label>
                                 &nbsp; - &nbsp;
                                 <label for="endDate1" class="customDatePicker">
-                                    <input type="date" id="endDate1" class="dateInput">
+                                    <input type="date" id="endDate1" class="dateInput" min="{{date('Y-m-d')}}">
                                     <span>{{$end_date?date('F d, Y',strtotime($end_date)):"End Date"}}</span>
                                 </label>
                             </div>
                         </div>
                         <div class="column2">
-                            <label>Selected Weekdays (7)</label>
+                            <label>Weekdays (7)</label>
                             <div class="bottom-row">
                                 <ul class="days-holder">
                                     <!--<li><button type="button" class="btn-day selected">S</button></li>-->
                                     <li>
                                         <label for="daycheck1" class="custom-day-check">
-                                            <input type="checkbox" name="day-check" id="daycheck1" checked>
+                                            <x-input-field 
+                                            type="checkbox" 
+                                            name="ignore_weekdays" 
+                                            wire:model="ignore_weekdays" 
+                                            id="daycheck1" value="Sun"/>
                                             <span>S</span>
                                         </label>
                                     </li>
                                     <li>
                                         <label for="daycheck2" class="custom-day-check">
-                                            <input type="checkbox" name="day-check" id="daycheck2">
+                                            <x-input-field 
+                                            type="checkbox" 
+                                            name="ignore_weekdays" 
+                                            wire:model="ignore_weekdays" 
+                                            id="daycheck2" value="Mon"/>
                                             <span>M</span>
                                         </label>
                                     </li>
                                     <li>
                                         <label for="daycheck3" class="custom-day-check">
-                                            <input type="checkbox" name="day-check" id="daycheck3">
+                                            <x-input-field 
+                                            type="checkbox" 
+                                            name="ignore_weekdays"  
+                                            wire:model="ignore_weekdays"
+                                            id="daycheck3" value="Tue"/>
                                             <span>T</span>
                                         </label>
                                     </li>
                                     <li>
                                         <label for="daycheck4" class="custom-day-check">
-                                            <input type="checkbox" name="day-check" id="daycheck4">
+                                            <x-input-field 
+                                            type="checkbox" 
+                                            name="ignore_weekdays" 
+                                            wire:model="ignore_weekdays" 
+                                            id="daycheck4" value="Wed"/>
                                             <span>W</span>
                                         </label>
                                     </li>
                                     <li>
                                         <label for="daycheck5" class="custom-day-check">
-                                            <input type="checkbox" name="day-check" id="daycheck5">
+                                            <x-input-field 
+                                            type="checkbox" 
+                                            name="ignore_weekdays" 
+                                            wire:model="ignore_weekdays" 
+                                            id="daycheck5" value="Thu"/>
                                             <span>T</span>
                                         </label>
                                     </li>
                                     <li>
                                         <label for="daycheck6" class="custom-day-check">
-                                            <input type="checkbox" name="day-check" id="daycheck6">
+                                            <x-input-field 
+                                            type="checkbox" 
+                                            name="ignore_weekdays" 
+                                            wire:model="ignore_weekdays" 
+                                            id="daycheck6" value="Fri"/>
                                             <span>F</span>
                                         </label>
                                     </li>
                                     <li>
                                         <label for="daycheck7" class="custom-day-check">
-                                            <input type="checkbox" name="day-check" id="daycheck7">
+                                            <x-input-field 
+                                            type="checkbox" 
+                                            name="ignore_weekdays"  
+                                            wire:model="ignore_weekdays"
+                                            id="daycheck7" value="Sat"/>
                                             <span>S</span>
                                         </label>
                                     </li>
                                 </ul>
                                 <div class="extra-days">
-                                    <button type="button" class="btn-extra" onclick="ShowExtraDays()">
+                                    <button class="btn-extra" wire:click="toggleExtraDays">
                                         View Calendar
                                         <img src="{{asset('build/assets/images/inventory/down-angle.png')}}">
                                     </button>
-                                    <div class="extra-drop" id="extra_drop" >
+                                    <div id="extra_drop" class="extra-drop {{$extra_days_status==2?"active":"hide"}}">
+                                        <div class="calender_header">
+                                            <span>{{$activeMonth}}</span>
+                                        </div>
                                         <ul>
+                                            @foreach ($dateRange as $date_item)
                                             <li>
-                                                <label for="exd1" class="custom-exd">
-                                                    <input type="checkbox" id="exd1">
+                                                <label for="exd{{ date('dmy', strtotime($date_item)) }}" class="custom-exd">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        name="ignore_othersdays[]" 
+                                                        wire:model="ignore_othersdays" 
+                                                        id="exd{{ date('dmy', strtotime($date_item)) }}" 
+                                                        value="{{ $date_item }}" 
+                                                        {{ in_array($date_item, $ignore_othersdays ?? []) ? 'checked' : '' }}>
+
                                                     <div class="exd-text">
-                                                        <span>Sun</span>
-                                                        <span>15</span>
+                                                        <span>{{ date('D', strtotime($date_item)) }}</span>
+                                                        <span>{{ date('d', strtotime($date_item)) }}</span>
                                                     </div>
                                                 </label>
                                             </li>
-                                            <li>
-                                                <label for="exd2" class="custom-exd">
-                                                    <input type="checkbox" id="exd2">
-                                                    <div class="exd-text">
-                                                        <span>Mon</span>
-                                                        <span>16</span>
-                                                    </div>
-                                                </label>
-                                            </li>
-                                            <li>
-                                                <label for="exd3" class="custom-exd">
-                                                    <input type="checkbox" id="exd3">
-                                                    <div class="exd-text">
-                                                        <span>Tue</span>
-                                                        <span>17</span>
-                                                    </div>
-                                                </label>
-                                            </li>
-                                            <li>
-                                                <label for="exd4" class="custom-exd">
-                                                    <input type="checkbox" id="exd4">
-                                                    <div class="exd-text">
-                                                        <span>Wed</span>
-                                                        <span>18</span>
-                                                    </div>
-                                                </label>
-                                            </li>
-                                            <li>
-                                                <label for="exd5" class="custom-exd">
-                                                    <input type="checkbox" id="exd5">
-                                                    <div class="exd-text">
-                                                        <span>Thu</span>
-                                                        <span>19</span>
-                                                    </div>
-                                                </label>
-                                            </li>
-                                            <li>
-                                                <label for="exd6" class="custom-exd">
-                                                    <input type="checkbox" id="exd6">
-                                                    <div class="exd-text">
-                                                        <span>Fri</span>
-                                                        <span>20</span>
-                                                    </div>
-                                                </label>
-                                            </li>
-                                            <li>
-                                                <label for="exd7" class="custom-exd">
-                                                    <input type="checkbox" id="exd7">
-                                                    <div class="exd-text">
-                                                        <span>Sat</span>
-                                                        <span>21</span>
-                                                    </div>
-                                                </label>
-                                            </li>
-                                            <li>
-                                                <label for="exd8" class="custom-exd">
-                                                    <input type="checkbox" id="exd8">
-                                                    <div class="exd-text">
-                                                        <span>Sun</span>
-                                                        <span>22</span>
-                                                    </div>
-                                                </label>
-                                            </li>
-                                            <li>
-                                                <label for="exd9" class="custom-exd">
-                                                    <input type="checkbox" id="exd9">
-                                                    <div class="exd-text">
-                                                        <span>Mon</span>
-                                                        <span>23</span>
-                                                    </div>
-                                                </label>
-                                            </li>
-                                            <li>
-                                                <label for="exd10" class="custom-exd">
-                                                    <input type="checkbox" id="exd10">
-                                                    <div class="exd-text">
-                                                        <span>Tue</span>
-                                                        <span>24</span>
-                                                    </div>
-                                                </label>
-                                            </li>
-                                            <li>
-                                                <label for="exd11" class="custom-exd">
-                                                    <input type="checkbox" id="exd11">
-                                                    <div class="exd-text">
-                                                        <span>Wed</span>
-                                                        <span>25</span>
-                                                    </div>
-                                                </label>
-                                            </li>
-                                            <li>
-                                                <label for="exd12" class="custom-exd">
-                                                    <input type="checkbox" id="exd12">
-                                                    <div class="exd-text">
-                                                        <span>Thu</span>
-                                                        <span>26</span>
-                                                    </div>
-                                                </label>
-                                            </li>
-                                            <li>
-                                                <label for="exd13" class="custom-exd">
-                                                    <input type="checkbox" id="exd13">
-                                                    <div class="exd-text">
-                                                        <span>Fri</span>
-                                                        <span>27</span>
-                                                    </div>
-                                                </label>
-                                            </li>
-                                            <li>
-                                                <label for="exd14" class="custom-exd">
-                                                    <input type="checkbox" id="exd14">
-                                                    <div class="exd-text">
-                                                        <span>Sat</span>
-                                                        <span>28</span>
-                                                    </div>
-                                                </label>
-                                            </li>
-                                            <li>
-                                                <label for="exd15" class="custom-exd">
-                                                    <input type="checkbox" id="exd15">
-                                                    <div class="exd-text">
-                                                        <span>Sun</span>
-                                                        <span>29</span>
-                                                    </div>
-                                                </label>
-                                            </li>
-                                            <li>
-                                                <label for="exd16" class="custom-exd">
-                                                    <input type="checkbox" id="exd16">
-                                                    <div class="exd-text">
-                                                        <span>Mon</span>
-                                                        <span>30</span>
-                                                    </div>
-                                                </label>
-                                            </li>
-                                            <li>
-                                                <label for="exd17" class="custom-exd">
-                                                    <input type="checkbox" id="exd17">
-                                                    <div class="exd-text">
-                                                        <span>Tue</span>
-                                                        <span>31</span>
-                                                    </div>
-                                                </label>
-                                            </li>
+                                            @endforeach
                                         </ul>
                                         <div class="cta">
-                                            <button type="button" class="btn-done">Next</button>
+                                            @if($showPrevButton)
+                                                <button type="button" class="btn-prev btn-back" wire:click="updateMonth(-1)">Previous</button>
+                                            @endif
+                                            @if($showNextButton)
+                                                <button type="button" class="btn-next btn-save" wire:click="updateMonth(1)">Next</button>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="column3">
-                            <button type="button" class="btn-save">Save</button>
+                            <button type="button" wire:click="UpdateInventory()" class="btn-save">Save</button>
                         </div>
                     </div>
-                    
+                    @if (session('store_error'))
+                        <div class="alert alert-danger">
+                            {{ session('store_error') }}
+                        </div>
+                    @endif
                     <div class="bottom-content">
                         <div class="accordion">
-                             @forelse ($room_category as $room)
+                             @forelse ($room_category as $index=> $room)
                                 <div class="accordion-item">
-                                    <div class="accordion-header {{ $activeSecondAccordionId == $room->id ? 'active' : '' }}" wire:click="SecondAccordionItem({{$room->id}})">
-                                        <span class="badge bg-primary/10 text-primary">{{$room->room_name}}</span>
-                                        <img src="{{asset('build/assets/images/inventory/up-arrow.png')}}" alt="">
-                                        <input type="text" class="green" value="2">
+                                    <div class="accordion-header {{ $activeSecondAccordionId == $room->id ? 'active' : '' }}">
+                                        <span class="badge bg-primary/10 text-primary" wire:click="SecondAccordionItem({{$room->id}})">{{$room->room_name}} <img src="{{asset('build/assets/images/inventory/up-arrow.png')}}" alt=""></span>
+                                        @if(in_array($room->id, $selected_room_id))
+                                            <x-input-field 
+                                                type="text" 
+                                                name="room_wise_quantity[{{$room->id}}]" 
+                                                class="green" 
+                                                id="room_wise_quantity_{{ $room->id }}" 
+                                                wire:model="room_wise_quantity.{{ $room->id }}" 
+                                                placeholder="0"
+                                                onkeyup="validateNumber(this)"
+                                                value=""
+                                            />
+                                        @endif
+                                       <!-- Checkbox -->
+                                        <x-input-field 
+                                        type="checkbox" 
+                                        name="selected_room_id[]" 
+                                        value="{{ $room->id }}" 
+                                        class="accordion_check_input" 
+                                        wire:model="selected_room_id" 
+                                        wire:change="toggleRoomWiseQuantity({{ $room->id }}, {{ $index }})"
+                                        {{ in_array($room->id, $selected_room_id ?? []) ? 'checked' : '' }} />
+
                                     </div>
                                     <div class="accordion-body {{ $activeSecondAccordionId == $room->id ? 'active' : '' }}">
                                         @if($hotel_seasion_times)
@@ -581,9 +506,51 @@
                                                         </td>
                                                         <td>
                                                             <ul>
-                                                                <li><input type="text" value="{{ App\Helpers\CustomHelper::GetHotelWiseMaxPrice($selected_plan_item_price,$room->id,'2 Person', $start_date, $end_date) }}"></li>
-                                                                <li><input type="text" value="{{ App\Helpers\CustomHelper::GetHotelWiseMaxPrice($selected_plan_item_price,$room->id,'1 Person', $start_date, $end_date) }}"></li>
+                                                                <li>
+                                                                    <!-- Text Input -->
+                                                                    @php
+                                                                        $this->selected_room_item[$room->id][0] = App\Helpers\CustomHelper::GetHotelWiseMaxPrice($selected_plan_item_price, $room->id, '2 Person', $start_date, $end_date);
+                                                                        $this->selected_room_item_name[$room->id][0] = '2 Person';
+                                                                    @endphp
+                                                                    <input 
+                                                                        type="text" 
+                                                                        name="selected_room_item[{{ $room->id }}][0]" 
+                                                                        wire:model="selected_room_item.{{ $room->id }}.0"
+                                                                        onkeyup="validateNumber(this)" 
+                                                                        value="{{$this->selected_room_item[$room->id][0]}}">
+                                                                    
+                                                                    <!-- Checkbox -->
+                                                                    <x-input-field 
+                                                                        type="checkbox" 
+                                                                        name="selected_room_item_checked[{{ $room->id }}][0]" 
+                                                                        class="accordion_check_input" 
+                                                                        wire:model="selected_room_item_checked.{{ $room->id }}.0"
+                                                                    />
+                                                                </li>
+                                                            
+                                                                <li>
+                                                                    <!-- Text Input -->
+                                                                    @php
+                                                                        $this->selected_room_item[$room->id][1] = App\Helpers\CustomHelper::GetHotelWiseMaxPrice($selected_plan_item_price, $room->id, '1 Person', $start_date, $end_date);
+                                                                        $this->selected_room_item_name[$room->id][1] = '1 Person';
+                                                                    @endphp
+                                                                    <input 
+                                                                        type="text" 
+                                                                        name="selected_room_item[{{ $room->id }}][1]" 
+                                                                        wire:model="selected_room_item.{{ $room->id }}.1"
+                                                                        onkeyup="validateNumber(this)" 
+                                                                        value="{{ $this->selected_room_item[$room->id][1] }}">
+                                                                    
+                                                                    <!-- Checkbox -->
+                                                                    <x-input-field 
+                                                                        type="checkbox" 
+                                                                        name="selected_room_item_checked[{{ $room->id }}][1]" 
+                                                                        class="accordion_check_input" 
+                                                                        wire:model="selected_room_item_checked.{{ $room->id }}.1" 
+                                                                    />
+                                                                </li>
                                                             </ul>
+                                                            
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -624,14 +591,49 @@
                                                         </td>
                                                         <td>
                                                             <ul>
-                                                                <li><input type="text" value="123"></li>
-                                                                <li><input type="text" value="123"></li>
-                                                                <li><input type="text" value="123"></li>
+                                                                @php
+                                                                    $item_sl = 2; // Initialize item_sl before the loop if not done already
+                                                                @endphp
+
+                                                                @forelse ($hotel_addon_plan_title as $k => $addon_plan_titles)
+                                                                @php
+                                                                    $this->selected_room_item[$room->id][$item_sl] = App\Helpers\CustomHelper::GetHotelWiseMaxPrice(0, $room->id, $addon_plan_titles, $start_date, $end_date);
+                                                                    $this->selected_room_item_name[$room->id][$item_sl] = $addon_plan_titles;
+                                                                @endphp
+                                                                    <li>
+                                                                        <!-- Text Input -->
+                                                                        <input 
+                                                                            type="text" 
+                                                                            name="selected_room_item[{{ $room->id }}][{{ $item_sl }}]" 
+                                                                            wire:model="selected_room_item.{{ $room->id }}.{{ $item_sl }}" 
+                                                                            class="addon-plan-item-price-{{$room->id}}-{{$k}}" 
+                                                                            onkeyup="validateNumber(this)"
+                                                                            value="{{ $this->selected_room_item[$room->id][$item_sl] }}"
+                                                                        >
+                                                                        
+                                                                        <!-- Checkbox -->
+                                                                        <x-input-field 
+                                                                            type="checkbox" 
+                                                                            name="selected_room_item_checked[{{ $room->id }}][{{ $item_sl }}]" class="accordion_check_input" 
+                                                                            wire:model="selected_room_item_checked.{{ $room->id }}.{{ $item_sl }}" 
+                                                                        />
+                                                                    </li>
+
+                                                                    @php
+                                                                        $item_sl++;  // Increment item_sl for the next iteration
+                                                                    @endphp
+                                                                @empty
+                                                                    <div class="alert alert-danger">
+                                                                        <p>No add-on items have been added yet.</p>
+                                                                    </div>
+                                                                @endforelse
+
+
                                                             </ul>
                                                         </td>
                                                     </tr>
                                                 </table>
-                                                @else
+                                            @else
                                                 <div class="left left-content">
                                                 </div>
                                                 <div class="right-content">
@@ -691,5 +693,8 @@
 </div>
 
 @section('scripts')
+<script>
+
+</script>
 <script src="{{asset('build/assets/libs/inventory.js')}}"></script>
 @endsection

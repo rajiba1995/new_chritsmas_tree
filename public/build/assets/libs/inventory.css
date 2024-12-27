@@ -410,6 +410,7 @@
         height: 30px;
         padding: 5px 10px;
     }
+
     /* Start For Step 2 */
         #step2 .top-cta-row {
             display: flex;
@@ -523,9 +524,15 @@
             width: 48px;
             padding: 0 5px;
         }
+        .accordion_check_input{
+            -webkit-appearence: auto !important;
+            -moz-appearence: auto !important;
+            appearance: auto !important;
+        }
         .custom-day-check input[type="checkbox"]:checked ~ span {
             color: #fff;
-            background-color: #7bdd7b;
+            background-color: #f42513;
+            cursor: pointer;
         }
         .top-cta-row .column3 {
             display: flex;
@@ -541,6 +548,16 @@
             border: 2px solid #fff;
             border-radius: 20px;
             background: linear-gradient(to right, #7bdd7b, #28a528);
+            padding: 5px 25px;
+        }
+        .btn-back {
+            font-size: 13px;
+            font-weight: 500;
+            color: #ffffff;
+            white-space: nowrap;
+            border: 2px solid #fff;
+            border-radius: 20px;
+            background: linear-gradient(to right, #ef5e35, #bd4100);
             padding: 5px 25px;
         }
         .accordion-item {
@@ -736,8 +753,8 @@
         }
         .custom-exd input[type="checkbox"]:checked ~ .exd-text {
             color: #fff;
-            border-color: #7bdd7b;
-            background-color: #7bdd7b;
+            border-color: #f42513;
+            background-color: #f42513;
         }
         .custom-exd .exd-text span {
             display: block;
@@ -768,7 +785,38 @@
             justify-content: flex-end;
             margin-top: 10px;
         }
-        #go_to_step2{
-            padding: 0 11px 0 10px !important;
+        .inventory_btn{
+            margin-bottom: .25rem;
+            margin-inline-start: 0px;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            border-radius: .375rem;
+            border-width: 1px;
+            border-color: transparent;
+            padding: .375rem .75rem;
+            font-size: .875rem;
+            font-weight: 400;
+            transition-property: all;
+            transition-timing-function: cubic-bezier(.4,0,.2,1);
+            transition-duration: .15s;
+        }
+
+        .calender_header{
+            margin-bottom: 10px;
+        }
+        .calender_header span{
+            border-radius: 7px;
+            padding: 5px 11px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 2px solid rgba(1, 98, 232, 1);
         }
     /* End For Step 2 */
+
+    .filter-cat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }

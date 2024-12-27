@@ -172,8 +172,8 @@ window.addEventListener('append_addOn_price', function(event) {
     return `${day} ${month} ${year}, ${weekday}`;
   }
 
-  function ShowExtraDays(){
-    const extra_drop = document.getElementById('extra_drop');
-    extra_drop.classList.toggle('active');  // Toggle 'active' class
-    extra_drop.classList.toggle('hide');
-  }
+//   function ShowExtraDays(){
+//     const extra_drop = document.getElementById('extra_drop');
+//     extra_drop.classList.toggle('active');  // Toggle 'active' class
+//     extra_drop.classList.toggle('hide');
+//   }
