@@ -118,6 +118,14 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
             Route::post('/update', [CommonController::class,'category_update'])->name('admin.category.update');
             Route::get('/destroy/{id}', [CommonController::class,'category_destroy'])->name('admin.category.destroy');
         });
+        // Sub-Category Master
+        Route::prefix('subcategory')->group(function(){
+            Route::get('/', [CommonController::class,'subcategory_index'])->name('admin.subcategory.index');
+            Route::post('/store', [CommonController::class,'subcategory_store'])->name('admin.subcategory.store');
+            // Route::get('/edit', [CommonController::class,'subcategory_edit'])->name('admin.subcategory.edit');
+            Route::post('/update', [CommonController::class,'subcategory_update'])->name('admin.subcategory.update');
+            Route::get('/destroy/{id}', [CommonController::class,'subcategory_destroy'])->name('admin.subcategory.destroy');
+        });
         // Ammenity Master
         Route::prefix('ammenity')->group(function(){
             Route::get('/', [CommonController::class,'ammenity_index'])->name('admin.ammenity.index');

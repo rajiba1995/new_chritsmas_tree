@@ -29,16 +29,17 @@
                 
                 <div class="table-responsive">
                     <x-global-table 
-                        :items="$categories" 
-                        :fields="['category_name', 'status']" 
-                        dataType="categories" 
+                        :items="$subcategories" 
+                        :fields="['subcategory_name', 'category_name', 'status']" 
+                        dataType="sub_categories" 
                         :extra="[]"
                     />
-                    {{ $categories->links() }}
+                    {{ $subcategories->links() }}
                 </div>
             </div>
         </div>
     </div>
+
     <div class="xl:col-span-4 col-span-12">
         @if(isset($update_item))
             <div class="bg-custom_card">
@@ -46,7 +47,7 @@
                     <h6 class="uppercase text-black">Update {{$childHeader}}</h6>
                 </div>
                 <div class="box-body">
-                    <form action="{{route('admin.category.update')}}" method="post" id="update_plan">
+                    <form action="{{route('admin.subcategory.update')}}" method="post" id="update_plan">
                         @csrf
                         <div class="xl:col-span-4 lf:col-span-6 md:col-span-6 sm:col-span-12 col-span-12">
                         <x-form-field 
@@ -54,17 +55,26 @@
                             name="name" 
                             label="Name" 
                             :options="[]"
-                            :value="old('title', $update_item->name ?? '')"
+                            :value="old('name', $update_item->name ?? '')"
                             />
                         @error('name')
                             <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror
+                        <x-form-field 
+                                type="select" 
+                                name="cat_id" 
+                                label="Choose Category" 
+                                :options="$categories->pluck('name', 'id')->toArray()" 
+                                :value="old('cat_id', $update_item->cat_id ?? '')" 
+                            />
+                            @error('cat_id')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
                         </div>
                             <!-- Dynamic plan_item fields container -->
-                        
                         <div class="flex justify-end">
                             <x-input-field type="hidden" name="id" value="{{$update_item->id}}" />
-                            <a href="{{route('admin.category.index')}}" class="ti-btn ti-btn-danger-full !py-1 !px-2 ti-btn-wave  me-[0.375rem]"><i class="fa-solid fa-caret-left"></i>Back</a>
+                            <a href="{{route('admin.subcategory.index')}}" class="ti-btn ti-btn-danger-full !py-1 !px-2 ti-btn-wave  me-[0.375rem]"><i class="fa-solid fa-caret-left"></i>Back</a>
                             <x-form-submit-button text="Update" class="change-text-button ti-btn ti-btn-primary-full !py-1 !px-2 ti-btn-wave me-[0.375rem]" />
                         </div>
                     </form>
@@ -76,7 +86,7 @@
                     <h6 class="uppercase">Create {{$childHeader}}</h6>
                 </div>
                 <div class="box-body">
-                    <form action="{{route('admin.category.store')}}" method="post">
+                    <form action="{{route('admin.subcategory.store')}}" method="post">
                         @csrf
                         <div class="xl:col-span-4 lf:col-span-6 md:col-span-6 sm:col-span-12 col-span-12">
                             <x-form-field 
@@ -89,6 +99,19 @@
                             @error('name')
                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                             @enderror
+
+                            <x-form-field 
+                                type="select" 
+                                name="cat_id" 
+                                label="Choose Category" 
+                                :options="$categories->pluck('name', 'id')->toArray()" 
+                                :value="old('cat_id')" 
+                            />
+                            @error('cat_id')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
+
+
                             <div class="flex justify-end">
                                 <x-form-submit-button text="Submit" class="change-text-button ti-btn ti-btn-primary-full !py-1 !px-2 ti-btn-wave me-[0.375rem]" />
                             </div>
@@ -96,7 +119,7 @@
                     </form>
                 </div>
             </div>
-        @endif
+        @endif     
     </div>
 </div>
 <!-- End:: row-10 -->

@@ -89,6 +89,9 @@
 										<a href="{{route('admin.category.index')}}" class="side-menu__item">Hotel Categories</a>
 									</li> 
 									<li class="slide">
+										<a href="{{route('admin.subcategory.index')}}" class="side-menu__item">Hotel Sub-categories</a>
+									</li> 
+									<li class="slide">
 										<a href="{{route('admin.room.category.index')}}" class="side-menu__item">Room Categories</a>
 									</li>
 									<li class="slide">

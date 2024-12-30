@@ -156,6 +156,25 @@
                         </div>
                     </td>
                 </tr>
+            @elseif($dataType=='sub_categories')
+                <tr class="text-grey" id="delete{{$item->id}}">
+                    <td scope="row" class="text-start !p-1">{{ $index + 1 }}</td>
+                    <td scope="row" class="!p-1">{{$item->name}}</td>
+                    <td scope="row" class="!p-1">{{$item->categoryData?$item->categoryData->name:""}}</td>
+                    <td scope="row" class="!p-1">
+                        <livewire:master-status-toggle 
+                            modelName="SubCategory" 
+                            :item="$item" 
+                            wire:key="status-toggle-{{ $item->id }}" 
+                        />
+                    </td>
+                    <td scope="row" class="!p-1" width="10%">
+                        <div>
+                            <x-action-button type="edit" url="{{ route('admin.subcategory.index',['update_id'=>$item->id]) }}" itemId="{{ $item->id }}" />
+                            <x-action-button type="delete" url="{{ route('admin.subcategory.destroy', $item->id) }}" itemId="{{ $item->id }}" />
+                        </div>
+                    </td>
+                </tr>
             @elseif($dataType=='roomCategories')
                 <tr class="text-grey" id="delete{{$item->id}}">
                     <td scope="row" class="text-start !p-1">{{ $index + 1 }}</td>

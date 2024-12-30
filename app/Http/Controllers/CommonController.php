@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Repositories\CommonRepository;
 use App\Helpers\CustomHelper;
 use Illuminate\Validation\Rule;
+use App\Models\Category;
+
 
 class CommonController extends Controller
 {
@@ -179,7 +181,12 @@ class CommonController extends Controller
 
     public function category_store(Request $request){
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name',
+                'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('categories', 'name')->whereNull('deleted_at'),
+            ],
         ], [
             'name.required' => 'Please enter category name.',
             'name.unique' => 'This category name already exists.',
@@ -222,6 +229,84 @@ class CommonController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
+
+
+     // sub-Category Master
+     public function subcategory_index(Request $request){
+        $subcategories = $this->commonRepository->getAllSubCategory(10);
+        $update_id = $request->update_id ?? "";
+        $update_item = $this->commonRepository->getHotelSubCategoryById($update_id);
+        $categories = $this->commonRepository->getAllActiveCategory();
+        $common = CustomHelper::setHeadersAndTitle('Hotel Management', 'Sub-category');
+        return view('admin.subcategory.index', array_merge(compact('categories','subcategories','update_item'), $common));
+    }
+    public function subcategory_store(Request $request){
+        $validatedData = $request->validate([
+           'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('sub_categories')->where(function ($query) use ($request) {
+                    return $query->where('cat_id', $request->cat_id)->whereNull('deleted_at');;
+                }),
+            ],
+            'cat_id' => 'required|exists:categories,id',
+
+        ], [
+            'name.required' => 'Please enter subcategory name.',
+            'name.unique' => 'This subcategory name already exists under the selected category.',
+            'cat_id.required' => 'Please select a category.',
+            'cat_id.exists' => 'The selected category is invalid.',
+        ]);
+        try {
+            $this->commonRepository->createSubCategory($validatedData);
+            return redirect()->back()->with('success', 'Subcategory created successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function subcategory_update(Request $request){
+        // dd($request->all());
+        $validatedData = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('sub_categories')
+                    ->where(function ($query) use ($request) {
+                        return $query->where('cat_id', $request->cat_id)
+                                     ->whereNull('deleted_at');
+                    })
+                    ->ignore($request->id), // Ignore the current subcategory during uniqueness check
+            ],
+            'cat_id' => 'required|exists:categories,id',
+        ], [
+            'name.required' => 'The name field is required.',
+            'cat_id.required' => 'Please select a category.',
+            'cat_id.exists' => 'The selected category is invalid.',
+            'name.unique' => 'This subcategory name already exists under the selected category.',
+        ]);
+          // After validation, proceed to save the data
+        try {
+            $this->commonRepository->updateSubCategory($request->all());
+            return redirect()->back()->with('success', 'Subcateggory updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function subcategory_destroy($id){
+        try {
+            $this->commonRepository->deleteSubCategory($id);
+            return redirect()->route('admin.subcategory.index')->with('success', 'Subcategory deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+
+
 
         // Ammenity Master
         public function ammenity_index(Request $request){

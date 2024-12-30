@@ -8,6 +8,7 @@ use App\Models\Division;
 use App\Models\Hotel;
 use App\Models\SeasionPlan;
 use App\Models\Category;
+use App\Models\SubCategory;
 use App\Models\SeasionType;
 use App\Models\Ammenity;
 use App\Models\RoomCategory;
@@ -181,7 +182,7 @@ class CommonRepository
      }
      public function getAllActiveCategory()
      {
-         return Category::where('status', 1)->get();
+         return Category::orderBy('name' , 'ASC')->where('status', 1)->get();
      }
 
      public function createCategory(array $data){
@@ -190,7 +191,7 @@ class CommonRepository
         $category->save();
         return $category;
     }
-
+    
     public function getHotelCategoryById($id){
         return Category::where('id', $id)->first();
     }
@@ -206,6 +207,35 @@ class CommonRepository
         $category->delete();
         return $category;
     }
+    
+    // Sub-Category
+    public function getAllSubCategory(int $perPage = 15)
+    {
+        return SubCategory::orderBy('name', 'ASC')->paginate($perPage);
+    }
+    public function createSubCategory(array $data){
+        $subcategory = new SubCategory;
+        $subcategory->name = ucwords($data['name']);
+        $subcategory->cat_id = $data['cat_id'];
+        $subcategory->save();
+        return $subcategory;
+    }
+    public function getHotelSubCategoryById($id)
+    {
+        return SubCategory::where('id', $id)->first();
+    }
+    public function updateSubCategory(array $data){
+        $subcategory  = SubCategory::findOrFail($data['id']);
+        $subcategory->name = $data['name'];
+        $subcategory->cat_id = $data['cat_id'];
+        $subcategory->save();
+        return $subcategory;
+    }
+   public function deleteSubCategory($id){
+    $subcategory = SubCategory::findOrFail($id);
+    $subcategory->delete();
+    return $subcategory;
+   }
 
     // Ammenity
     public function getAllAmmenity(int $perPage = 15)
