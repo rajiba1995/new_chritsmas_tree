@@ -13,7 +13,28 @@ window.addEventListener('append_addOn_price', function(event) {
         });
     }
   });
-  
+  window.addEventListener('resetCheckboxes', () => {
+        document.querySelectorAll('input[name="selected_room_id[]"]').forEach((checkbox) => {
+            checkbox.checked = false;
+        });
+    });
+  window.addEventListener('resetItemCheckboxes', () => {
+        // Reset checkboxes with name starting with "selected_room_item_checked"
+        document.querySelectorAll('input[name^="selected_room_item_checked"]').forEach((checkbox) => {
+            checkbox.checked = false;
+        });
+    });
+    window.addEventListener('ResetItemPrice', (event) => {
+        const room_id = event.detail[0].room_id;
+        const index = event.detail[0].index;
+        const price = event.detail[0].price; // Access the data passed with the event
+        const input = document.querySelector(`input[name="selected_room_item[${room_id}][${index}]"]`);
+        
+        if (input) {
+            input.value = price;  // Set the value of the input field to the new price
+        }
+    });
+    
   
   // Listen for the 'inventory-scroller' event
   function scrollable(direction) {
@@ -126,11 +147,15 @@ window.addEventListener('append_addOn_price', function(event) {
   function BlockRequestItem(value) {
     const yellow = document.getElementById('bulk_block_request');
     const green = document.getElementById('fresh_block_request');
+    const update = document.getElementById('update_block_request');
     
     if (value === "green") {
         green.classList.toggle('active');  // Toggle 'active' class
         green.classList.toggle('hide');   // Toggle 'hide' class
-    } else {
+    } else if(value==="update"){
+        update.classList.toggle('active');  // Toggle 'active' class
+        update.classList.toggle('hide');   // Toggle 'hide' class
+    }else {
         yellow.classList.toggle('active');  // Toggle 'active' class
         yellow.classList.toggle('hide');   // Toggle 'hide' class
     }
@@ -177,3 +202,72 @@ window.addEventListener('append_addOn_price', function(event) {
 //     extra_drop.classList.toggle('active');  // Toggle 'active' class
 //     extra_drop.classList.toggle('hide');
 //   }
+function validateItems(input) {
+    // Remove any characters that are not digits or a single decimal point
+    input.value = input.value.replace(/[^0-9.]/g, '');
+
+    // Ensure only one decimal point is allowed
+    const parts = input.value.split('.');
+    if (parts.length > 2) {
+        input.value = parts[0] + '.' + parts[1];
+    }
+
+
+    // Update the value attribute of the input
+    input.setAttribute('value', input.value);
+    // Trigger input event so Livewire knows the value has changed
+    input.dispatchEvent(new Event('input'));
+}
+window.addEventListener('ResetSelectedValue', (event) => {
+    console.log(event);
+    const value = event.detail[0].value;
+    const input = document.getElementById('single_appended_value');
+    if (input) {
+        input.value = value;
+        // Trigger the input event to notify other listeners (e.g., Livewire)
+        input.dispatchEvent(new Event('input'));
+    }
+})
+function validateSingleItems(input) {
+    if (!input.value.trim()) {
+        input.value = '0';
+    } else {
+        // Remove any characters that are not digits or a single decimal point
+        input.value = input.value.replace(/[^0-9.]/g, '');
+
+        // Ensure only one decimal point is allowed
+        const parts = input.value.split('.');
+        if (parts.length > 2) {
+            input.value = parts[0] + '.' + parts[1];
+        }
+
+         // Remove leading zeros, except for "0" itself
+         if (!isNaN(input.value)) {
+            input.value = parseFloat(input.value).toString();
+        }
+        // Get the room ID and date values from their respective elements
+        var room = document.getElementById('single_appended_room_id').value;
+        var date = document.getElementById('single_appended_date').textContent;
+
+        // Get the button element that triggers wire:click
+        var button = document.getElementById('single_request_submit');
+
+        // Update the wire:click attribute of the button with dynamic values
+        button.setAttribute('wire:click', `DateWiseInventoryUpdate(${room}, '${date}', ${input.value})`);
+
+        // Update the value attribute of the input to match the updated value
+        input.value = input.value; // No need to call setAttribute for value, as it's already bound
+
+        // Trigger the input event so Livewire knows the value has changed
+        input.dispatchEvent(new Event('input'));
+    }
+}
+
+function openModal(modalId) {
+    document.getElementById(modalId).classList.remove('hidden');
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.add('hidden');
+}
+

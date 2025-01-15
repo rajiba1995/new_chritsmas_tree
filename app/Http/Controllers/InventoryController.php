@@ -44,8 +44,8 @@ class InventoryController extends Controller
         ];
 
         // Fetch filtered and paginated hotel data
-        $get_data = $this->inventoryRepository->getAllInventory(10, $filters);
-        $data['inventories'] = $get_data['inventories'];
+        // $get_data = $this->inventoryRepository->getAllInventory(10, $filters);
+        // $data['inventories'] = $get_data['inventories'];
 
         // Set headers and title
         $common = CustomHelper::setHeadersAndTitle('Inventory Management', 'Inventories');

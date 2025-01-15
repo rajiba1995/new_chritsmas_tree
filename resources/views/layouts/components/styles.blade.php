@@ -6,3 +6,4 @@
 
         <!-- Color Picker Css -->
         <link rel="stylesheet" href="{{asset('build/assets/libs/@simonwep/pickr/themes/nano.min.css')}}">
+        

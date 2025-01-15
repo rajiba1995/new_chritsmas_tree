@@ -4,6 +4,7 @@ namespace App\Helpers;
 use App\Models\HotelPriceChart;
 use App\Models\HotelPriceChartType;
 use App\Models\HotelSeasionTime;
+use App\Models\Inventory;
 use App\Models\DateWiseHotelPrice;
 
 class CustomHelper
@@ -127,7 +128,72 @@ class CustomHelper
         ->value('item_price');
 
         // Return the retrieved item_price or the existing price if null
-        return intval($item_price ?? $existing_price);
+        return intval($item_price ?? 0);
+    }
+    public static function GetDateWiseHotelInventory($hotel_id, $room_id, $date)
+    {
+        // Retrieve the inventory record from the database
+        $inventory = Inventory::where('hotel_id', $hotel_id)
+            ->where('room_id', $room_id)
+            ->whereDate('date', $date)
+            ->first(['total_unsold', 'block_request_type']);
+
+        // Initialize default values if no record is found
+        if (!$inventory) {
+            return [
+                'total_unsold' => 0,
+                'block_request_type' => 0,
+            ];
+        }
+
+        // Convert inventory object to an array
+        $inventoryData = [
+            'total_unsold' => $inventory->total_unsold,
+            'block_request_type' => $inventory->block_request_type,
+        ];
+
+        // Adjust block_request_type while preserving total_unsold
+        if ($inventory->block_request_type == 1) {
+            $inventoryData['block_request_type'] = 1;
+        } elseif ($inventory->block_request_type == 2) {
+            $inventoryData['block_request_type'] = 2;
+        } else {
+            // Default case for block_request_type
+            $inventoryData['block_request_type'] = 0;
+        }
+        return $inventoryData;
+    }
+    public static function GetDateWiseHotelAllInventory($hotel_id, $date)
+    {
+        // Retrieve the inventory record from the database
+        $inventory = Inventory::where('hotel_id', $hotel_id)
+            ->whereDate('date', $date)
+            ->first(['total_unsold', 'block_request_type']);
+
+        // Initialize default values if no record is found
+        if (!$inventory) {
+            return [
+                'total_unsold' => 0,
+                'block_request_type' => 0,
+            ];
+        }
+
+        // Convert inventory object to an array
+        $inventoryData = [
+            'total_unsold' => $inventory->total_unsold,
+            'block_request_type' => $inventory->block_request_type,
+        ];
+
+        // Adjust block_request_type while preserving total_unsold
+        if ($inventory->block_request_type == 1) {
+            $inventoryData['block_request_type'] = 1;
+        } elseif ($inventory->block_request_type == 2) {
+            $inventoryData['block_request_type'] = 2;
+        } else {
+            // Default case for block_request_type
+            $inventoryData['block_request_type'] = 0;
+        }
+        return $inventoryData;
     }
     public static function GetHotelWiseMaxPrice($existing_price, $room_id, $item_title,$start_date,$end_date){
        
@@ -136,7 +202,6 @@ class CustomHelper
         ->where('item_title', $item_title)
         ->whereBetween('date', [$start_date, $end_date])
         ->max('item_price');
-
         // Return the retrieved item_price or the existing price if null
         return intval($item_price ?? $existing_price);
        

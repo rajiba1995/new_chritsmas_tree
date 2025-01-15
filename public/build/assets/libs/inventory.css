@@ -102,6 +102,7 @@
     }
     .dropbox label {
         display: flex;
+        cursor: pointer;
         align-items: center;
         font-size: 14px;
         font-weight: 500;
@@ -273,6 +274,7 @@
     }
     .count-input-holder {
         list-style-type: none;
+        overflow: visible;
         white-space: nowrap;
         overflow-x: scroll;
         padding: 3px;
@@ -286,6 +288,7 @@
     }
     .count-input-holder li input {
         font-size: 18px;
+        cursor: pointer;
         font-weight: 700;
         color: #ffffff;
         text-align: center;
@@ -303,7 +306,19 @@
     .count-input-holder li input.count-0:focus,
     .count-input-holder li input.count-0:focus-visible {
         background-color: #e69c73;
-        border: 2px solid darkseagreen;
+        border: 2px solid #e69c73;
+    }
+    .count-input-holder li input.count-1,
+    .count-input-holder li input.count-1:focus,
+    .count-input-holder li input.count-1:focus-visible {
+        background-color: #2a9e2a;
+        border: 2px solid #2a9e2a;
+    }
+    .count-input-holder li input.count-2,
+    .count-input-holder li input.count-2:focus,
+    .count-input-holder li input.count-2:focus-visible {
+        background-color: #065acf;
+        border: 2px solid #065acf;
     }
     .count-input-holder .info {
         display: block;
@@ -705,6 +720,11 @@
             border: 2px solid rgba(1, 98, 232, 1);
             z-index: 999;
             padding: 8px;
+        } 
+        .summary_calendar{
+            display: block !important;
+            position: unset !important;
+            width: 257px !important;
         }
         .extra-drop.active {
             display: block;
@@ -768,6 +788,36 @@
             line-height: 16px;
             margin-top: 2px;
         }
+        .custom-exd .green-text {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            color: rgba(1, 98, 232, 0.7);
+            border: 1px solid rgba(1, 98, 232, 0.7);
+            border-radius: 4px;
+            background-color: #fff;
+            width: 30px;
+            padding: 2.5px;
+        }
+        .custom-exd input[type="checkbox"]:checked ~ .green-text {
+            color: #fff;
+            border-color: #2a9e2a;
+            background-color: #2a9e2a;
+        }
+        .custom-exd .green-text span {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
+            line-height: 10px;
+        }
+        .custom-exd .green-text span:nth-child(2) {
+            font-size: 20px;
+            line-height: 16px;
+            margin-top: 2px;
+        }
         .btn-done {
             font-size: 12px;
             font-weight: 500;
@@ -820,3 +870,91 @@
         align-items: center;
         width: 100%;
     }
+    .opacity-100{
+        opacity: 100% !important;
+    }
+    .release_trigger_point{
+        background: transparent;
+        width: 46px;
+        height: 20px;
+    }
+    .fs-17{
+        font-size: 17px;
+    }
+    .update_block_request{
+        width: 134px;
+        text-align: center;
+        top: 43.8px !important;
+        left: auto !important;
+        right: 0px !important;
+    }
+    .block_btn{
+        position: relative;
+    }
+    .inventory_count{
+        position: relative;
+    }
+    .inventory_count input[type='radio']{
+        background-color: transparent;
+        width: auto;
+    }
+    .active_bulk{
+        color: #fff !important;
+        background: #e51010 !important;
+        border: 2px solid !important;
+    }
+    .active_fresh{
+        color: #fff !important;
+        background: #49bc49 !important;
+        border: 2px solid !important;
+    }
+    #single_appended_value{
+        font-size: 18px;
+        border: 2px solid #065acf;
+        cursor: pointer;
+        font-weight: 700;
+        color: #000000;
+        text-align: center;
+        border-radius: 6px;
+        width: 100%;
+        height: 30px;
+        max-width: 40px;
+        padding: 3px;
+    }
+    .fs-15{
+        font-size: 15px !important;
+      }
+      .summary_calendar_wrap{
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 10px;
+      }
+      .inventory-summary-count-green{
+        display: block;
+        width: 100%;
+        background-color: green;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        text-align: center;
+        margin-top: 2px;
+        line-height: 12px;
+      }
+      .inventory-summary-count-blue{
+        display: block;
+        width: 100%;
+        background-color: blue;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        text-align: center;
+        margin-top: 2px;
+        line-height: 12px;
+      }
+      .custom-exd.type1{
+        flex-direction: column;
+      }
+      .summary-calendar-days{
+        margin: 4px 2px !important;
+      }

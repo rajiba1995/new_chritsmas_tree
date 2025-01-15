@@ -24,7 +24,6 @@
         <!-- APP CSS & APP SCSS -->
         @vite(['resources/sass/app.scss' ])
         
-
         @include('layouts.components.styles')
         @yield('styles')
         @livewireStyles

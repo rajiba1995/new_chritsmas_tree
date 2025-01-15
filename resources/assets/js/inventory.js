@@ -12,6 +12,12 @@ window.addEventListener('append_addOn_price', function(event) {
           inputField.value = price;
       });
   }
+
+});
+window.addEventListener('resetCheckboxes', () => {
+   document.querySelectorAll('input[name="selected_room_id[]"]').forEach((checkbox) => {
+        checkbox.checked = false;
+    });
 });
 
 

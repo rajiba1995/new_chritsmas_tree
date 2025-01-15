@@ -8,11 +8,16 @@ use App\Models\City;
 use App\Repositories\CommonRepository;
 use App\Models\Category;
 use App\Models\Hotel;
+use App\Models\Inventory;
 use App\Models\Room;
+use App\Models\HotelPolicy;
 use App\Models\HotelSeasionTime;
 use App\Models\HotelPriceChart;
 use App\Models\DateWiseHotelPrice;
 use Carbon\Carbon;
+use App\Helpers\CustomHelper;
+use Carbon\CarbonPeriod;
+use Illuminate\Support\Facades\DB;
 
 class HotelWiseInventory extends Component
 {
@@ -21,9 +26,11 @@ class HotelWiseInventory extends Component
     public $hotelCategories = [];
     public $hotels = [];
     public $dateRange = [];
+    public $dateRange2 = [];
     public $selectedDestination = null;
     public $selectedDivision = null;
     public $selectedCategory = null;
+    public $selectedHotelName = null;
     public $selectedHotel = null;
     public $start_date = null;
     public $end_date = null;
@@ -32,6 +39,7 @@ class HotelWiseInventory extends Component
     public $activeMonth;
     public $room_category = null;
     public $activeButtonid = 'second';
+    public $single_booking_modal = 0;
     public $activeAccordionId = null;
     public $activeSecondAccordionId = null;
     public $activeAccordionAddonId = null;
@@ -55,6 +63,17 @@ class HotelWiseInventory extends Component
     public $selected_room_item = [];
     public $selected_room_item_name = [];
     public $selected_room_item_checked = [];
+    public $selected_trigger_point = null;
+    public $block_request_type = 1;
+    public $selected_inventory_type = 1;
+    public $fresh_block_request_type = 1;
+    public $fresh_single_value = 0;
+    public $single_selected_room_name = null;
+    public $single_selected_date = null;
+    public $single_selected_room_id = null;
+    public $activeViewSummary = 0;
+    public $activeViewSummaryCallender = 0;
+    public $summary_calendar = [];
 
 
     protected $commonRepository;
@@ -75,7 +94,7 @@ class HotelWiseInventory extends Component
         if ($this->selectedDestination) {
             $this->loadInitialHotelData();
         }
-        
+        $this->dispatch('load_editor');
     }
 
     public function loadInitialHotelData()
@@ -149,11 +168,15 @@ class HotelWiseInventory extends Component
     public function FilterDate($start_date, $end_date, $hotel_id){
         // Initialize dateRange as an empty array before populating it
         $this->dateRange = [];
-      
+       
         $this->start_date = $start_date;
         $this->end_date = $end_date;
 
         $this->selectedHotel = $hotel_id;
+        $hotel = Hotel::where('id', $hotel_id)->first();
+        $this->selectedHotelName = $hotel ? $hotel->name : null;
+
+
         if(!empty($this->start_date) && !empty($this->end_date)){
           
             $this->extra_days_status = 1;
@@ -161,6 +184,7 @@ class HotelWiseInventory extends Component
             $this->currentYear = Carbon::parse($this->start_date)->year;
          
             $this->generateDateRange();
+            $this->generateCalendar($start_date, $end_date);
            
             // Check if hotel_id is empty
             if (empty($this->selectedHotel)) {
@@ -181,6 +205,9 @@ class HotelWiseInventory extends Component
                 $this->dateRange[]= $start->format('Y-m-d'); // Format as "Sun 01 Dec"
                 $start->addDay(); // Increment the date by one day
             }
+
+            // Get Release Trigger days
+           $this->selected_trigger_point = Hotel::where('id', $this->selectedHotel)->value('release_trigger');
         }else{
             session()->flash('error', '🚨 Oops! Start Date and End Date are required. Please select both to proceed.');
             return;
@@ -224,12 +251,12 @@ class HotelWiseInventory extends Component
             if (count($this->room_plan_items)>0) {
                 foreach ($this->room_plan_items as $key=> $item) {
                     if ($item['plan_item'] === 'CP') {
-                        $this->selected_plan_item_price = $item['item_price'];
+                        $this->selected_plan_item_price = (int) $item['item_price'];
                     }
                 }
                 foreach ($this->room_plan_items as $key=> $item) {
                     if ($item['plan_item'] === $hotel_seasion_item_type) {
-                        $this->selected_plan_item_price = $item['item_price'];
+                        $this->selected_plan_item_price = (int) $item['item_price'];
                     }
                 }
                
@@ -284,7 +311,51 @@ class HotelWiseInventory extends Component
                 'item_price' => $value, // Corrected: removed extra space after 'item_price'
             ]
         );
-       
+    }
+
+    public function BlockSingleRequestItem($date, $value, $room_name, $room_id){
+        $this->single_selected_room_name = $room_name;
+        $this->single_selected_room_id = $room_id;
+        $this->single_selected_date = $date;
+        $this->fresh_single_value = $value;
+        $this->single_booking_modal = 1;
+        $this->dispatch('ResetSelectedValue', ['value' => $value ]);
+    }
+    public function CloseBlockSingleModal(){
+        $this->single_booking_modal = 0;
+    }
+    public function handleBlockTypeChange($type)
+    {
+        $this->single_booking_modal = 1;
+        $this->fresh_block_request_type = $type;
+    }
+    public function DateWiseInventoryUpdate($room_id, $date, $value){
+        // Update or create the inventory record
+        // dd($this->fresh_block_request_type);
+        $type= $this->fresh_block_request_type;
+        if ($value === null || $value === '') {
+            // You can return or handle this case to avoid inserting invalid data
+            $value = 0;
+        }
+        if ($room_id === null || $room_id === '') {
+            session()->flash('single_error', 'Please try again!.');
+            return;
+        }
+        $store = Inventory::updateOrCreate(
+            [
+                'hotel_id' => $this->selectedHotel,
+                'room_id' => $room_id,
+                'date' => $date,
+            ],
+            [
+                'total_unsold' => $value,
+                'block_request_type' => $this->fresh_block_request_type,
+            ]
+        );
+        $this->single_booking_modal = 0;
+        // Return the updated or created record
+        session()->flash('success', '🔔 Inventory updated successfully!');
+        return $store;
     }
 
     public function FilterRoomCatgeory($hotel_seasion_item_type){
@@ -300,13 +371,72 @@ class HotelWiseInventory extends Component
     // }
 
     public function TabChange($value){
+        $this->FilterDate($this->start_date, $this->end_date, $this->selectedHotel);
+
         if ($value === 'second') {
+            $this->activeViewSummary = 1;
+            $this->activeViewSummaryCallender = 0;
             $this->activeButtonid = 'first'; // Collapse if the same item is clicked again
            $this->toggleExtraDays();
         } else {
             $this->toggleExtraDays();
+            $this->activeViewSummary = 0;
+            $this->activeViewSummaryCallender = 0;
             $this->activeButtonid = 'second'; // Set the clicked item as active
         }
+        $this->dispatch('resetCheckboxes');
+        $this->dispatch('resetItemCheckboxes');
+
+        $this->selected_room_id = [];
+        $this->selected_room_item_checked = [];
+        $this->selected_room_item = [];
+        $this->selected_room_item_name = [];
+    }
+    public function OpenViewSummary(){
+        $this->activeViewSummary = 1;
+        $this->activeViewSummaryCallender = 1;
+        $this->generateCalendar($this->start_date, $this->end_date);
+        $this->dispatch('resetCheckboxes');
+        $this->dispatch('resetItemCheckboxes');
+
+        $this->selected_room_id = [];
+        $this->selected_room_item_checked = [];
+        $this->selected_room_item = [];
+        $this->selected_room_item_name = [];
+    }
+
+    public function generateCalendar($start_date, $end_date)
+    {
+        // Parse the start and end dates
+        $start = Carbon::parse($start_date)->startOfMonth();
+        $end = Carbon::parse($end_date)->endOfMonth();
+
+        // Create an array to store the calendar data
+        $calendar = [];
+
+        // Iterate through each month between start and end dates
+        while ($start <= $end) {
+            $month = $start->format('F Y'); // e.g., "January 2025"
+            $daysInMonth = $start->daysInMonth;
+
+            $monthData = [];
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $date = $start->copy()->day($day);
+                $inventoryData = CustomHelper::GetDateWiseHotelAllInventory($this->selectedHotel,$date->format('Y-m-d'));
+                $monthData[] = [
+                    'date' => $date->format('Y-m-d'),
+                    'day_name' => $date->format('D'), // e.g., "Mon"
+                    'day_number' => $date->format('d'), // e.g., "01"
+                    'inventory'=>$inventoryData
+                ];
+            }
+
+            $calendar[$month] = $monthData;
+
+            // Move to the next month
+            $start->addMonth()->startOfMonth();
+        }
+        $this->summary_calendar = $calendar;
     }
     // Second Tab
    public function SecondAccordionItem($id){
@@ -371,9 +501,9 @@ class HotelWiseInventory extends Component
         $startOfMonth = $startOfMonth->greaterThan($rangeStart) ? $startOfMonth : $rangeStart;
         $endOfMonth = $endOfMonth->lessThan($rangeEnd) ? $endOfMonth : $rangeEnd;
     
-        $this->dateRange = [];
+        $this->dateRange2 = [];
         while ($startOfMonth <= $endOfMonth) {
-            $this->dateRange[] = $startOfMonth->format('Y-m-d');
+            $this->dateRange2[] = $startOfMonth->format('Y-m-d');
             $startOfMonth->addDay();
         }
     }
@@ -390,61 +520,222 @@ class HotelWiseInventory extends Component
         $this->RoomWiseAddonPriceChart($roomId);
         $this->extra_days_status = 1;
     }
+    protected function filterDates($start_date,$end_date, $ignore_weekdays,$ignore_othersdays){
+        // Parse start and end dates
+        $startDate = Carbon::parse($start_date);
+        $endDate = Carbon::parse($end_date);
 
-    public function UpdateInventory(){
-        if(empty($this->selected_room_id)){
-            session()->flash('store_error', '🔔 Please select at least one hotel room to proceed.');
-            return;
+        // Generate all dates in the range
+        $allDates = CarbonPeriod::create($startDate, $endDate);
+
+        // Convert ignore_weekdays into a numerical representation
+        $ignoreWeekdays = array_map(function ($day) {
+            return Carbon::parse($day)->dayOfWeek; // "Mon" -> 1 (Carbon dayOfWeek)
+        }, $ignore_weekdays);
+
+        // Filter out the dates
+        $filteredDates = [];
+        foreach ($allDates as $date) {
+            $dayOfWeek = $date->dayOfWeek; // Numeric representation of the day (0=Sun, 1=Mon, ...)
+            $formattedDate = $date->format('Y-m-d');
+
+            // Skip if the day is in ignore_weekdays or the exact date is in ignore_othersdays
+            if (in_array($dayOfWeek, $ignoreWeekdays) || in_array($formattedDate, $ignore_othersdays)) {
+                continue;
+            }
+
+            $filteredDates[] = $formattedDate;
         }
-        foreach($this->selected_room_id as $k=>$room_id){
-            // Step 1
-            // Retrieve the room name for the error message
-            $room_name = Room::where('id', $room_id)->value('room_name');
-            if (empty($this->room_wise_quantity[$room_id])) {
-              
-                // Flash the error message to the session
-                session()->flash('store_error', "🔔 Please choose a booking quantity for room $room_name to proceed.");
+        return $filteredDates;
+    }
+
+   
+    public function UpdateInventory(){
+        // dd($this->selected_room_id);
+        DB::beginTransaction();
+
+        try {
+           
+            if($this->selected_inventory_type==1){
+                $filteredDates = $this->filterDates($this->start_date,$this->end_date, $this->ignore_weekdays,$this->ignore_othersdays);
+            }else{
+                if(empty($this->ignore_othersdays)){
+                    session()->flash('store_error', '🔔 Please select at least one date for Fresh Blocking.');
+                    $this->dispatch('resetCheckboxes');
+                    return;
+                }
+                $filteredDates = $this->ignore_othersdays;
+            }
+             // dd($this->selected_room_item, $this->selected_room_item_checked);
+             if(empty($this->selected_room_id)){
+                session()->flash('store_error', '🔔 Please select at least one hotel room to proceed.');
+                $this->dispatch('resetCheckboxes');
                 return;
             }
-            // Step 2
-            if(!empty($this->selected_room_item_checked)){
-                $this->selected_room_item_checked[$room_id] = collect($this->selected_room_item_checked[$room_id])->values()->all();
-                foreach($this->selected_room_item_checked[$room_id] as $k2=>$item_checked){
-                    if ($item_checked==true) {
-                    // Checking for null or 0
-                        if (empty($this->selected_room_item[$room_id][$k2]) || $this->selected_room_item[$room_id][$k2] == 0) {
-                            $item_name = $this->selected_room_item_name[$room_id][$k2];
-                            session()->flash('store_error', "🔔 Please provide a valid amount for the selected item ($item_name) in room $room_name.");
-                            return;
-                        }
-                        // filter Date from ignore date
-                        // dd($this->start_date,$this->end_date, $this->ignore_weekdays, $this->ignore_othersdays);
-    
-                        // Insert or update section
-                        // $insert = DateWiseHotelPrice::updateOrCreate(
-                        //     [
-                        //         'hotel_id' => $hotel_id,
-                        //         'room_id' => $room_id,
-                        //         'date' => date('Y-m-d', strtotime($date)),
-                        //         'item_title' => $item_title,
-                        //     ],
-                        //     [
-                        //         'item_price' => $value, // Corrected: removed extra space after 'item_price'
-                        //     ]
-                        // );
-                    }
-    
+       
+            foreach($this->selected_room_id as $k=>$room_id){
+                // Step 1
+                  
+                // Retrieve the room name for the error message
+                $room_name = Room::where('id', $room_id)->value('room_name');
+                if (empty($this->room_wise_quantity[$room_id])) {
+                    // Flash the error message to the session
+                    session()->flash('store_error', "🔔 Please choose a booking quantity for room $room_name to proceed.");
+                    // $this->dispatch('resetCheckboxes');
+                    return;
                 }
-            }
-            
-        }
+                
+                // Step 2
+                
+                if(!empty($this->selected_room_item_checked)){
+                    foreach ($this->selected_room_item as $room => $items) {
+                        // Initialize selected_room_item_checked for the room_id
+                        if (!isset($this->selected_room_item_checked[$room])) {
+                            $this->selected_room_item_checked[$room] = [];
+                        }
+                    
+                        foreach ($items as $index => $item) {
+                            // Set default to false if not already set
+                            if (!isset($this->selected_room_item_checked[$room][$index])) {
+                                $this->selected_room_item_checked[$room][$index] = false;
+                            }
+                        }
+                        // Sort the indices in ascending order
+                        ksort($this->selected_room_item_checked[$room]);
+                    }
+                    $criteria = [
+                        'hotel_id' => $this->selectedHotel,
+                        'room_id' => $room_id,
+                    ];
+
+                    // Delete all matching records for the filtered dates
+                    DateWiseHotelPrice::where($criteria)
+                    ->whereIn('date', $filteredDates)
+                    ->delete();
+                    foreach($this->selected_room_item_checked[$room_id] as $k2=>$item_checked){
+                      
+                        if ($item_checked==true) {
+                            // Checking for null or 0
+                            if (empty($this->selected_room_item[$room_id][$k2]) || $this->selected_room_item[$room_id][$k2] == 0) {
+                                $item_name = $this->selected_room_item_name[$room_id][$k2];
+                                $this->dispatch('resetItemCheckboxes');
+                                session()->flash('store_error', "🔔 Please provide a valid amount for the selected item ($item_name) in room $room_name.");
+                                return;
+                            }
+                            // filter Date from ignore date
+                            // dd($filteredDates);
+                            if(count($filteredDates)>0){
+                                // Insert or update section
+                                foreach($filteredDates as $date){
+                                    // Define the criteria for the records to delete
+                                    // Create a new record
+                                    DateWiseHotelPrice::create([
+                                        'hotel_id' => $this->selectedHotel,
+                                        'room_id' => $room_id,
+                                        'date' => date('Y-m-d', strtotime($date)),
+                                        'item_title' => $this->selected_room_item_name[$room_id][$k2],
+                                        'item_price' => (int) $this->selected_room_item[$room_id][$k2],
+                                    ]);
+                                }
+                            }else{
+                                session()->flash('store_error', "🔔 Please choose a booking date first to proceed.");
+                                $this->dispatch('resetCheckboxes');
+                                $this->dispatch('resetItemCheckboxes');
+                                return; 
+                            } 
+                        }
         
-        $this->selected_room_id = [];
-        $this->selected_room_item_checked = [];
-        $this->selected_room_item = [];
-        $this->selected_room_item_name = [];
-        $this->room_category = Room::where('hotel_id', $this->selectedHotel)->orderBy('room_name', 'ASC')->get();
-        // dd($this->selected_room_id,$this->room_wise_quantity);
+                    }
+                }else{
+                    // Flash the error message to the session
+                    session()->flash('store_error', "🔔 Please choose a booking item for room $room_name to proceed.");
+                    $this->dispatch('resetItemCheckboxes');
+                    return; 
+                }
+                
+            }
+
+            // Filter out elements with a value of 0
+            $this->room_wise_quantity = array_filter($this->room_wise_quantity, function ($value) {
+                return $value !== 0;
+            });
+            if(count($this->room_wise_quantity)>0){
+                foreach($this->room_wise_quantity as $index=>$quantity){
+                    foreach($filteredDates as $date){
+                        $Inventory = Inventory::where('hotel_id', $this->selectedHotel)
+                        ->where('room_id', $index)
+                        ->where('date', date('Y-m-d', strtotime($date)))
+                        ->first();
+                    
+                        if ($Inventory) {
+                            // Update the total unsold quantity
+                            $Inventory->total_unsold += (int) $quantity;
+                            $Inventory->block_request_type = $this->block_request_type;
+                            $Inventory->save();
+                        } else {
+                            // Handle the case where no inventory record exists
+                            Inventory::create([
+                                'hotel_id' => $this->selectedHotel,
+                                'room_id' => $index,
+                                'date' => date('Y-m-d', strtotime($date)),
+                                'total_unsold' => (int) $quantity,
+                                'block_request_type' => $this->block_request_type
+                            ]);
+                        }
+                    }
+                }
+                
+            }
+
+            // Commit the transaction if all operations succeed
+            
+            DB::commit();
+
+            $this->selected_room_id = [];
+            $this->selected_room_item_checked = [];
+            $this->selected_room_item = [];
+            $this->selected_room_item_name = [];
+            $this->room_category = Room::where('hotel_id', $this->selectedHotel)->orderBy('room_name', 'ASC')->get();
+            $this->TabChange('first');
+            session()->flash('success', '🔔 Inventory updated successfully!');
+
+        } catch (\Exception $e) {
+            // If any exception occurs, rollback all database changes
+            DB::rollBack();
+
+            // Flash the error message
+            session()->flash('store_error', "🔔 Error updating inventory: " . $e->getMessage());
+            $this->dispatch('resetCheckboxes');
+            $this->dispatch('resetItemCheckboxes');
+        }
+    }
+    public function ReleaseTriggerUpdate($hotel_id, $value){
+        Hotel::updateOrCreate(
+            [
+                'id' => $hotel_id,  // Ensure the hotel_id is matched
+            ],
+            [
+                'release_trigger' => (int) $value,  // Add new value
+            ]
+        );
+        $this->FilterDate($this->start_date, $this->end_date, $this->selectedHotel);
+    }
+
+    public function GetRoomItemMaxPrice($index, $selected_plan_item_price, $room_id, $item_title){
+
+       $item_price = CustomHelper::GetHotelWiseMaxPrice($selected_plan_item_price, $room_id, $item_title, $this->start_date, $this->end_date);
+        // Update the Livewire property for the corresponding room item
+        $this->selected_room_item[$room_id][$index] = $item_price;
+       // Dispatch the event with the necessary data
+        $this->dispatch('ResetItemPrice', [
+            'price' => $item_price,
+            'room_id' => $room_id,
+            'index' => $index
+        ]);
+    }
+
+    public function GetInventoryType($value){
+        $this->selected_inventory_type = $value;
     }
 
     public function render()

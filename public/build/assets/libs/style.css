@@ -120,6 +120,9 @@
   .mt-22{
     margin-top: 22px;
   }
+  .fs-15{
+    font-size: 15px !important;
+  }
 
   /* Padding */
   .p-20{
@@ -210,6 +213,9 @@
   }
   .modal_lg_width{
     max-width: 75rem !important;
+  }
+  .modal_sm_width{
+    max-width: 15rem !important;
   }
   .cw-60{
     width: 60px;
