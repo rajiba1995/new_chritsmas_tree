@@ -43,9 +43,6 @@ class InventoryController extends Controller
             'quick_search' => $request->get('quick_search'),
         ];
 
-        // Fetch filtered and paginated hotel data
-        // $get_data = $this->inventoryRepository->getAllInventory(10, $filters);
-        // $data['inventories'] = $get_data['inventories'];
 
         // Set headers and title
         $common = CustomHelper::setHeadersAndTitle('Inventory Management', 'Inventories');

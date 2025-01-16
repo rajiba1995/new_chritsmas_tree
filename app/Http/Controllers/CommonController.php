@@ -343,14 +343,67 @@ class CommonController extends Controller
             $get_countries = $this->commonRepository->getAllCountry(10,$country);
             $country_codes = $get_countries['country_codes'];  // Paginated data
             $common = CustomHelper::setHeadersAndTitle('Master Management', 'Countries');
-            // $data['country_codes'] = $get_countries['country_codes'];
-            // $fields = [
-            //     'country_code' => 'Country Code',
-            //     'country_name' => 'Country Name',
-            //     'phone_code' => 'Phone Code',
-            // ];
-            // dd($countries);
             return view('admin.country.index', array_merge(compact('country_codes'), $common));
+        }
+
+        // Cab Master
+        public function cab_index(Request $request){
+            $update_id = $request->update_id ?? "";
+            $update_item = $this->commonRepository->getCabById($update_id);
+            $cab = $request->cab??"";
+            $get_destinations = $this->commonRepository->getAllCabs(10,$cab);
+            $cabs = $get_destinations['cabs'];  // Paginated data
+            $common = CustomHelper::setHeadersAndTitle('Master Management', 'Cabs');
+            return view('admin.cab.index', array_merge(compact('cabs','update_item'), $common));
+        }
+
+        public function cab_store(Request $request){
+            $validatedData = $request->validate([
+                'title' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('cabs', 'title')->whereNull('deleted_at'), // Ignore soft-deleted records
+                ],
+            ], [
+                'title.required' => 'Please enter cab title.',
+                'title.unique' => 'This cab title already exists.',
+            ]);
+            try {
+                $this->commonRepository->createCab($validatedData);
+                return redirect()->back()->with('success', 'Cab created successfully.');
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', $e->getMessage());
+            }
+        }
+
+        public function cab_update(Request $request){
+            $validatedData = $request->validate([
+                'title' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('cabs', 'title')->ignore($request->id)->whereNull('deleted_at'),
+                ],
+            ], [
+                'title.required' => 'Please enter cab title.',
+            ]);
+            // After validation, proceed to save the data
+            try {
+                $this->commonRepository->updateCab($request->all());
+                return redirect()->back()->with('success', 'Cab updated successfully.');
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', $e->getMessage());
+            }
+        }
+
+        public function cab_destroy($id){
+            try {
+                $this->commonRepository->deleteCab($id);
+                return redirect()->route('admin.cab.index')->with('success', 'Cab deleted successfully.');
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', $e->getMessage());
+            }
         }
     
 }

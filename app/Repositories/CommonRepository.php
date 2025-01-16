@@ -12,6 +12,7 @@ use App\Models\SeasionType;
 use App\Models\Ammenity;
 use App\Models\RoomCategory;
 use App\Models\CountryCode;
+use App\Models\Cab;
 use Illuminate\Support\Facades\Log;
 use Exception;
 
@@ -93,6 +94,22 @@ class CommonRepository
             'totalRecords' => $totalRecords,  // Total records count
         ];
     }
+    public function getAllCabs(int $perPage = 15, $cab, $limit = 10,)
+    {
+        $query = Cab::orderBy('title', 'ASC');
+    
+        if (!empty($cab)) {
+            $query->where('title', 'like', "%{$cab}%");
+        }
+        
+        $paginatedCabs = $query->paginate($perPage);
+        $totalRecords = $query->count();
+
+        return [
+            'cabs' => $paginatedCabs,  // Paginated states
+            'totalRecords' => $totalRecords,  // Total records count
+        ];
+    }
     public function getAllActiveState()
     {
         return State::where('status', 1)->orderBy('name', 'ASC')->get();
@@ -105,11 +122,18 @@ class CommonRepository
         $state->save();
         return $state;
     }
-
-    
+    public function createCab(array $data){
+        $state = new Cab;
+        $state->title = ucwords($data['title']);
+        $state->save();
+        return $state;
+    }
 
     public function getStateById($id){
         return State::where('id', $id)->first();
+    }
+    public function getCabById($id){
+        return Cab::where('id', $id)->first();
     }
  
     public function updateState(array $data){
@@ -119,10 +143,21 @@ class CommonRepository
         $state->save();
         return $state;
     }
+    public function updateCab(array $data){
+        $cab  = Cab::findOrFail($data['id']);
+        $cab->title = $data['title'];
+        $cab->save();
+        return $cab;
+    }
     public function deleteState($id){
         $state = State::findOrFail($id);
         $state->delete();
         return $state;
+    }
+    public function deleteCab($id){
+        $cab = Cab::findOrFail($id);
+        $cab->delete();
+        return $cab;
     }
    
 

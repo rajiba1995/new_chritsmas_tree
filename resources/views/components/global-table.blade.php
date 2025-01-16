@@ -119,6 +119,28 @@
                         </div>
                     </td>
                 </tr>
+            @elseif($dataType=='cab')
+                <tr class="text-grey" id="delete{{$item->id}}">
+                    <td scope="row" class="" width="4%">
+                        <span class="ti-btn ti-btn-sm ti-btn-soft-info"><strong>{{ $index + 1 }}</strong></span></td>
+                    <td scope="row" class="!p-1" width="20%">
+                        <img src="{{asset('assets/img/cab.png')}}" alt="Cab Image" width="90%">
+                    </td>
+                    <td scope="row" class="!p-1">{{$item->title}}</td>
+                    <td scope="row" class="!p-1">
+                        <livewire:master-status-toggle 
+                            modelName="Cab" 
+                            :item="$item" 
+                            wire:key="status-toggle-{{ $item->id }}" 
+                        />
+                    </td>
+                    <td scope="row" class="!p-1" width="10%">
+                        <div>
+                            <x-action-button type="edit" url="{{ route('admin.cab.index',['update_id'=>$item->id]) }}" itemId="{{ $item->id }}" />
+                            <x-action-button type="delete" url="{{ route('admin.cab.destroy', $item->id) }}" itemId="{{ $item->id }}" />
+                        </div>
+                    </td>
+                </tr>
             @elseif($dataType=='division')
                 <tr class="text-grey" id="delete{{$item->id}}">
                     <td scope="row" class="text-start !p-1">{{ $index + 1 }}</td>

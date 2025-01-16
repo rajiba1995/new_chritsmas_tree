@@ -823,8 +823,5 @@
 </div>
 
 @section('scripts')
-<script>
-
-</script>
 <script src="{{asset('build/assets/libs/inventory.js')}}"></script>
 @endsection

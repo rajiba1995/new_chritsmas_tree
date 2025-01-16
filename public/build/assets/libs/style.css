@@ -217,6 +217,9 @@
   .modal_sm_width{
     max-width: 15rem !important;
   }
+  .modal_md_width{
+    max-width: 30rem !important;
+  }
   .cw-60{
     width: 60px;
   }
@@ -292,6 +295,65 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.active-primary{
+  background-color:#0162e8;
+  color: #fff;
+}
+.active-primary-badge{
+  background: #0162e8;
+  color: #fff !important;
+}
+.cab-card{
+  background-color: #ecf0fa;
+}
+.cab-avatar{
+  /* margin-top: -5px !important; */
+}
+.seasion_title{
+  margin-bottom: -10px;
+}
+.cab-avatar.online:before{
+  position: absolute;
+  background-color: #379937;
+  inset-inline-end: 0px;
+  top: 0;
+  height: 0.75rem;
+  width: .75rem;
+  border-radius: 9999px;
+  border-width: 2px;
+  border-style: solid;
+  content: var(--tw-content);
+  --tw-border-opacity: 1;
+}
+.cab-avatar.offline:before{
+  position: absolute;
+  background-color: #379937;
+  inset-inline-end: 0px;
+  top: 0;
+  height: 0.75rem;
+  width: .75rem;
+  border-radius: 9999px;
+  border-width: 2px;
+  border-style: solid;
+  content: var(--tw-content);
+  --tw-border-opacity: 1;
+}
+.cab-card .toggle{
+  margin-inline-start: unset !important;
+}
+.check-form{
+  padding-right: 15px;
+  padding-top: 15px;
+}
+.check-form .badge{
+  font-size: unset !important;
+}
+.col-cab-list{
+  display: ruby;
+}
+
+
 
 
 
