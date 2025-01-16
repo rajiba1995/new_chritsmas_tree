@@ -307,8 +307,8 @@
 .cab-card{
   background-color: #ecf0fa;
 }
-.cab-avatar{
-  /* margin-top: -5px !important; */
+.cab-avatar img{
+  padding: 0px 19px;
 }
 .seasion_title{
   margin-bottom: -10px;
@@ -351,6 +351,16 @@
 }
 .col-cab-list{
   display: ruby;
+}
+.selected_seasion_type{
+  padding: 4px 30px 4px 10px;
+  border-radius: 10px !important;
+}
+.cab_status_activity span{
+  background-color: red;
+}
+.cab_status_activity .toggle{
+  border: 1px solid #c3c3c3 !important;
 }
 
 

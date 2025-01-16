@@ -117,5 +117,5 @@
 
             // Automatically call the function to show and hide the loader
             FetchLoader
-         </script>   
+</script>   
          

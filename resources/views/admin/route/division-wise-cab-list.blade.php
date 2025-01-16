@@ -1,7 +1,6 @@
 @extends('layouts.master')
 @section('title', $common['pageTitle']) <!-- This sets the page title dynamically -->
 @section('styles')
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
 @endsection
 @section('content')
 <div class="md:flex block items-center justify-between mb-6 mt-1  page-header-breadcrumb">
@@ -26,11 +25,5 @@
 @endsection
 
 @section('scripts')
-
-<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
-
-<!-- Select2 Cdn -->
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-@vite('resources/assets/js/select2.js')
 @endsection
 
