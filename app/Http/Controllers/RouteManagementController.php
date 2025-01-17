@@ -20,4 +20,10 @@ class RouteManagementController extends Controller
         $common = CustomHelper::setHeadersAndTitle('Route Management', 'Division Wise Cab List');
         return view('admin.route.division-wise-cab-list', compact('common'));
     }
+    public function DivisionWiseActivityList(Request $request)
+    {
+        $common = CustomHelper::setHeadersAndTitle('Route Management', 'Division Wise Activity');
+        return view('admin.route.division-wise-activity-list', compact('common'));
+    }
+
 }

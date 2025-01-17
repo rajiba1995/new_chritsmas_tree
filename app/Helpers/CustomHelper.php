@@ -6,6 +6,8 @@ use App\Models\HotelPriceChartType;
 use App\Models\HotelSeasionTime;
 use App\Models\Inventory;
 use App\Models\DateWiseHotelPrice;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CustomHelper
 {
@@ -205,5 +207,35 @@ class CustomHelper
         // Return the retrieved item_price or the existing price if null
         return intval($item_price ?? $existing_price);
        
+    }
+
+    public static function uploadImage($image, $dynamicText=null, $divisionName=null, $folder){
+        // Validate the uploaded file
+        if (!$image->isValid()) {
+            throw new \Exception('Invalid image file.');
+        }
+
+        // Format division name and dynamic text for filename
+        $formattedDivisionName = Str::slug($divisionName); // Convert to URL-friendly string
+        $formattedDynamicText = Str::slug($dynamicText);   // Convert to URL-friendly string
+
+        // Generate a unique filename
+        $timestamp = now()->format('YmdHis');            // Generate a 6-digit random number
+        $extension = $image->getClientOriginalExtension(); // Get the original file extension
+
+        // Construct the filename
+        $uniqueFilename = "{$formattedDivisionName}-{$formattedDynamicText}-{$timestamp}.{$extension}";
+
+        // Ensure the folder exists with proper permissions
+        $folderPath = storage_path("app/public/{$folder}");
+        if (!is_dir($folderPath)) {
+            mkdir($folderPath, 0755, true); // Create the folder with 755 permissions
+        }
+
+        // Store the image in the specified folder
+        $path = $image->storeAs($folder, $uniqueFilename, 'public');
+
+        // Return the stored file path
+        return 'storage/'.$path;
     }
 }

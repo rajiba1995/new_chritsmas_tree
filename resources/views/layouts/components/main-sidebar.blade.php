@@ -130,10 +130,12 @@
 									<i class="fe fe-chevron-right side-menu__angle"></i>
 								</a>
 								<ul class="slide-menu child1 {{ request()->is('admin/route/division-wise-cab*') ? 'active' : '' }}">
-									<li class="slide {{ request()->is('admin/route/division-wise-cab*')? 'active' : '' }}">
-										<a href="{{route('admin.route.division_wise_cab_list')}}" class="side-menu__item">Division Wise Cab</a>
-									</li>
-									</li>
+										<li class="slide {{ request()->is('admin/route/division-wise-cab*')? 'active' : '' }}">
+											<a href="{{route('admin.route.division_wise_cab_list')}}" class="side-menu__item">Division Wise Cab</a>
+										</li>
+										<li class="slide {{ request()->is('admin/route/division-wise-activity*')? 'active' : '' }}">
+											<a href="{{route('admin.route.division_wise_activity_list')}}" class="side-menu__item">Division Wise Activity</a>
+										</li>
 								</ul>
 							</li>
 							<!-- End::slide -->
