@@ -14,6 +14,6 @@ class DivisionWiseActivityImage extends Model
 
     public function activity()
     {
-        return $this->belongsTo(DivisionWiseActivity::class, 'division_wise_activity_id');
+        return $this->belongsTo(DivisionWiseActivity::class, 'division_wise_activity_id', 'id');
     }
 }

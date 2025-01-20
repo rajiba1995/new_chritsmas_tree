@@ -209,33 +209,50 @@ class CustomHelper
        
     }
 
-    public static function uploadImage($image, $dynamicText=null, $divisionName=null, $folder){
+    public static function uploadImage($image, $dynamicText=null, $divisionName=null, $folder)
+    {
         // Validate the uploaded file
         if (!$image->isValid()) {
             throw new \Exception('Invalid image file.');
         }
-
+    
         // Format division name and dynamic text for filename
         $formattedDivisionName = Str::slug($divisionName); // Convert to URL-friendly string
         $formattedDynamicText = Str::slug($dynamicText);   // Convert to URL-friendly string
-
-        // Generate a unique filename
-        $timestamp = now()->format('YmdHis');            // Generate a 6-digit random number
+    
+        // Generate a unique filename with a do-while loop to ensure uniqueness
+        $timestamp = now()->format('YmdHis');            // Generate a timestamp
         $extension = $image->getClientOriginalExtension(); // Get the original file extension
-
-        // Construct the filename
-        $uniqueFilename = "{$formattedDivisionName}-{$formattedDynamicText}-{$timestamp}.{$extension}";
-
-        // Ensure the folder exists with proper permissions
+    
+        // Folder path to check for existing files
         $folderPath = storage_path("app/public/{$folder}");
+    
+        // Start with an initial filename
+        $uniqueFilename = "{$formattedDivisionName}-{$formattedDynamicText}-{$timestamp}.{$extension}";
+    
+        // Check if the file already exists, and regenerate the filename if necessary
+        $counter = 1;  // Counter to append if file already exists
+        do {
+            // Check if the file exists in the folder
+            if (file_exists("{$folderPath}/{$uniqueFilename}")) {
+                // If it exists, modify the filename to make it unique
+                $uniqueFilename = "{$formattedDivisionName}-{$formattedDynamicText}-{$timestamp}-{$counter}.{$extension}";
+                $counter++; // Increment the counter for the next iteration
+            } else {
+                break; // If it doesn't exist, exit the loop
+            }
+        } while (true);
+    
+        // Ensure the folder exists with proper permissions
         if (!is_dir($folderPath)) {
             mkdir($folderPath, 0755, true); // Create the folder with 755 permissions
         }
-
+    
         // Store the image in the specified folder
         $path = $image->storeAs($folder, $uniqueFilename, 'public');
-
+    
         // Return the stored file path
         return 'storage/'.$path;
     }
+    
 }

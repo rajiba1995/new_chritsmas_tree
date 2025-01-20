@@ -441,6 +441,57 @@
   object-fit: cover;
 }
 
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-container .tooltip-text {
+  visibility: hidden;
+  min-width: 80px; /* Adjust based on content */
+  background-color: #000; /* Tooltip background color */
+  color: #fff; /* Tooltip text color */
+  text-align: center;
+  padding: 5px 5px;
+  border-radius: 4px;
+  font-size: 12px;
+  position: absolute;
+  bottom: 150%; /* Position above the button */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+.tooltip-container .tooltip-text::after {
+  content: '';
+  position: absolute;
+  top: 100%; /* Position at the bottom of the tooltip */
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: #000 transparent transparent transparent; /* Create arrow pointing up */
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Activity Iage slider  */
+
+/* Main Image Styling */
+
+  .thumbnail-image {
+    width: 200px;
+    height: 150px;
+    padding: 5px;
+  }
+/* Activity Iage slider  */
+
+
 
 
 

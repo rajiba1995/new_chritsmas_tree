@@ -13,16 +13,16 @@ class DivisionWiseActivity extends Model
     ];
 
     public function seasonType(){
-        return $this->belongsTo(SeasionType::class);
+        return $this->belongsTo(SeasionType::class, 'seasion_type_id', 'id');
     }
 
     public function division(){
-        return $this>belongsTo(City::class);
+        return $this>belongsTo(City::class, 'division_id', 'id');
     }
 
     public function images()
     {
-        return $this->hasMany(DivisionWiseActivityImage::class);
+        return $this->hasMany(DivisionWiseActivityImage::class, 'division_wise_activity_id', 'id');
     }
 
 }
