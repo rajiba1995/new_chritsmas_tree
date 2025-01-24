@@ -26,4 +26,9 @@ class RouteManagementController extends Controller
         return view('admin.route.division-wise-activity-list', compact('common'));
     }
 
+    public function DivisionWiseSightseeingList(Request $request){
+        $common = CustomHelper::setHeadersAndTitle('Route Management', 'Division Wise SIghtseeing');
+        return view('admin.route.division-wise-sightseeing-list', compact('common'));
+    }
+
 }

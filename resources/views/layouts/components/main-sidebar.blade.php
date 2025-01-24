@@ -129,12 +129,15 @@
 									<span class="side-menu__label">Route Management</span>
 									<i class="fe fe-chevron-right side-menu__angle"></i>
 								</a>
-								<ul class="slide-menu child1 {{ request()->is('admin/route/division-wise-cab*') ? 'active' : '' }}">
+								<ul class="slide-menu child1 {{ request()->is('admin/route/division-wise-cabs*') ? 'active' : '' }}">
 										<li class="slide {{ request()->is('admin/route/division-wise-cab*')? 'active' : '' }}">
-											<a href="{{route('admin.route.division_wise_cab_list')}}" class="side-menu__item">Division Wise Cab</a>
+											<a href="{{route('admin.route.division_wise_cab_list')}}" class="side-menu__item">Division Wise Cabs</a>
 										</li>
-										<li class="slide {{ request()->is('admin/route/division-wise-activity*')? 'active' : '' }}">
-											<a href="{{route('admin.route.division_wise_activity_list')}}" class="side-menu__item">Division Wise Activity</a>
+										<li class="slide {{ request()->is('admin/route/division-wise-activities*')? 'active' : '' }}">
+											<a href="{{route('admin.route.division_wise_activity_list')}}" class="side-menu__item">Division Wise Activities</a>
+										</li>
+										<li class="slide {{ request()->is('admin/route/division-wise-sightseeings*')? 'active' : '' }}">
+											<a href="{{route('admin.route.division_wise_sightseeing_list')}}" class="side-menu__item">Division Wise Sightseeings</a>
 										</li>
 								</ul>
 							</li>

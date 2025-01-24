@@ -158,8 +158,9 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
             });
         });
         Route::prefix('route')->group(function(){
-            Route::get('division-wise-cab', [RouteManagementController::class, 'DivisionWiseCabList'])->name('admin.route.division_wise_cab_list');
-            Route::get('division-wise-activity', [RouteManagementController::class, 'DivisionWiseActivityList'])->name('admin.route.division_wise_activity_list');
+            Route::get('division-wise-cabs', [RouteManagementController::class, 'DivisionWiseCabList'])->name('admin.route.division_wise_cab_list');
+            Route::get('division-wise-activities', [RouteManagementController::class, 'DivisionWiseActivityList'])->name('admin.route.division_wise_activity_list');
+            Route::get('division-wise-sightseeings', [RouteManagementController::class, 'DivisionWiseSightseeingList'])->name('admin.route.division_wise_sightseeing_list');
         });
     });
    

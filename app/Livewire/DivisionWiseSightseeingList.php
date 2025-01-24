@@ -4,16 +4,15 @@ namespace App\Livewire;
 
 use App\Models\City;
 use App\Models\State;
-use App\Models\DivisionWiseActivity;
-use App\Models\DivisionWiseActivityImage;
+use App\Models\DivisionWiseSightseeing;
+use App\Models\DivisionWiseSightseeingImage;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use App\Helpers\CustomHelper;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
 
-
-class DivisionWiseActivityList extends Component
+class DivisionWiseSightseeingList extends Component
 {
     use WithFileUploads;
     public $desitinations =[];
@@ -24,20 +23,17 @@ class DivisionWiseActivityList extends Component
     public $selectedDivisionName = null;
     public $seasion_types = [];
     public $selected_season_type =0; // Must be public for validation
-    public $payment_type =0; // Must be public for validation
     public $active_assign_new_modal = 0;
     public $active_assign_update_modal = 0;
     public $active_modal_for_image = 0;
-    public $division_wise_cabs = [];
-    public $active_activity_images = [];
+    public $division_wise_sightseeing = [];
+    public $active_sightseeing_images = [];
 
-    public $assign_season_type; // Must be public for validation
-    public $assign_cab_id = [];
 
-    public $activities = []; // Holds dynamic activity rows
+    public $sightseeings = []; // Holds dynamic activity rows
     public $files = []; // Holds uploaded files for each activity
     
-    public $edit_activities = [];
+    public $edit_sightseeings = [];
     public $update_files = []; // Holds uploaded files for each activity
 
     public function mount(){
@@ -50,12 +46,13 @@ class DivisionWiseActivityList extends Component
         }
         
         $State = $State->first();
-        $this->selectedDestinationName = $State->name;
+    
         if($State->id){
+            $this->selectedDestinationName = $State->name;
             $this->getDestination($State->id);
         }
         $this->seasion_types = DB::table('seasion_types')->where('status', 1)->orderBy('title', 'ASC')->get();
-        $this->addActivity(); // Start with one activity
+        $this->addSightseeing(); // Start with one activity
         $this->files = collect();
     }
     public function getDestination($destination_id){
@@ -67,8 +64,8 @@ class DivisionWiseActivityList extends Component
             if($this->selectedDivision){
                 $city->where('id', $this->selectedDivision);
             }
+           
            $city = $city->first();
-
             $this->selectedDivision = $city->id;
             $this->selectedDivisionName =$city->name;
         }else{
@@ -78,101 +75,80 @@ class DivisionWiseActivityList extends Component
             $this->selectedDivisionName =null;
         }
         
-        $this->division_wise_cabs  = $this->GetActivity();
+        $this->division_wise_sightseeing  = $this->GetSightseeing();
     }
-    public function GetActivity(){
-        return DivisionWiseActivity::with('seasonType')->where('division_id', $this->selectedDivision)
+    public function GetSightseeing(){
+        return DivisionWiseSightseeing::with('seasonType')->where('division_id', $this->selectedDivision)
         ->when($this->selected_season_type > 0, function ($query) {
             return $query->where('seasion_type_id', $this->selected_season_type);
-        })
-        ->when($this->payment_type > 0, function ($query) {
-            return $query->where('type', $this->payment_type);
         })
         ->orderBy('name', 'ASC')
         ->orderBy('seasion_type_id', 'ASC')
         ->get();
     }
-    public function FilterCabBySeasionType($value){
+    public function FilterSightseeingPointBySeasionType($value){
         $this->selected_season_type = $value; 
-        $this->division_wise_cabs  = $this->GetActivity();
+        $this->division_wise_sightseeing  = $this->GetSightseeing();
     }
     public function UpdateSeasonType($value){
-        $this->edit_activities['seasion_type_id'] = $value; 
-    }
-    public function FilterCabByPaymentType($value){
-        $this->payment_type = $value; 
-        $this->division_wise_cabs  = $this->GetActivity();
+        $this->edit_sightseeings['seasion_type_id'] = $value; 
     }
     public function FilterCabByDivision($value){
         $this->selectedDivision = $value; 
-        $this->division_wise_cabs  = $this->GetActivity();
+        $this->division_wise_sightseeing  = $this->GetSightseeing();
         $this->divisions = City::where('state_id', $this->selectedDestination)->where('status', 1)->orderBy('name', 'ASC')->get();
     }
 
-    public function OpenNewCabModal($value){
+    public function OpenNewSightSeeingModal($value){
         $this->active_assign_new_modal = $value=="yes"?1:0;
 
-        // Reset all activities fields
+        // Reset all sightseeings fields
         if ($this->active_assign_new_modal) {
-            $this->activities = []; // Reset all activities by setting the array to empty
+            $this->sightseeings = []; // Reset all sightseeings by setting the array to empty
 
             // If you need to initialize some fields with an empty template, you can add default values like this
-            $this->activities[] = [
+            $this->sightseeings[] = [
                 'name' => '',
-                'type' => 'PAID',
-                'price' => '',
                 'ticket_price' => '',
                 'files' => []
             ];
-            unset($this->activities[0]);
+            unset($this->sightseeings[0]);
             unset($this->files[0]);
         }
     }
 
     public function ShowItemImage($id){
         $this->active_modal_for_image = 1;
-        $this->active_activity_images = DivisionWiseActivityImage::where('division_wise_activity_id', $id)->get();
+        $this->active_sightseeing_images = DivisionWiseSightseeingImage::where('sightseeing_id', $id)->get();
     }
 
     
-    public function EditActivityItem($id){
+    public function EditSightSeeing($id){
         $this->active_assign_update_modal = 1;
-        $activity = DivisionWiseActivity::with('images:division_wise_activity_id,file_path')->find($id);
-        $this->edit_activities = $activity->toArray();
+        $activity = DivisionWiseSightseeing::with('images:sightseeing_id,file_path')->find($id);
+        $this->edit_sightseeings = $activity->toArray();
         $this->resetValidation();
     }
     public function CloseImageModal(){
         $this->active_modal_for_image = 0;
-        $this->active_activity_images = [];
+        $this->active_sightseeing_images = [];
     }
     public function CloseEditModal(){
         $this->active_assign_update_modal = 0;
-        unset($this->edit_activities);
+        unset($this->edit_sightseeings);
         unset($this->update_files);
     }
 
-    public function addActivity(){
-        $this->activities[] = ['name' => '', 'type' => 'PAID', 'price' => '', 'ticket_price' => ''];
+    public function addSightseeing(){
+        $this->sightseeings[] = ['name' => '', 'ticket_price' => ''];
         $this->files[] = null; // Placeholder for the file
     }
-    public function removeActivity($index)
+    public function removeSightSeing($index)
     {
-        unset($this->activities[$index]);
+        unset($this->sightseeings[$index]);
         unset($this->files[$index]);
     }
     
-    public function updateType($index, $type){
-        // Update the 'type' field for the specific activity
-        $this->activities[$index]['type'] = $type;
-    }
-    public function UpdateTypeFromEdit($type){
-        // Update the 'type' field for the specific activity
-        $this->edit_activities['type'] = $type;
-        if($type==="PAID"){
-            $this->edit_activities['price'] = null;
-            $this->edit_activities['ticket_price'] = null;
-        }
-    }
     public function getDivisionNameById($divisionId){
         $division = City::find($divisionId);
         return $division ? $division->name : 'unknown-division';
@@ -180,47 +156,41 @@ class DivisionWiseActivityList extends Component
     public function submitForm()
     {
         $this->validate([
-            'activities.*.name' => 'required|string|max:255',
-            'activities.*.type' => 'required|in:PAID,UNPAID',
+            'sightseeings.*.name' => 'required|string|max:255',
             'selected_season_type' => 'required',
             'selectedDivision' => 'required',
             'files.*.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'activities.*.price' => 'required_if:activities.*.type,PAID|nullable|numeric',
-            'activities.*.ticket_price' => 'required_if:activities.*.type,PAID|nullable|numeric',
+            'sightseeings.*.ticket_price' => 'required|numeric',
         ], [
-            'activities.*.name.required' => 'This field is required.',
-            'activities.*.type.required' => 'This field is required.',
+            'sightseeings.*.name.required' => 'This field is required.',
             'selected_season_type.required' => 'This field is required.',
             'selectedDivision.required' => 'This field is required.',
             'files.*.*.required' => 'This field is required.',
-            'activities.*.price.required_if' => 'This field is required',
-            'activities.*.ticket_price.required_if' => 'This field is required',
+            'sightseeings.*.ticket_price.required' => 'This field is required',
         ]);
 
         try {
             DB::beginTransaction(); // Start transaction
             // Check if the selected season type and division are provided
             if ($this->selected_season_type == 0) {
-                session()->flash('new-activity-error', 'Please Choose a Season Type!');
+                session()->flash('new-sightseeing-error', 'Please Choose a Season Type!');
                 return; // Stop further execution
             }
 
             if (!$this->selectedDivision) {
-                session()->flash('new-activity-error', 'Please Choose a Division!');
+                session()->flash('new-sightseeing-error', 'Please Choose a Division!');
                 return; // Stop further execution
             }
-            if (count($this->activities)==0) {
-                session()->flash('new-activity-error', 'Please Choose atleast one activity!');
+            if (count($this->sightseeings)==0) {
+                session()->flash('new-sightseeing-error', 'Please Choose atleast one sightseeing point!');
                 return; // Stop further execution
             }
-        // Loop through activities and save them to the database
+        // Loop through sightseeings and save them to the database
        
-            foreach ($this->activities as $index => $activity) {
+            foreach ($this->sightseeings as $index => $activity) {
                 // Save the activity record
-                $activityRecord = DivisionWiseActivity::create([
+                $activityRecord = DivisionWiseSightseeing::create([
                     'name' => $activity['name'], // Ensure this key exists
-                    'type' => $activity['type'], // Ensure this key exists and is 'PAID' or 'UNPAID'
-                    'price' => !empty($activity['price']) ? $activity['price'] : 0, // Save 0 if empty
                     'ticket_price' => !empty($activity['ticket_price']) ? $activity['ticket_price'] : 0, // Save 0 if empty
                     'seasion_type_id' => $this->selected_season_type, // Validate this is set
                     'division_id' => $this->selectedDivision, // Validate this is set
@@ -232,10 +202,10 @@ class DivisionWiseActivityList extends Component
                     foreach ($uploadedFiles as $file) {
                         $dynamicText = $activity['name'];
                         $divisionName = $this->selectedDivisionName; // Assuming you have a division name
-                        $uploadedPath = CustomHelper::uploadImage($file, $dynamicText, $divisionName, 'activities');
+                        $uploadedPath = CustomHelper::uploadImage($file, $dynamicText, $divisionName, 'sightseeings');
                         // Save the uploaded file record
-                        DivisionWiseActivityImage::create([
-                            'division_wise_activity_id' => $activityRecord->id,
+                        DivisionWiseSightseeingImage::create([
+                            'sightseeing_id' => $activityRecord->id,
                             'file_path' => $uploadedPath,
                         ]);
                     }
@@ -243,20 +213,20 @@ class DivisionWiseActivityList extends Component
             }
         
             DB::commit(); // Commit transaction
-            session()->flash('success', 'Activities saved successfully!');
+            session()->flash('success', 'Sightseeing point saved successfully!');
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback transaction on error
-            session()->flash('new-activity-error', 'Error: ' . $e->getMessage());
+            session()->flash('new-sightseeing-error', 'Error: ' . $e->getMessage());
             return; // Stop further execution
         }
 
         // Success message
-        session()->flash('success', 'Activities saved successfully!');
+        session()->flash('success', 'Sightseeing point saved successfully!');
         $this->active_assign_new_modal = 0;
-        $this->FilterCabBySeasionType(0); //for All
-        $this->activities = []; // Reset all activities by setting the array to empty
+        $this->FilterSightseeingPointBySeasionType(0); //for All
+        $this->sightseeings = []; // Reset all sightseeings by setting the array to empty
         // If you need to initialize some fields with an empty template, you can add default values like this
-        $this->activities[] = [
+        $this->sightseeings[] = [
             'name' => '',
             'type' => 'PAID',
             'price' => '',
@@ -269,41 +239,41 @@ class DivisionWiseActivityList extends Component
     {
         $this->validate(
             [
-                'edit_activities.name' => 'required|string|max:255',
-                'edit_activities.type' => 'required|in:PAID,UNPAID',
-                'edit_activities.seasion_type_id' => 'required|exists:seasion_types,id',
+                'edit_sightseeings.name' => 'required|string|max:255',
+                'edit_sightseeings.type' => 'required|in:PAID,UNPAID',
+                'edit_sightseeings.seasion_type_id' => 'required|exists:seasion_types,id',
                 'selectedDivision' => 'required|exists:cities,id',
                 // 'update_files.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             ],
             [
-                'edit_activities.name.required' => 'The activity name is required.',
-                'edit_activities.type.required' => 'The activity type is required.',
-                'edit_activities.type.in' => 'Type must be either PAID or UNPAID.',
-                'edit_activities.seasion_type_id.required' => 'The season type is required.',
+                'edit_sightseeings.name.required' => 'The activity name is required.',
+                'edit_sightseeings.type.required' => 'The activity type is required.',
+                'edit_sightseeings.type.in' => 'Type must be either PAID or UNPAID.',
+                'edit_sightseeings.seasion_type_id.required' => 'The season type is required.',
                 'selectedDivision.required' => 'The division is required.',
                 // 'update_files.*.image' => 'Each file must be an image.',
                 // 'update_files.*.mimes' => 'Each file must be a JPG, JPEG, PNG, or WEBP image.',
                 // 'update_files.*.max' => 'Each file must not exceed 2MB in size.',
             ]
         );
-        if ($this->edit_activities['type'] === 'PAID') {
+        if ($this->edit_sightseeings['type'] === 'PAID') {
             $this->validate([
-                'edit_activities.price' => 'required|numeric|gt:0',
-                'edit_activities.ticket_price' => 'required|numeric|gt:0',
+                'edit_sightseeings.price' => 'required|numeric|gt:0',
+                'edit_sightseeings.ticket_price' => 'required|numeric|gt:0',
             ],[
-                'edit_activities.price.required' => 'This field is required',
-                'edit_activities.price.numeric' => 'Price must be a valid number.',
-                'edit_activities.price.gt' => 'Price must be greater than 0.',
-                'edit_activities.ticket_price.required' => 'This field is required',
-                'edit_activities.ticket_price.numeric' => 'Price must be a valid number.',
-                'edit_activities.ticket_price.gt' => 'Price must be greater than 0.',
+                'edit_sightseeings.price.required' => 'This field is required',
+                'edit_sightseeings.price.numeric' => 'Price must be a valid number.',
+                'edit_sightseeings.price.gt' => 'Price must be greater than 0.',
+                'edit_sightseeings.ticket_price.required' => 'This field is required',
+                'edit_sightseeings.ticket_price.numeric' => 'Price must be a valid number.',
+                'edit_sightseeings.ticket_price.gt' => 'Price must be greater than 0.',
             ]);
         }
        
         try {
             DB::beginTransaction(); // Start transaction
             // Check if the selected season type and division are provided
-            if ($this->edit_activities['seasion_type_id'] == 0) {
+            if ($this->edit_sightseeings['seasion_type_id'] == 0) {
                 session()->flash('edit-activity-error', 'Please Choose a Season Type!');
                 return; // Stop further execution
             }
@@ -314,15 +284,15 @@ class DivisionWiseActivityList extends Component
             }
 
              // Find the activity record that you want to update
-            $activityRecord = DivisionWiseActivity::findOrFail($this->edit_activities['id']); // Ensure $id is available
+            $activityRecord = DivisionWiseSightseeing::findOrFail($this->edit_sightseeings['id']); // Ensure $id is available
            
             // Update the activity record with the new data
             $activityRecord->update([
-                'name' => $this->edit_activities['name'], // Ensure this key exists
-                'type' => $this->edit_activities['type'], // Ensure this key exists and is 'PAID' or 'UNPAID'
-                'price' => $this->edit_activities['type'] ==="PAID" ? $this->edit_activities['price'] : 0, // Save 0 if empty
-                'ticket_price' => $this->edit_activities['type']==="PAID" ? $this->edit_activities['ticket_price'] : 0, // Save 0 if empty
-                'seasion_type_id' => $this->edit_activities['seasion_type_id'], // Validate this is set
+                'name' => $this->edit_sightseeings['name'], // Ensure this key exists
+                'type' => $this->edit_sightseeings['type'], // Ensure this key exists and is 'PAID' or 'UNPAID'
+                'price' => $this->edit_sightseeings['type'] ==="PAID" ? $this->edit_sightseeings['price'] : 0, // Save 0 if empty
+                'ticket_price' => $this->edit_sightseeings['type']==="PAID" ? $this->edit_sightseeings['ticket_price'] : 0, // Save 0 if empty
+                'seasion_type_id' => $this->edit_sightseeings['seasion_type_id'], // Validate this is set
                 'division_id' => $this->selectedDivision, // Validate this is set
             ]);
            
@@ -333,42 +303,42 @@ class DivisionWiseActivityList extends Component
                 foreach ($uploadedFiles as $file) {
                     $dynamicText = $activityRecord->name;
                     $divisionName = $this->selectedDivisionName; // Assuming you have a division name
-                    $uploadedPath = CustomHelper::uploadImage($file, $dynamicText, $divisionName, 'activities');
+                    $uploadedPath = CustomHelper::uploadImage($file, $dynamicText, $divisionName, 'sightseeings');
                     // Save the uploaded file record
-                    DivisionWiseActivityImage::create([
-                        'division_wise_activity_id' => $activityRecord->id,
+                    DivisionWiseSightseeingImage::create([
+                        'sightseeing_id' => $activityRecord->id,
                         'file_path' => $uploadedPath,
                     ]);
                 }
             }
            
             DB::commit(); // Commit transaction
-            session()->flash('success', 'Activities update successfully!');
+            session()->flash('success', 'Sightseeing point update successfully!');
             $this->CloseEditModal();
-            $this->FilterCabBySeasionType(0); //for All
+            $this->FilterSightseeingPointBySeasionType(0); //for All
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback transaction on error
-            session()->flash('new-activity-error', 'Error: ' . $e->getMessage());
+            session()->flash('new-sightseeing-error', 'Error: ' . $e->getMessage());
             return; // Stop further execution
         }
     
         // Proceed with the update logic
     }
     
-    public function DeleteActivityItem($id)
+    public function DeleteSightSeeingItem($id)
     {
-        $activity = DivisionWiseActivity::find($id);
+        $activity = DivisionWiseSightseeing::find($id);
         if ($activity) {
             $activity->delete();
             $this->mount(); // Or call any method to refresh data
-            session()->flash('success', 'Activity deleted successfully!');
+            session()->flash('success', 'Sightseeing point deleted successfully!');
         } 
     }
 
     public function deleteItemImage($imageId)
     {
         // Find the image by ID
-        $image = DivisionWiseActivityImage::find($imageId);
+        $image = DivisionWiseSightseeingImage::find($imageId);
         if ($image) {
             $filePath = $image->file_path;
 
@@ -382,7 +352,7 @@ class DivisionWiseActivityList extends Component
             $image->delete();
 
             // Re-fetch the active images
-            $this->active_activity_images = DivisionWiseActivityImage::where('division_wise_activity_id', $image->division_wise_activity_id)->get();
+            $this->active_sightseeing_images = DivisionWiseSightseeingImage::where('sightseeing_id', $image->sightseeing_id)->get();
             $this->active_modal_for_image = 1;
         } 
     }
@@ -394,6 +364,7 @@ class DivisionWiseActivityList extends Component
     }
     public function render()
     {
-        return view('livewire.division-wise-activity-list');
+        return view('livewire.division-wise-sightseeing-list');
     }
 }
+

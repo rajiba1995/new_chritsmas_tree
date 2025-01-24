@@ -64,32 +64,12 @@
                             </select>
                         </div>
                     </div>
-                    <div>
-                        <div class="grid grid-cols-1 hover:grid-cols-6">
-                            <label for="">
-                                <span class="badge gap-2 bg-danger/10 text-danger uppercase">
-                                   Type
-                                </span>
-                            </label>
-                            <select 
-                                name="payment_type" 
-                                class="placeholder:text-textmuted text-sm selected_seasion_type"  
-                                wire:change="FilterCabByPaymentType($event.target.value)" 
-                                wire:key="select-payment-type">
-                                <option value="" hidden>Filter Type</option>
-                                <option value="0" wire:key="select-payment-type-0">All</option>
-                                    <option value="PAID" wire:key="select-payment-type-1">Paid</option>
-                                    <option value="UNPAID" wire:key="select-payment-type-2">Unpaid</option>
-                            </select>
-                        </div>
-                    </div>
-                    
                     <div class="prism-toggle mt-5">
-                        <a href="javascript:void(0)" wire:click="OpenNewCabModal('yes')" class="ti-btn ti-btn-primary-full !py-1 pt-0 ti-btn-wave  me-[0.375rem]"><i class="fa-solid fa-plus"></i>Add New Activity</a>
+                        <a href="javascript:void(0)" wire:click="OpenNewSightSeeingModal('yes')" class="ti-btn ti-btn-primary-full !py-1 pt-0 ti-btn-wave  me-[0.375rem]"><i class="fa-solid fa-plus"></i>Add New Sightseeing Point</a>
                     </div>
                     @endif
                     <div class="mt-5">
-                        <a href="{{route('admin.route.division_wise_activity_list')}}" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20">
+                        <a href="{{route('admin.route.division_wise_sightseeing_list')}}" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20">
                             <i class="ri-refresh-line"></i>
                         </a>
                     </div>
@@ -97,16 +77,16 @@
                 <div class="box-body">
                     <div class="flex justify-between">
                         <div class="badge bg-outline-success cursor-pointer">
-                            <span>No of Result: {{$division_wise_cabs->count()}}</span>
+                            <span>No of Result: {{$division_wise_sightseeing->count()}}</span>
                         </div>
                         <div>
                             {{-- <input type="text" class="badge bg-outline-primary !w-56" placeholder="Quick Search.."> --}}
                             @foreach ($seasion_types as $types_item)
-                            <div class="badge bg-outline-primary cursor-pointer {{$selected_season_type==$types_item->id?"active-primary-badge":""}}" wire:click="FilterCabBySeasionType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
+                            <div class="badge bg-outline-primary cursor-pointer {{$selected_season_type==$types_item->id?"active-primary-badge":""}}" wire:click="FilterSightseeingPointBySeasionType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
                                 <span>{{ strtoupper($types_item->title) }}</span>
                             </div>
                             @endforeach
-                            <div class="badge bg-outline-primary cursor-pointer {{$selected_season_type==0?"active-primary-badge":""}}" wire:click="FilterCabBySeasionType(0)" wire:key="seasion-type-0">
+                            <div class="badge bg-outline-primary cursor-pointer {{$selected_season_type==0?"active-primary-badge":""}}" wire:click="FilterSightseeingPointBySeasionType(0)" wire:key="seasion-type-0">
                                 <span>ALL</span>
                             </div>
                         </div>
@@ -118,16 +98,14 @@
                                 <thead class="uppercase">
                                     <tr class="border-b !border-primary/30">
                                         <th scope="col" class="!text-center">SL No.</th>
-                                        <th scope="col" class="!text-center">Activity Name</th>
+                                        <th scope="col" class="!text-center">Sightseeing Point</th>
                                         <th scope="col" class="!text-center">Seasion</th>
-                                        <th scope="col" class="!text-center">Activity Type</th>
-                                        <th scope="col" class="!text-center">Activity Price</th>
                                         <th scope="col" class="!text-center">Ticket Price (PP)</th>
                                         <th scope="col" class="!text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($division_wise_cabs as $cab_item)
+                                    @forelse($division_wise_sightseeing as $sightseeing_item)
                                     <tr>
                                         <th scope="row" class="!text-center">
                                             <span class="badge bg-primary/10 text-primary">
@@ -135,32 +113,26 @@
                                             </span>
                                         </th>
                                         <td class="!text-center">
-                                            <span>{{ucwords($cab_item->name)}}</span>
+                                            <span>{{ucwords($sightseeing_item->name)}}</span>
                                         </td>
                                         
                                         <td class="!text-center">
-                                            @if($cab_item->seasonType)
-                                                <span class="badge badge-{{ $cab_item->seasion_type_id == 3 ? 'purple' : ($cab_item->seasion_type_id == 1 ? 'info' : 'warning') }}-gradient">
-                                                    {{$cab_item->seasonType?$cab_item->seasonType->title:"N/A"}}
+                                            @if($sightseeing_item->seasonType)
+                                                <span class="badge badge-{{ $sightseeing_item->seasion_type_id == 3 ? 'purple' : ($sightseeing_item->seasion_type_id == 1 ? 'info' : 'warning') }}-gradient">
+                                                    {{$sightseeing_item->seasonType?$sightseeing_item->seasonType->title:"N/A"}}
                                                 </span>
                                             @endif
                                         </td>
 
                                         <td class="!text-center">
-                                            <span class="badge {{$cab_item->type=="PAID"?"bg-primary text-light":"bg-light text-dark"}}">{{$cab_item->type}}</span>
-                                        </td>
-                                        <td class="!text-center">
-                                           {{env('DEFAULT_CURRENCY_SYMBOL')}}{{number_format($cab_item->price, 2)}}
-                                        </td>
-                                        <td class="!text-center">
-                                            {{env('DEFAULT_CURRENCY_SYMBOL')}}{{number_format($cab_item->ticket_price,2)}}
+                                            {{env('DEFAULT_CURRENCY_SYMBOL')}}{{number_format($sightseeing_item->ticket_price,2)}}
                                         </td>
                                         <td class="!text-center">
                                             <x-tooltip-button 
                                                 button-class="ti-btn-soft-primary" 
                                                 border-class="primary" 
                                                 action="ShowItemImage"
-                                                :item-id="$cab_item->id" 
+                                                :item-id="$sightseeing_item->id" 
                                                 key="show-item-image" 
                                                 icon="ti ti-photo" 
                                                 tooltip="View Image"
@@ -169,8 +141,8 @@
                                             <x-tooltip-button 
                                                 button-class="ti-btn-soft-info" 
                                                 border-class="info" 
-                                                action="EditActivityItem" 
-                                                :item-id="$cab_item->id" 
+                                                action="EditSightSeeing" 
+                                                :item-id="$sightseeing_item->id" 
                                                 key="edit-item" 
                                                 icon="ti ti-pencil" 
                                                 tooltip="Edit Item"
@@ -179,8 +151,8 @@
                                             <x-tooltip-button 
                                                 button-class="ti-btn-soft-danger" 
                                                 border-class="danger" 
-                                                action="DeleteActivityItem" 
-                                                :item-id="$cab_item->id" 
+                                                action="DeleteSightSeeingItem" 
+                                                :item-id="$sightseeing_item->id" 
                                                 key="delete-item" 
                                                 icon="ti ti-trash" 
                                                 tooltip="Delete Item"
@@ -208,10 +180,10 @@
     </div>
     {{-- Model --}}
     <div id="assign_cab" class="hs-overlay {{$active_assign_new_modal==0?"hidden":""}} fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_lg_sm_width bg-white rounded-lg">
+        <div class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_md_width bg-white rounded-lg">
             <div class="ti-modal-content p-20">
                 <div class="ti-modal-header flex justify-end items-center">
-                    <button type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none badge gap-2 bg-danger/10 text-danger" wire:click="OpenNewCabModal('no')">
+                    <button type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none badge gap-2 bg-danger/10 text-danger" wire:click="OpenNewSightSeeingModal('no')">
                         <i class="fa-solid fa-xmark text-lg text-dark"></i>
                     </button>
                 </div>
@@ -270,7 +242,7 @@
                                  </span>
                             </label>
                             @foreach ($seasion_types as $types_item)
-                            <div class="badge bg-outline-primary cursor-pointer !py-2 {{$selected_season_type==$types_item->id?"active-primary-badge":""}}" wire:click="FilterCabBySeasionType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
+                            <div class="badge bg-outline-primary cursor-pointer !py-2 {{$selected_season_type==$types_item->id?"active-primary-badge":""}}" wire:click="FilterSightseeingPointBySeasionType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
                                 <span>{{ strtoupper($types_item->title) }}</span>
                             </div>
                             @endforeach
@@ -281,75 +253,39 @@
                             <table class="table whitespace-nowrap table-bordered table-bordered-primary border-primary/10 min-w-full new-activity">
                                 <thead class="uppercase">
                                     <tr class="border-b !border-primary/30">
-                                        <th scope="col" class="!text-center w-1/2">Activity Name</th> <!-- Example for 50% width -->
-                                        <th scope="col" class="!text-center w-1/5">Activity Type</th> <!-- Example for 20% width -->
-                                        <th scope="col" class="!text-center w-1/8">Activity Price</th> <!-- Example for 12.5% width -->
+                                        <th scope="col" class="!text-center w-1/2">Sightseeing Point</th> <!-- Example for 50% width -->
                                         <th scope="col" class="!text-center w-1/10">Ticket Price (PP)</th> <!-- Example for 10% width -->
                                         <th scope="col" class="!text-center w-1/20">
-                                            <button type="button" wire:click.prevent="addActivity" class="ti-btn ti-btn-sm ti-btn-soft-success !border !border-success/20">
+                                            <button type="button" wire:click.prevent="addSightseeing" class="ti-btn ti-btn-sm ti-btn-soft-success !border !border-success/20">
                                                 <i class="fa-solid fa-plus text-lg text-dark"></i>
                                             </button>
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                        @foreach ($activities as $index => $activity)
+                                        @foreach ($sightseeings as $index => $activity)
                                             <tr>
                                                 <td class="!text-center">
                                                     <div>
-                                                        <input type="text" wire:model="activities.{{ $index }}.name" class="form-control form-control-sm text-center" placeholder="Enter activity name">
+                                                        <input type="text" wire:model="sightseeings.{{ $index }}.name" class="form-control form-control-sm text-center" placeholder="Enter sightseeing point">
                                                     </div>
-                                                    @error('activities.' . $index . '.name') <span class="text-danger">{{ $message }}</span> @enderror
-                                                </td>
-                                                <td class="!text-center border-x-0">
-                                                    <div>
-                                                        <label class="badge !rounded-full bg-outline-secondary cursor-pointer {{ isset($activities[$index]['type']) && $activities[$index]['type'] === 'PAID' ? 'active' : '' }}">
-                                                            <input 
-                                                                type="radio"
-                                                                name="type" 
-                                                                value="PAID" 
-                                                                class="contents" 
-                                                                wire:change="updateType('{{ $index }}', 'PAID')"
-                                                                wire:key="radio-{{ $index }}-PAID"> 
-                                                            PAID
-                                                        </label>
-                                                        <label class="badge !rounded-full bg-outline-secondary cursor-pointer {{ isset($activities[$index]['type']) && $activities[$index]['type'] === 'UNPAID' ? 'active' : '' }}">
-                                                            <input 
-                                                                type="radio"
-                                                                name="type" 
-                                                                value="UNPAID" 
-                                                                class="contents" 
-                                                                wire:change="updateType('{{ $index }}', 'UNPAID')" 
-                                                                wire:key="radio-{{ $index }}-UNPAID"> 
-                                                            UNPAID
-                                                        </label>
-                                                    </div>
-                                                    @error('activities.' . $index . '.type') 
-                                                        <span class="text-danger">{{ $message }}</span> 
-                                                    @enderror
+                                                    @error('sightseeings.' . $index . '.name') <span class="text-danger">{{ $message }}</span> @enderror
                                                 </td>
                                                 <td class="!text-center border-x-0">
                                                    <div>
-                                                        <input type="text" wire:model="activities.{{ $index }}.price" class="form-control form-control-sm text-center {{ isset($activities[$index]['type']) && $activities[$index]['type'] === 'UNPAID' ? 'placeholder:text-textmuted' : '' }}" placeholder="Price" 
-                                                        onkeyup="validateNumber(this)" {{ isset($activities[$index]['type']) && $activities[$index]['type'] === 'UNPAID' ? 'disabled' : '' }} >
+                                                        <input type="text" wire:model="sightseeings.{{ $index }}.ticket_price" class="form-control form-control-sm text-center" placeholder="Price"
+                                                        onkeyup="validateNumber(this)">
                                                    </div>
-                                                    @error('activities.' . $index . '.price') <span class="text-danger">{{ $message }}</span> @enderror
-                                                </td>
-                                                <td class="!text-center border-x-0">
-                                                   <div>
-                                                        <input type="text" wire:model="activities.{{ $index }}.ticket_price" class="form-control form-control-sm text-center {{ isset($activities[$index]['type']) && $activities[$index]['type'] === 'UNPAID' ? 'placeholder:text-textmuted' : '' }}" placeholder="Price"
-                                                        onkeyup="validateNumber(this)" {{ isset($activities[$index]['type']) && $activities[$index]['type'] === 'UNPAID' ? 'disabled' : '' }}>
-                                                   </div>
-                                                    @error('activities.' . $index . '.ticket_price') <span class="text-danger">{{ $message }}</span> @enderror
+                                                    @error('sightseeings.' . $index . '.ticket_price') <span class="text-danger">{{ $message }}</span> @enderror
                                                 </td>
                                                 <td class="!text-center border-l-0">
-                                                    <button type="button" wire:click.prevent="removeActivity({{ $index }})" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20">
+                                                    <button type="button" wire:click.prevent="removeSightSeing({{ $index }})" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20">
                                                         <i class="ti ti-trash"></i>
                                                     </button>
                                                 </td>
                                             </tr>
                                             <tr class="border-t-0">
-                                                <td colspan="3">
+                                                <td colspan="2">
                                                     <!-- Display Selected Image Previews -->
                                                         @if (isset($files[$index]) && is_array($files[$index]) && count($files[$index]) > 0)
                                                             <div class="image-preview-container">
@@ -365,7 +301,7 @@
                                                         <span class="text-danger">{{ $message }}</span> 
                                                     @enderror
                                                 </td>
-                                                <td colspan="2" class=" border-l-0">
+                                                <td class=" border-l-0 sightseeing_images">
                                                      <!-- Custom File Upload Design -->
                                                      <label class="file-upload-container">
                                                         <span class="choose-text">Choose Images</span>
@@ -379,9 +315,9 @@
                             </table>
                         </div>
                     
-                        @if (session('new-activity-error'))
+                        @if (session('new-sightseeing-error'))
                             <div class="alert alert-danger">
-                                {{ session('new-activity-error') }}
+                                {{ session('new-sightseeing-error') }}
                             </div>
                         @endif
                     
@@ -399,14 +335,14 @@
     {{-- Model --}}
     {{-- Start Update Activity Modal --}}
         <div id="assign_cab_update" class="hs-overlay {{$active_assign_update_modal==0?"hidden":""}} fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_lg_sm_width bg-white rounded-lg">
+            <div class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_md_width bg-white rounded-lg">
                 <div class="ti-modal-content p-20">
                     <div class="ti-modal-header flex justify-end items-center">
                         <button type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none badge gap-2 bg-danger/10 text-danger" wire:click="CloseEditModal">
                             <i class="fa-solid fa-xmark text-lg text-dark"></i>
                         </button>
                     </div>
-                    @if(!empty($edit_activities))
+                    @if(!empty($edit_sightseeings))
                         <div class="ti-modal-body text-start">
                             <div class="flex items-center">
                                 <div class="grid grid-cols-1 hover:grid-cols-6 mx-1">
@@ -462,7 +398,7 @@
                                         </span>
                                     </label>
                                     @foreach ($seasion_types as $types_item)
-                                    <div class="badge bg-outline-primary cursor-pointer !py-2 {{$edit_activities['seasion_type_id']==$types_item->id?"active-primary-badge":""}}" wire:click="UpdateSeasonType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
+                                    <div class="badge bg-outline-primary cursor-pointer !py-2 {{$edit_sightseeings['seasion_type_id']==$types_item->id?"active-primary-badge":""}}" wire:click="UpdateSeasonType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
                                         <span>{{ strtoupper($types_item->title) }}</span>
                                     </div>
                                     @endforeach
@@ -473,9 +409,7 @@
                                     <table class="table whitespace-nowrap table-bordered table-bordered-primary border-primary/10 min-w-full new-activity">
                                         <thead class="uppercase">
                                             <tr class="border-b !border-primary/30">
-                                                <th scope="col" class="!text-center w-1/2">Activity Name</th> <!-- Example for 50% width -->
-                                                <th scope="col" class="!text-center w-1/5">Activity Type</th> <!-- Example for 20% width -->
-                                                <th scope="col" class="!text-center w-1/8">Activity Price</th> <!-- Example for 12.5% width -->
+                                                <th scope="col" class="!text-center w-1/2">Sightseeing Point</th> <!-- Example for 50% width -->
                                                 <th scope="col" class="!text-center w-1/10">Ticket Price (PP)</th> <!-- Example for 10% width -->
                                             </tr>
                                         </thead>
@@ -483,59 +417,25 @@
                                             <tr>
                                                 <td class="!text-center">
                                                     <div>
-                                                        <input type="text" wire:model="edit_activities.name" class="form-control form-control-sm text-center" placeholder="Edit activity name">
+                                                        <input type="text" wire:model="edit_sightseeings.name" class="form-control form-control-sm text-center" placeholder="Edit sightseeing point">
                                                     </div>
-                                                    @error('edit_activities.name') <span class="text-danger">{{ $message }}</span> @enderror
-                                                </td>
-                                                <td class="!text-center border-x-0">
-                                                    <div>
-                                                        <label class="badge !rounded-full bg-outline-secondary cursor-pointer {{ isset($edit_activities['type']) && $edit_activities['type'] === 'PAID' ? 'active' : '' }}">
-                                                            <input 
-                                                                type="radio"
-                                                                name="type" 
-                                                                value="PAID" 
-                                                                class="contents" 
-                                                                wire:change="UpdateTypeFromEdit('PAID')"
-                                                                wire:key="radio-edit-PAID"> 
-                                                            PAID
-                                                        </label>
-                                                        <label class="badge !rounded-full bg-outline-secondary cursor-pointer {{ isset($edit_activities['type']) && $edit_activities['type'] === 'UNPAID' ? 'active' : '' }}">
-                                                            <input 
-                                                            type="radio"
-                                                            name="type" 
-                                                            value="PAID" 
-                                                            class="contents" 
-                                                            wire:change="UpdateTypeFromEdit('UNPAID')"
-                                                            wire:key="radio-edit-UNPAID">  
-                                                            UNPAID
-                                                        </label>
-                                                    </div>
-                                                    @error('edit_activities.type') 
-                                                        <span class="text-danger">{{ $message }}</span> 
-                                                    @enderror
+                                                    @error('edit_sightseeings.name') <span class="text-danger">{{ $message }}</span> @enderror
                                                 </td>
                                                 <td class="!text-center border-x-0">
                                                 <div>
-                                                        <input type="text" wire:model="edit_activities.price" class="form-control form-control-sm text-center {{ isset($edit_activities['type']) && $edit_activities['type'] === 'UNPAID' ? 'placeholder:text-textmuted' : '' }}" placeholder="Price" 
-                                                        onkeyup="validateNumber(this)" {{ isset($edit_activities['type']) && $edit_activities['type'] === 'UNPAID' ? 'disabled' : '' }} >
+                                                        <input type="text" wire:model="edit_sightseeings.ticket_price" class="form-control form-control-sm text-center" placeholder="Price"
+                                                        onkeyup="validateNumber(this)">
                                                 </div>
-                                                    @error('edit_activities.price') <span class="text-danger">{{ $message }}</span> @enderror
-                                                </td>
-                                                <td class="!text-center border-x-0">
-                                                <div>
-                                                        <input type="text" wire:model="edit_activities.ticket_price" class="form-control form-control-sm text-center {{ isset($edit_activities['type']) && $edit_activities['type'] === 'UNPAID' ? 'placeholder:text-textmuted' : '' }}" placeholder="Price"
-                                                        onkeyup="validateNumber(this)" {{ isset($edit_activities['type']) && $edit_activities['type'] === 'UNPAID' ? 'disabled' : '' }}>
-                                                </div>
-                                                    @error('edit_activities.ticket_price') <span class="text-danger">{{ $message }}</span> @enderror
+                                                    @error('edit_sightseeings.ticket_price') <span class="text-danger">{{ $message }}</span> @enderror
                                                 </td>
                                             </tr>
                                             <tr class="border-t-0">
-                                                <td colspan="3">
+                                                <td colspan="2">
                                                     <!-- Display Selected Image Previews -->
                                                       
                                                     <div class="image-preview-container">
-                                                        @if (count($edit_activities['images'])>0)
-                                                            @foreach ($edit_activities['images'] as $edit_file)
+                                                        @if (count($edit_sightseeings['images'])>0)
+                                                            @foreach ($edit_sightseeings['images'] as $edit_file)
                                                                 <div class="image-preview">
                                                                     <img src="{{ asset($edit_file['file_path']) }}" alt="Image Preview" class="image-thumbnail">
                                                                 </div>
@@ -554,7 +454,7 @@
                                                         <span class="text-danger">{{ $message }}</span> 
                                                     @enderror
                                                 </td>
-                                                <td colspan="2" class=" border-l-0">
+                                                <td class=" border-l-0 sightseeing_images">
                                                     <!-- Custom File Upload Design -->
                                                     <label class="file-upload-container">
                                                         <span class="choose-text">Choose Images</span>
@@ -588,7 +488,7 @@
 
     {{-- Start Model For Activity Images --}}
     <div id="show_images" class="hs-overlay {{$active_modal_for_image==0?"hidden":""}} fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_lg_sm_width bg-white rounded-lg">
+        <div class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_md_width bg-white rounded-lg">
             <div class="ti-modal-content p-20">
                 <div class="ti-modal-header flex justify-end items-center">
                     <button type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none badge gap-2 bg-danger/10 text-danger" wire:click="CloseImageModal">
@@ -597,7 +497,7 @@
                 </div>
                 <div class="ti-modal-body text-start mt-2">
                     <div class="grid grid-cols-12 gap-x-6">
-                        @forelse ($active_activity_images as $image)
+                        @forelse ($active_sightseeing_images as $image)
                             <div class="lg:col-span-3 md:col-span-3 sm:col-span-6 col-span-12 relative">
                                 <!-- Image -->
                                 <img src="{{ asset($image->file_path) }}" alt="image" class="box thumbnail-image">
