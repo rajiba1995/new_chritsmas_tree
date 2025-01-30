@@ -379,8 +379,36 @@
 .new-activity .border-l-0{
   border-left: none !important;
 }
+.new-activity .border-r-0{
+  border-right: none !important;
+}
+.bg-primary{
+  background: #e5effd !important;
+}
+
+.way_point_th{
+  text-align: center !important;
+  font-weight: 400 !important;
+}
+.way_point_division{
+  padding: 3px 25px 2px 9px;
+  border-radius: 5px !important;
+  border-color: #ece3e3 !important;
+  font-size: 12px;
+}
+.way_point_add{
+  color: #000;
+  background: #fff;
+}
+.way_point_add:hover{
+  color: #fff !important;
+  background: #0563e9 !important;
+}
 .new-activity .border-t-0{
   border-top: none !important;
+}
+.new-activity .border-b-0{
+  border-bottom: none !important;
 }
 .new-activity label.active{
   background-color: #0162e8 !important;

@@ -31,4 +31,9 @@ class RouteManagementController extends Controller
         return view('admin.route.division-wise-sightseeing-list', compact('common'));
     }
 
+    public function DestinationWiseRouteList(Request $request){
+        $common = CustomHelper::setHeadersAndTitle('Route Management', 'Destination Wise Route');
+        return view('admin.route.destination-wise-route-list', compact('common'));
+    }
+
 }

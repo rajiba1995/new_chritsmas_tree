@@ -172,7 +172,7 @@
         <!-- APP JS-->
 		@vite('resources/js/app.js')       
 
-        <script src="{{ asset('livewire/livewire.js') }}" data-csrf="{{ csrf_token() }}" data-update-uri="{{asset('/livewire/update')}}" data-navigate-once="true"></script>
+        {{-- <script src="{{ asset('livewire/livewire.js') }}" data-csrf="{{ csrf_token() }}" data-update-uri="{{asset('/livewire/update')}}" data-navigate-once="true"></script> --}}
         
         @include('layouts.components.scripts')
         

@@ -60,14 +60,14 @@ class DivisionWiseSightseeingList extends Component
         $this->divisions = City::where('state_id', $this->selectedDestination)->where('status', 1)->orderBy('name', 'ASC')->get();
         $State = State::find($destination_id);
         if(count($this->divisions)>0){
-            $city= City::where('state_id', $this->selectedDestination)->where('status', 1)->orderBy('name', 'ASC');
-            if($this->selectedDivision){
-                $city->where('id', $this->selectedDivision);
-            }
-           
-           $city = $city->first();
-            $this->selectedDivision = $city->id;
-            $this->selectedDivisionName =$city->name;
+            $city= City::where('state_id', $destination_id)->where('status', 1)->orderBy('name', 'ASC')->first();
+           if($city){
+                $this->selectedDivision = $city->id;
+                $this->selectedDivisionName =$city->name;
+           }else{
+             session()->flash('error', 'Please add a division first for the ' . $State->name . ' destination. <a href="' . route('admin.division.index') . '" class="text-primary">Click here to add.</a>');
+           }
+          
         }else{
             session()->flash('error', 'Please add a division first for the ' . $State->name . ' destination. <a href="' . route('admin.division.index') . '" class="text-primary">Click here to add.</a>');
 

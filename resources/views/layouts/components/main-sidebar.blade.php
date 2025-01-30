@@ -139,6 +139,9 @@
 										<li class="slide {{ request()->is('admin/route/division-wise-sightseeings*')? 'active' : '' }}">
 											<a href="{{route('admin.route.division_wise_sightseeing_list')}}" class="side-menu__item">Division Wise Sightseeings</a>
 										</li>
+										<li class="slide {{ request()->is('admin/route/destination-wise-route-list*')? 'active' : '' }}">
+											<a href="{{route('admin.route.destination_wise_route_list')}}" class="side-menu__item">Destination Wish Routes</a>
+										</li>
 								</ul>
 							</li>
 							<!-- End::slide -->

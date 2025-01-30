@@ -33,7 +33,7 @@
                 <div class="table-responsive">
                     <x-global-table 
                         :items="$cabs" 
-                        :fields="['image', 'cab_title', 'status']" 
+                        :fields="['image', 'cab_title', 'Capacity', 'status']" 
                         dataType="cab" 
                         :extra="[]"
                     />
