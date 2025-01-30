@@ -90,6 +90,7 @@ class DivisionWiseSightseeingList extends Component
         $this->selected_season_type = $value; 
         $this->division_wise_sightseeing  = $this->GetSightseeing();
     }
+   
     public function UpdateSeasonType($value){
         $this->edit_sightseeings['seasion_type_id'] = $value; 
     }

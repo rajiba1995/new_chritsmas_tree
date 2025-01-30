@@ -213,15 +213,23 @@
   }
   .modal_lg_width{
     max-width: 75rem !important;
+    max-height: 95vh;
+    overflow: hidden;
   }
   .modal_sm_width{
     max-width: 15rem !important;
+    max-height: 95vh;
+    overflow: hidden;
   }
   .modal_lg_sm_width{
     max-width: 50rem !important;
+    max-height: 95vh;
+    overflow: hidden;
   }
   .modal_md_width{
     max-width: 30rem !important;
+    max-height: 95vh;
+    overflow: hidden;
   }
   .cw-60{
     width: 60px;
@@ -524,6 +532,22 @@
     height: 150px;
     padding: 5px;
   }
+  .ti-modal-body{
+    overflow-y: scroll;
+    max-height: 80vh;
+  }
+
+  .table-responsive input::placeholder{
+    color: #868686 !important;
+  }
+  .route_details{
+    font-size: x-small !important;
+    padding: 10px 1px !important;
+    text-align: center !important;
+  }
+
+
+  
 /* Activity Iage slider  */
 
 

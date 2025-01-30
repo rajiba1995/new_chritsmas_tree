@@ -105,11 +105,11 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($division_wise_sightseeing as $sightseeing_item)
+                                    @forelse($division_wise_sightseeing as $k=> $sightseeing_item)
                                     <tr>
                                         <th scope="row" class="!text-center">
                                             <span class="badge bg-primary/10 text-primary">
-                                                1
+                                                {{$k+1}}
                                             </span>
                                         </th>
                                         <td class="!text-center">

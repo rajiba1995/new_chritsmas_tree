@@ -19,4 +19,8 @@ class DestinationWiseRoute extends Model
     public function destination(){
         return $this>belongsTo(State::class, 'destination_id', 'id');
     }
+    public function waypoints ()
+    {
+        return $this->hasMany(DestinationWiseRouteWaypoint::class, 'route_id', 'id');
+    }
 }
