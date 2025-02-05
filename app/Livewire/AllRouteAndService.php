@@ -10,12 +10,11 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use App\Helpers\CustomHelper;
 use Illuminate\Support\Facades\Storage;
-use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Log;
 
-class DestinationWiseRouteMap extends Component
+class AllRouteAndService extends Component
 {
-    use WithFileUploads;
+    public $active_tab = 1;
     public $desitinations =[];
     public $divisions =[];
     public $selectedDestination = null;
@@ -50,22 +49,12 @@ class DestinationWiseRouteMap extends Component
             $this->getDestination($State->id);
         }
         $this->seasion_types = DB::table('seasion_types')->where('status', 1)->orderBy('title', 'ASC')->get();
-        $this->addRoute(); // Start with one route
     }
     public function getDestination($destination_id){
         $this->selectedDestination = $destination_id;
         $this->divisions = City::where('state_id', $this->selectedDestination)->where('status', 1)->orderBy('name', 'ASC')->get();
         $State = State::find($destination_id);
-        if(count($this->divisions)>0){
-        //     $city= City::where('state_id', $destination_id)->where('status', 1)->orderBy('name', 'ASC')->first();
-        //    if($city){
-        //         $this->selectedDivision = $city->id;
-        //         $this->selectedDivisionName =$city->name;
-        //    }else{
-        //      session()->flash('error', 'Please add a division first for the ' . $State->name . ' destination. <a href="' . route('admin.division.index') . '" class="text-primary">Click here to add.</a>');
-        //    }
-          
-        }else{
+        if(count($this->divisions)==0){
             session()->flash('error', 'Please add a division first for the ' . $State->name . ' destination. <a href="' . route('admin.division.index') . '" class="text-primary">Click here to add.</a>');
 
             $this->selectedDivision = null;
@@ -175,21 +164,8 @@ class DestinationWiseRouteMap extends Component
     {
         // dd($this->all());
         $this->resetErrorBag();
-        if ($this->selected_season_type == 0) {
-            session()->flash('new-route-error', 'Please choose a season type!');
-            return; // Stop further execution
-        }
         if(count($this->new_routes)>0){
             foreach ($this->new_routes as $index => $route) {
-                $checkExisting = DestinationWiseRoute::where('route_name', $route['route_name'])->where('seasion_type_id', $this->selected_season_type)
-                ->where('destination_id', $this->selectedDestination)
-                ->first();
-            
-                if ($checkExisting) {
-                    session()->flash('new-route-error', 'The route name "' . $route['route_name'] . '" already exists for this destination. Please choose another route name.');
-                    return; // Stop further execution
-                }
-            
                 if(count($route['waypoints'])==0){
                     session()->flash('new-route-error', 'Please choose atleast one waypoint. on this '.$route['route_name']);
                     return; // Stop further execution 
@@ -213,6 +189,11 @@ class DestinationWiseRouteMap extends Component
         try {
             DB::beginTransaction(); // Start transaction
             // Check if the selected season type and division are provided
+            if ($this->selected_season_type == 0) {
+                session()->flash('new-route-error', 'Please choose a season type!');
+                return; // Stop further execution
+            }
+
             if (count($this->new_routes)==0) {
                 session()->flash('new-route-error', 'Please choose atleast one route point!');
                 return; // Stop further execution
@@ -260,7 +241,6 @@ class DestinationWiseRouteMap extends Component
         $this->FilterRoutePointBySeasionType(0); //for All
         $this->new_routes = []; // Reset all sightseeings by setting the array to empty
         // If you need to initialize some fields with an empty template, you can add default values like this
-       $this->addRoute();
     }
 
     public function submitEditForm()
@@ -268,16 +248,8 @@ class DestinationWiseRouteMap extends Component
         // dd($this->edit_routes);
        
         $this->resetErrorBag();
-        $checkExisting = DestinationWiseRoute::where('route_name', $this->edit_routes['route_name'])
-                ->where('destination_id', $this->edit_routes['destination_id'])->where('seasion_type_id', $this->edit_routes['seasion_type_id'])->where('id', '!=', $this->edit_routes['id'])
-                ->first();
-            
-        if ($checkExisting) {
-            session()->flash('edit-route-error', 'The route name "' . $this->edit_routes['route_name'] . '" already exists for this destination. Please choose another route name.');
-            return; // Stop further execution
-        }
         if(count($this->edit_routes['waypoints'])==0){
-            session()->flash('edit-route-error', 'Please choose atleast one waypoint. on this '.$this->edit_routes['route_name']);
+            session()->flash('new-route-error', 'Please choose atleast one waypoint. on this '.$this->edit_routes['route_name']);
             return; // Stop further execution 
         }
        
@@ -404,8 +376,17 @@ class DestinationWiseRouteMap extends Component
             session()->flash('success', 'Route deleted successfully!');
         } 
     }
+
+    // New code
+
+    public function TabChange($value){
+        $this->active_tab = $value;
+    }
+
+
     public function render()
     {
-        return view('livewire.destination-wise-route-map');
+        return view('livewire.all-route-and-service');
     }
 }
+

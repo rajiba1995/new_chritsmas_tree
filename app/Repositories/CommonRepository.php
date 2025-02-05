@@ -125,6 +125,7 @@ class CommonRepository
     public function createCab(array $data){
         $state = new Cab;
         $state->title = ucwords($data['title']);
+        $state->capacity = $data['capacity'];
         $state->save();
         return $state;
     }
@@ -146,6 +147,7 @@ class CommonRepository
     public function updateCab(array $data){
         $cab  = Cab::findOrFail($data['id']);
         $cab->title = $data['title'];
+        $cab->capacity = $data['capacity'];
         $cab->save();
         return $cab;
     }

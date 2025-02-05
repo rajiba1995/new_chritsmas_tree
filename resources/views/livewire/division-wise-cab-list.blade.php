@@ -86,7 +86,7 @@
                             <div class="xl:col-span-2 col-span-2">
                                 <div class="box">
                                     <div class="box-header text-center">
-                                        <h5 class="box-title">{{$cab_item->cab?$cab_item->cab->title:"....."}}</h5>
+                                        <h5 class="box-title">{{$cab_item->cab?$cab_item->cab->title.'('.$cab_item->cab->capacity.')':"....."}}</h5>
                                     </div>
                                     <div class="box-body cab-card !p-0">
                                         <div class="items-center mb-2">
@@ -172,6 +172,7 @@
                                 <label class="form-check-label font-semibold uppercase text-secondary cursor-pointer" for="Checkbox-{{$cabs_item->id}}">
                                     {{$cabs_item->title}}
                                 </label>
+                                <span>({{$cabs_item->capacity}})</span>
                             </div>
                             @endforeach
                         </div>

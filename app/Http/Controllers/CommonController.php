@@ -363,11 +363,15 @@ class CommonController extends Controller
                     'required',
                     'string',
                     'max:255',
-                    Rule::unique('cabs', 'title')->whereNull('deleted_at'), // Ignore soft-deleted records
+                    Rule::unique('cabs', 'title')->where('capacity', $request->capacity)->whereNull('deleted_at'),
                 ],
+                'capacity' => 'required|integer|min:1', // Ensures capacity is a number and at least 1
             ], [
                 'title.required' => 'Please enter cab title.',
-                'title.unique' => 'This cab title already exists.',
+                'title.unique' => 'This cab already exists for the given capacity🚀',
+                'capacity.required' => 'Please enter cab capacity.',
+                'capacity.integer' => 'Capacity must be a number.',
+                'capacity.min' => 'Capacity must be at least 1.',
             ]);
             try {
                 $this->commonRepository->createCab($validatedData);
@@ -383,15 +387,20 @@ class CommonController extends Controller
                     'required',
                     'string',
                     'max:255',
-                    Rule::unique('cabs', 'title')->ignore($request->id)->whereNull('deleted_at'),
+                    Rule::unique('cabs', 'title')->where('capacity', $request->capacity)->ignore($request->id)->whereNull('deleted_at'),
                 ],
+                'capacity' => 'required|integer|min:1', // Ensures capacity is a number and at least 1
             ], [
                 'title.required' => 'Please enter cab title.',
+                'title.unique' => 'This cab already exists for the given capacity🚀',
+                'capacity.required' => 'Please enter cab capacity.',
+                'capacity.integer' => 'Capacity must be a number.',
+                'capacity.min' => 'Capacity must be at least 1.',
             ]);
             // After validation, proceed to save the data
             try {
                 $this->commonRepository->updateCab($request->all());
-                return redirect()->back()->with('success', 'Cab updated successfully.');
+                return redirect()->route('admin.cab.index')->with('success', 'Cab updated successfully.');
             } catch (\Exception $e) {
                 return redirect()->back()->with('error', $e->getMessage());
             }

@@ -52,16 +52,29 @@
                 <form action="{{route('admin.cab.update')}}" method="post" id="update_plan">
                     @csrf
                     <div class="xl:col-span-4 lf:col-span-6 md:col-span-6 sm:col-span-12 col-span-12">
-                    <x-form-field 
-                        type="text" 
-                        name="title" 
-                        label="Cab Title" 
-                        :options="[]"
-                        :value="old('title', $update_item->title ?? '')"
-                        />
-                    @error('title')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
+                        <x-form-field 
+                            type="text" 
+                            name="title" 
+                            label="Cab Title" 
+                            :options="[]"
+                            :value="old('title', $update_item->title ?? '')"
+                            />
+                        @error('title')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="xl:col-span-4 lf:col-span-6 md:col-span-6 sm:col-span-12 col-span-12">
+                        <x-form-field 
+                            type="number" 
+                            name="capacity" 
+                            label="Capacity(Seat)"
+                            :options="[]"
+                            :value="old('capacity', $update_item->capacity?? '')"
+                            />
+                            <span class="text-gray-500 text-sm">Just add the number of seats.</span><br>
+                        @error('capacity')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
                     </div>
                         <!-- Dynamic plan_item fields container -->
                     
@@ -92,10 +105,24 @@
                         @error('title')
                             <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror
-                        <div class="flex justify-end">
-                            <x-form-submit-button text="Submit" class="change-text-button ti-btn ti-btn-primary-full !py-1 !px-2 ti-btn-wave me-[0.375rem]" />
-                        </div>
                     </div>
+                    <div class="xl:col-span-4 lf:col-span-6 md:col-span-6 sm:col-span-12 col-span-12">
+                    <x-form-field 
+                            type="number" 
+                            name="capacity" 
+                            label="Capacity(Seat)" 
+                            :options="[]"
+                            :value="old('capacity')"
+                            />
+                        <span class="text-gray-500 text-sm">Just add the number of seats.</span><br>
+                        @error('capacity')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="flex justify-end">
+                        <x-form-submit-button text="Submit" class="change-text-button ti-btn ti-btn-primary-full !py-1 !px-2 ti-btn-wave me-[0.375rem]" />
+                    </div>
+                   
                 </form>
             </div>
         </div>

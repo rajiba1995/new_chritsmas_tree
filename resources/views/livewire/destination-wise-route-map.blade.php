@@ -15,7 +15,7 @@
                     @endif
                 </div>
                 <div class="box-header flex justify-end">
-                    @if(count($divisions)>0)
+                    {{-- @if(count($divisions)>0) --}}
                     <div>
                        <div class="grid grid-cols-1 hover:grid-cols-6">
                             <label for="">
@@ -67,7 +67,7 @@
                     <div class="prism-toggle mt-5">
                         <a href="javascript:void(0)" wire:click="OpenNewRouteMapModal('yes')" class="ti-btn ti-btn-primary-full !py-1 pt-0 ti-btn-wave  me-[0.375rem]"><i class="fa-solid fa-plus"></i>Add New Route</a>
                     </div>
-                    @endif
+                    {{-- @endif --}}
                     <div class="mt-5">
                         <a href="{{route('admin.route.destination_wise_route_list')}}" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20">
                             <i class="ri-refresh-line"></i>
@@ -80,7 +80,6 @@
                             <span>No of Result: {{$destination_wise_route->count()}}</span>
                         </div>
                         <div>
-                            {{-- <input type="text" class="badge bg-outline-primary !w-56" placeholder="Quick Search.."> --}}
                             @foreach ($seasion_types as $types_item)
                             <div class="badge bg-outline-primary cursor-pointer {{$selected_season_type==$types_item->id?"active-primary-badge":""}}" wire:click="FilterRoutePointBySeasionType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
                                 <span>{{ strtoupper($types_item->title) }}</span>
@@ -162,24 +161,34 @@
                                                 
                                             </td>
                                             <td class="align-top !text-center">
-                                                @php
-                                                $new_divisions = [];
-                                                @endphp
-                                                
-                                                @foreach ($route_item->waypoints as $index => $r_items)
-                                                {{-- {{dd($r_items->division)}} --}}
                                                     @php
-                                                        if($r_items->division){
-                                                            $new_divisions[] = $r_items->division->name;
-                                                        }
+                                                    $new_divisions = [];
                                                     @endphp
-                                                @endforeach
-                                                
-                                                @if(count($new_divisions) > 0)
-                                                    @foreach(collect($new_divisions)->unique() as $div_item)
-                                                        <span class="badge bg-outline-secondary cursor-pointer">{{ $div_item }}</span>
+                                                    
+                                                    @foreach ($route_item->waypoints as $index => $r_items)
+                                                        @if($r_items->division)
+                                                            @php
+                                                                $new_divisions[] = [
+                                                                    'name' => $r_items->division->name,
+                                                                    'id' => $r_items->division->id
+                                                                ];
+                                                            @endphp
+                                                        @endif
                                                     @endforeach
-                                                @endif
+                                                    
+                                                    @php
+                                                        // Ensure uniqueness by filtering unique IDs
+                                                        $unique_divisions = collect($new_divisions)->unique('id');
+                                                    @endphp
+                                                    
+                                                    @if($unique_divisions->isNotEmpty())
+                                                        @foreach($unique_divisions as $div_item)
+                                                            <span class="{{ $selectedDivision == $div_item['id'] ? 'badge bg-success text-white' : 'badge bg-outline-secondary' }} cursor-pointer">
+                                                                {{ $div_item['name'] }}
+                                                            </span>
+                                                        @endforeach
+                                                    @endif
+                                            
                                             </td>
                                             <td class="!p-0 align-top">
                                                 <div class="table-responsive -mt-9">

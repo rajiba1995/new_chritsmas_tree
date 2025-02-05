@@ -162,6 +162,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
             Route::get('division-wise-activities', [RouteManagementController::class, 'DivisionWiseActivityList'])->name('admin.route.division_wise_activity_list');
             Route::get('division-wise-sightseeings', [RouteManagementController::class, 'DivisionWiseSightseeingList'])->name('admin.route.division_wise_sightseeing_list');
             Route::get('destination-wise-route-list', [RouteManagementController::class, 'DestinationWiseRouteList'])->name('admin.route.destination_wise_route_list');
+            Route::get('all-services', [RouteManagementController::class, 'AllServices'])->name('admin.route.all_services');
         });
     });
    

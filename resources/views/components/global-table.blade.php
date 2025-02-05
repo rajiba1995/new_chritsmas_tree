@@ -127,6 +127,7 @@
                         <img src="{{asset('assets/img/cab.png')}}" alt="Cab Image" width="90%">
                     </td>
                     <td scope="row" class="!p-1">{{$item->title}}</td>
+                    <td scope="row" class="!p-1">{{$item->capacity?$item->capacity.' Seat':""}}</td>
                     <td scope="row" class="!p-1">
                         <livewire:master-status-toggle 
                             modelName="Cab" 

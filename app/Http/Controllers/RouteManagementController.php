@@ -35,5 +35,9 @@ class RouteManagementController extends Controller
         $common = CustomHelper::setHeadersAndTitle('Route Management', 'Destination Wise Route');
         return view('admin.route.destination-wise-route-list', compact('common'));
     }
+    public function AllServices(Request $request){
+        $common = CustomHelper::setHeadersAndTitle('Route Management', 'All Route & Services');
+        return view('admin.route.routes-and-services-list', compact('common'));
+    }
 
 }

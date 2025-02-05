@@ -142,6 +142,11 @@
 										<li class="slide {{ request()->is('admin/route/destination-wise-route-list*')? 'active' : '' }}">
 											<a href="{{route('admin.route.destination_wise_route_list')}}" class="side-menu__item">Destination Wish Routes</a>
 										</li>
+										<li class="slide {{ request()->is('admin/route/all-services*') ? 'active' : '' }}">
+											<a href="{{ route('admin.route.all_services') }}" class="side-menu__item">
+												<span class="side-menu__label">All Routes & Services</span>
+											</a>
+										</li>
 								</ul>
 							</li>
 							<!-- End::slide -->
