@@ -124,21 +124,41 @@ class DivisionWiseSightseeingList extends Component
     }
 
     
+    // public function EditSightSeeing($id){
+    //     $this->active_assign_update_modal = 1;
+    //     $activity = DivisionWiseSightseeing::with('images:sightseeing_id,file_path')->find($id);
+    //     $this->edit_sightseeings = $activity->toArray();
+    //     $this->resetValidation();
+    // }
     public function EditSightSeeing($id){
         $this->active_assign_update_modal = 1;
         $activity = DivisionWiseSightseeing::with('images:sightseeing_id,file_path')->find($id);
-        $this->edit_sightseeings = $activity->toArray();
+    
+        // Ensure edit_sightseeings is initialized with an empty array to prevent null reference errors
+        $this->edit_sightseeings = [];
+    
+        // Convert to array properly and merge with default values
+        $this->edit_sightseeings = array_merge([
+            'id' => null,
+            'name' => '',
+            'division_id' => null,
+            'seasion_type_id' => null,
+            'ticket_price' => '',
+            'images' => [],
+        ], $activity->toArray());
+    
         $this->resetValidation();
     }
+    
     public function CloseImageModal(){
         $this->active_modal_for_image = 0;
         $this->active_sightseeing_images = [];
     }
-    public function CloseEditModal(){
+    public function CloseEditModal() {
         $this->active_assign_update_modal = 0;
-        unset($this->edit_sightseeings);
-        unset($this->update_files);
+        $this->reset(['edit_sightseeings', 'update_files']);
     }
+    
 
     public function addSightseeing(){
         $this->sightseeings[] = ['name' => '', 'ticket_price' => ''];
@@ -229,8 +249,6 @@ class DivisionWiseSightseeingList extends Component
         // If you need to initialize some fields with an empty template, you can add default values like this
         $this->sightseeings[] = [
             'name' => '',
-            'type' => 'PAID',
-            'price' => '',
             'ticket_price' => '',
             'files' => []
         ];
@@ -238,41 +256,30 @@ class DivisionWiseSightseeingList extends Component
 
     public function updateActivity()
     {
+
         $this->validate(
             [
                 'edit_sightseeings.name' => 'required|string|max:255',
-                'edit_sightseeings.type' => 'required|in:PAID,UNPAID',
                 'edit_sightseeings.seasion_type_id' => 'required|exists:seasion_types,id',
                 'selectedDivision' => 'required|exists:cities,id',
+                'edit_sightseeings.ticket_price' => 'required|numeric',
                 // 'update_files.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             ],
             [
                 'edit_sightseeings.name.required' => 'The activity name is required.',
-                'edit_sightseeings.type.required' => 'The activity type is required.',
-                'edit_sightseeings.type.in' => 'Type must be either PAID or UNPAID.',
                 'edit_sightseeings.seasion_type_id.required' => 'The season type is required.',
                 'selectedDivision.required' => 'The division is required.',
+                'edit_sightseeings.ticket_price.required' => 'This field is required',
+                'edit_sightseeings.ticket_price.numeric' => 'Price must be a valid number.',
                 // 'update_files.*.image' => 'Each file must be an image.',
                 // 'update_files.*.mimes' => 'Each file must be a JPG, JPEG, PNG, or WEBP image.',
                 // 'update_files.*.max' => 'Each file must not exceed 2MB in size.',
             ]
         );
-        if ($this->edit_sightseeings['type'] === 'PAID') {
-            $this->validate([
-                'edit_sightseeings.price' => 'required|numeric|gt:0',
-                'edit_sightseeings.ticket_price' => 'required|numeric|gt:0',
-            ],[
-                'edit_sightseeings.price.required' => 'This field is required',
-                'edit_sightseeings.price.numeric' => 'Price must be a valid number.',
-                'edit_sightseeings.price.gt' => 'Price must be greater than 0.',
-                'edit_sightseeings.ticket_price.required' => 'This field is required',
-                'edit_sightseeings.ticket_price.numeric' => 'Price must be a valid number.',
-                'edit_sightseeings.ticket_price.gt' => 'Price must be greater than 0.',
-            ]);
-        }
-       
+        
+        // Start transaction
         try {
-            DB::beginTransaction(); // Start transaction
+            DB::beginTransaction();
             // Check if the selected season type and division are provided
             if ($this->edit_sightseeings['seasion_type_id'] == 0) {
                 session()->flash('edit-activity-error', 'Please Choose a Season Type!');
@@ -290,9 +297,7 @@ class DivisionWiseSightseeingList extends Component
             // Update the activity record with the new data
             $activityRecord->update([
                 'name' => $this->edit_sightseeings['name'], // Ensure this key exists
-                'type' => $this->edit_sightseeings['type'], // Ensure this key exists and is 'PAID' or 'UNPAID'
-                'price' => $this->edit_sightseeings['type'] ==="PAID" ? $this->edit_sightseeings['price'] : 0, // Save 0 if empty
-                'ticket_price' => $this->edit_sightseeings['type']==="PAID" ? $this->edit_sightseeings['ticket_price'] : 0, // Save 0 if empty
+                'ticket_price' => $this->edit_sightseeings['ticket_price']? $this->edit_sightseeings['ticket_price'] : 0, // Save 0 if empty
                 'seasion_type_id' => $this->edit_sightseeings['seasion_type_id'], // Validate this is set
                 'division_id' => $this->selectedDivision, // Validate this is set
             ]);
@@ -319,7 +324,7 @@ class DivisionWiseSightseeingList extends Component
             $this->FilterSightseeingPointBySeasionType(0); //for All
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback transaction on error
-            session()->flash('new-sightseeing-error', 'Error: ' . $e->getMessage());
+            session()->flash('edit-activity-error', 'Error: ' . $e->getMessage());
             return; // Stop further execution
         }
     

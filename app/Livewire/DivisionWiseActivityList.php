@@ -146,8 +146,7 @@ class DivisionWiseActivityList extends Component
     }
     public function CloseEditModal(){
         $this->active_assign_update_modal = 0;
-        unset($this->edit_activities);
-        unset($this->update_files);
+        $this->reset(['edit_activities', 'update_files']);
     }
 
     public function addActivity(){

@@ -6,6 +6,9 @@ use App\Models\City;
 use App\Models\State;
 use App\Models\DestinationWiseRoute;
 use App\Models\DestinationWiseRouteWaypoint;
+use App\Models\DivisionWiseActivity;
+use App\Models\DivisionWiseSightseeing;
+use App\Models\DivisionWiseCab;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use App\Helpers\CustomHelper;
@@ -15,6 +18,10 @@ use Illuminate\Support\Facades\Log;
 class AllRouteAndService extends Component
 {
     public $active_tab = 1;
+    public $all_activities =[];
+    public $all_sightseeings =[];
+    public $all_cabs =[];
+
     public $desitinations =[];
     public $divisions =[];
     public $selectedDestination = null;
@@ -29,7 +36,8 @@ class AllRouteAndService extends Component
     public $selected_routes = [];
 
 
-    public $new_routes = []; // Holds dynamic route rows
+    public $new_route = [];
+    public $new_service = [];
     
     public $edit_routes = [];
 
@@ -49,6 +57,7 @@ class AllRouteAndService extends Component
             $this->getDestination($State->id);
         }
         $this->seasion_types = DB::table('seasion_types')->where('status', 1)->orderBy('title', 'ASC')->get();
+        
     }
     public function getDestination($destination_id){
         $this->selectedDestination = $destination_id;
@@ -62,6 +71,9 @@ class AllRouteAndService extends Component
         }
         
         $this->destination_wise_route  = $this->GetRoute();
+        $this->all_activities = $this->GetActivities($destination_id);
+        $this->all_sightseeings = $this->GetSightseeings($destination_id);
+        $this->all_cabs = $this->GetCabs($destination_id);
     }
     public function GetRoute()
     {
@@ -80,6 +92,13 @@ class AllRouteAndService extends Component
     public function FilterRoutePointBySeasionType($value){
         $this->selected_season_type = $value; 
         $this->destination_wise_route  = $this->GetRoute();
+        $this->reset(['new_route']);
+        $this->reset(['new_service']);
+        $this->dispatch('resetCheckboxes');
+        
+        $this->all_activities = $this->GetActivities($this->selectedDestination);
+        $this->all_sightseeings =  $this->GetSightseeings($this->selectedDestination);
+        $this->all_cabs =  $this->GetCabs($this->selectedDestination);
     }
     public function UpdateSeasonType($value){
         $this->edit_sightseeings['seasion_type_id'] = $value; 
@@ -91,81 +110,41 @@ class AllRouteAndService extends Component
         $this->destination_wise_route  = $this->GetRoute();
     }
 
-    public function OpenNewRouteMapModal($value){
+    public function OpenNewRouteWiseServiceModal($value){
         $this->active_assign_new_modal = $value=="yes"?1:0;
-
-        // Reset all new_routes fields
+        // Reset all new_service fields
         if ($this->active_assign_new_modal) {
-            $this->new_routes = []; // Reset all new_routes by setting the array to empty
+            $this->new_service = [
+                'route'=>null,
+                'selectedActivities' => [],
+                'selectedSightseeings' => [],
+                'selectedCabs' => [],
+            ];
         }
     }
 
-    public function addRoute(){
-        $this->new_routes[] = [
-            'route_name' => '',
-            'total_distance_km' => '',
-            'total_travel_time' => '',
-            'waypoints' => [
-            ]
-        ];
-       
-    }
-    
-    public function removeRoute($index){
-        unset($this->new_routes[$index]);
-        $this->new_routes = array_values($this->new_routes);
-        session()->flash('success', "Removing route with index: " . $index);
-    }
 
-    public function addWayPoint($routeIndex){
-
-        if (!isset($this->new_routes[$routeIndex]['waypoints'])) {
-            $this->new_routes[$routeIndex]['waypoints'] = [];
+    public function AddedNewRoute($isChecked,$value, $key){
+        if ($isChecked) {  // If checkbox is checked
+            if (!isset($this->new_service[$key])) {
+                $this->new_service[$key] = [
+                   'route' => (string) $value,
+                    'selectedActivities' => [],
+                    'selectedSightseeings' => [],
+                    'selectedCabs' => [],
+                ];
+            }
+        } else {  // If checkbox is unchecked
+            $this->reset(['new_service']);
         }
-
-        $this->new_routes[$routeIndex]['waypoints'][] = [
-            'point_name' => '',
-            'division_id' => '',
-            'distance_from_previous_km' => '',
-            'travel_time_from_previous' => '',
-        ];
     }
     
-
-    public function removeEditWayPoint($waypointIndex)
+    public function submitNewService()
     {
-        unset($this->edit_routes['waypoints'][$waypointIndex]);
-        // Reindex array to fix Livewire reactivity issue
-        $this->edit_routes['waypoints'] = array_values($this->edit_routes['waypoints']);
-    }
-    public function UpdateWayPoint(){
-
-        if (!isset($this->edit_routes['waypoints'])) {
-            $this->edit_routes['waypoints'] = [];
-        }
-
-        $this->edit_routes['waypoints'][] = [
-            'point_name' => '',
-            'division_id' => '',
-            'distance_from_previous_km' => '',
-            'travel_time_from_previous' => '',
-        ];
-    }
-    
-
-    public function removeWayPoint($routeIndex, $waypointIndex)
-    {
-        unset($this->new_routes[$routeIndex]['waypoints'][$waypointIndex]);
-        // Reindex array to fix Livewire reactivity issue
-        $this->new_routes[$routeIndex]['waypoints'] = array_values($this->new_routes[$routeIndex]['waypoints']);
-    }
-
-    public function submitForm()
-    {
-        // dd($this->all());
+        dd($this->all());
         $this->resetErrorBag();
-        if(count($this->new_routes)>0){
-            foreach ($this->new_routes as $index => $route) {
+        if(count($this->new_service)>0){
+            foreach ($this->new_service as $index => $route) {
                 if(count($route['waypoints'])==0){
                     session()->flash('new-route-error', 'Please choose atleast one waypoint. on this '.$route['route_name']);
                     return; // Stop further execution 
@@ -174,15 +153,15 @@ class AllRouteAndService extends Component
         }
        
         $this->validate([
-            'new_routes.*.route_name' => 'required|string|max:255',
-            'new_routes.*.waypoints' => 'required|array', // Ensures waypoints exist
-            'new_routes.*.waypoints.*.point_name' => 'required|string|max:255',
-            'new_routes.*.waypoints.*.division_id' => 'required',
+            'new_service.*.route_name' => 'required|string|max:255',
+            'new_service.*.waypoints' => 'required|array', // Ensures waypoints exist
+            'new_service.*.waypoints.*.point_name' => 'required|string|max:255',
+            'new_service.*.waypoints.*.division_id' => 'required',
         ], [
-            'new_routes.*.route_name.required' => 'Please enter route name.',
-            'new_routes.*.waypoints.required' => 'Waypoints are required.',
-            'new_routes.*.waypoints.*.point_name.required' => 'please enter waypoint name.',
-            'new_routes.*.waypoints.*.division_id.required' => 'Please choose the division.',
+            'new_service.*.route_name.required' => 'Please enter route name.',
+            'new_service.*.waypoints.required' => 'Waypoints are required.',
+            'new_service.*.waypoints.*.point_name.required' => 'please enter waypoint name.',
+            'new_service.*.waypoints.*.division_id.required' => 'Please choose the division.',
         ]);
         
 
@@ -194,13 +173,13 @@ class AllRouteAndService extends Component
                 return; // Stop further execution
             }
 
-            if (count($this->new_routes)==0) {
+            if (count($this->new_service)==0) {
                 session()->flash('new-route-error', 'Please choose atleast one route point!');
                 return; // Stop further execution
             }
         // Loop through route and save them to the database
        
-            foreach ($this->new_routes as $index => $route) {
+            foreach ($this->new_service as $index => $route) {
                 // Save the route record
                 $RouteRecord = DestinationWiseRoute::create([
                     'route_name' => $route['route_name'], // Ensure this key exists
@@ -239,7 +218,7 @@ class AllRouteAndService extends Component
         session()->flash('success', 'route point saved successfully!');
         $this->active_assign_new_modal = 0;
         $this->FilterRoutePointBySeasionType(0); //for All
-        $this->new_routes = []; // Reset all sightseeings by setting the array to empty
+        $this->new_service = []; // Reset all sightseeings by setting the array to empty
         // If you need to initialize some fields with an empty template, you can add default values like this
     }
 
@@ -378,9 +357,21 @@ class AllRouteAndService extends Component
     }
 
     // New code
-
     public function TabChange($value){
         $this->active_tab = $value;
+    }
+
+    public function GetActivities($destination_id){
+        $divisions = City::where('state_id', $destination_id)->pluck('id')->toArray();
+        return DivisionWiseActivity::whereIn('division_id', $divisions)->where('seasion_type_id', $this->selected_season_type)->get();
+    }
+    public function GetSightseeings($destination_id){
+        $divisions = City::where('state_id', $destination_id)->pluck('id')->toArray();
+        return DivisionWiseSightseeing::whereIn('division_id', $divisions)->where('seasion_type_id', $this->selected_season_type)->get();
+    }
+    public function GetCabs($destination_id){
+        $divisions = City::where('state_id', $destination_id)->pluck('id')->toArray();
+        return DivisionWiseCab::whereIn('division_id', $divisions)->where('seasion_type_id', $this->selected_season_type)->get();
     }
 
 

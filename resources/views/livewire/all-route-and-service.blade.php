@@ -81,12 +81,12 @@
                     {{-- route wise data --}}
                     @if($active_tab==1)
                         <div class="prism-toggle mt-5">
-                            <a href="javascript:void(0)" wire:click="OpenNewRouteMapModal('yes')" class="ti-btn ti-btn-primary-full !py-1 pt-0 ti-btn-wave  me-[0.375rem]"><i class="fa-solid fa-plus"></i>Add Route Wise Service</a>
+                            <a href="javascript:void(0)" wire:click="OpenNewRouteWiseServiceModal('yes')" class="ti-btn ti-btn-primary-full !py-1 pt-0 ti-btn-wave  me-[0.375rem]"><i class="fa-solid fa-plus"></i>Add Route Wise Service</a>
                         </div>
                     {{-- Per day data --}}
                     @elseif($active_tab==2)
                         <div class="prism-toggle mt-5">
-                            <a href="javascript:void(0)" wire:click="OpenNewRouteMapModal('yes')" class="ti-btn ti-btn-primary-full !py-1 pt-0 ti-btn-wave  me-[0.375rem]"><i class="fa-solid fa-plus"></i>Add Per Day Service</a>
+                            <a href="javascript:void(0)" wire:click="OpenNewRouteWiseServiceModal('yes')" class="ti-btn ti-btn-primary-full !py-1 pt-0 ti-btn-wave  me-[0.375rem]"><i class="fa-solid fa-plus"></i>Add Per Day Service</a>
                         </div>
                     @endif
                     <div class="mt-5">
@@ -478,77 +478,159 @@
         <div class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_lg_width bg-white rounded-lg">
             <div class="ti-modal-content p-20">
                 <div class="ti-modal-header flex justify-end items-center">
-                    <button type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none badge gap-2 bg-danger/10 text-danger" wire:click="OpenNewRouteMapModal('no')">
+                    <button type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none badge gap-2 bg-danger/10 text-danger" wire:click="OpenNewRouteWiseServiceModal('no')">
                         <i class="fa-solid fa-xmark text-lg text-dark"></i>
                     </button>
                 </div>
                 <div class="ti-modal-body text-start">
-                    <div class="flex items-center">
-                        <div class="grid grid-cols-1 hover:grid-cols-6 mx-1">
-                            <label for="">
-                                <span class="badge gap-2 bg-danger/10 text-danger uppercase">
-                                    Destination
-                                 </span>
-                            </label>
-                            <select 
-                                name="destination_list" 
-                                class="placeholder:text-textmuted text-sm selected_seasion_type"  
-                                wire:change="getDestination($event.target.value)" 
-                                wire:key="destination-0">
-                                <option value="" hidden>Filter Destinations</option>
-                                @foreach ($desitinations as $destination_item)
-                                    <option 
-                                        value="{{ $destination_item->id }}" 
-                                        {{$selectedDestination == $destination_item->id ? "selected" : ""}} 
-                                        wire:key="destination-{{ $destination_item->id }}">
-                                        {{ $destination_item->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="my-3">
-                        <div clas="flex item-center">
-                            <label for="">
-                                <span class="badge gap-2 bg-danger/10 text-danger uppercase">
-                                    Seasion Type
-                                 </span>
-                            </label>
-                            @foreach ($seasion_types as $types_item)
-                            <div class="badge bg-outline-primary cursor-pointer !py-2 {{$selected_season_type==$types_item->id?"active-primary-badge":""}}" wire:click="FilterRoutePointBySeasionType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
-                                <span>{{ strtoupper($types_item->title) }}</span>
+                    <form wire:submit.prevent="submitNewService">
+                        <div class="flex items-center">
+                            <div class="grid grid-cols-1 hover:grid-cols-6 mx-1">
+                                <label for="">
+                                    <span class="badge gap-2 bg-danger/10 text-danger uppercase">
+                                        Destination
+                                    </span>
+                                </label>
+                                <select 
+                                    name="destination_list" 
+                                    class="placeholder:text-textmuted text-sm selected_seasion_type"  
+                                    wire:change="getDestination($event.target.value)" 
+                                    wire:key="destination-0">
+                                    <option value="" hidden>Filter Destinations</option>
+                                    @foreach ($desitinations as $destination_item)
+                                        <option 
+                                            value="{{ $destination_item->id }}" 
+                                            {{$selectedDestination == $destination_item->id ? "selected" : ""}} 
+                                            wire:key="destination-{{ $destination_item->id }}">
+                                            {{ $destination_item->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
-                            @endforeach
                         </div>
-                    </div>
-                    <form wire:submit.prevent="submitForm">
+                        <div class="my-3">
+                            <div clas="flex item-center">
+                                <label for="">
+                                    <span class="badge gap-2 bg-danger/10 text-danger uppercase">
+                                        Seasion Type
+                                    </span>
+                                </label>
+                                @foreach ($seasion_types as $types_item)
+                                <div class="badge bg-outline-primary cursor-pointer !py-2 {{$selected_season_type==$types_item->id?"active-primary-badge":""}}" wire:click="FilterRoutePointBySeasionType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
+                                    <span>{{ strtoupper($types_item->title) }}</span>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
                         <div class="table-responsive mb-2">
                             <table class="table whitespace-nowrap table-bordered table-bordered-primary border-primary/10 min-w-full new-activity">
                                 <thead class="uppercase">
                                     <tr class="border-b !border-primary/30">
-                                        <th scope="col" class="!text-center w-1/2">Route Name</th>
+                                        <th scope="col" class="!text-center w-1/10">#</th>
+                                        <th scope="col" class="!text-center w-1/3">Route Name</th>
                                         <th scope="col" class="!text-center w-1/10">Activities</th>
                                         <th scope="col" class="!text-center w-1/10">SightSeeings</th>
                                         <th scope="col" class="!text-center w-1/10">Cabs</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($destination_wise_route as $rindex=>$r_items)
+                                    @forelse ($destination_wise_route as $rindex => $r_items)
                                         <tr>
-                                            <td> <p class="mb-1">{{ ucwords($r_items->route_name) }}</p></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
+                                            <td class="!text-center" width="6%">
+                                                <div class="form-check form-check-lg d-flex align-items-center">
+                                                    <input type="checkbox" class="form-check-input border-sky-500 new_service_checkbox"
+                                                        wire:model="new_route.{{ $rindex }}" 
+                                                        id="checkbox-lg{{$rindex}}" 
+                                                        wire:change="AddedNewRoute($event.target.checked, $event.target.value, {{ $rindex }})" 
+                                                        value="{{ $r_items->id }}">
+                                                </div>
+                                            </td>
+                                            <td> 
+                                                <p class="mb-1">{{ ucwords($r_items->route_name) }}</p>
+                                            </td>
+                                            <td>
+                                                {{-- For Activities --}}
+                                                @forelse ($all_activities as $act_index => $activity_item)
+                                                    <div class="form-check">
+                                                        <input class="form-check-input border-sky-500 new_service_checkbox" type="checkbox" 
+                                                            wire:model="new_service.{{ $rindex }}.selectedActivities"  
+                                                            value="{{ $activity_item->id }}" 
+                                                            id="checkbox-sm-activity-{{$rindex+1}}-{{$act_index+1}}"
+                                                            @disabled(!(isset($new_route[$rindex])) || isset($new_route[$rindex]) && $new_route[$rindex] === false)>
+                                                        <label class="form-check-label cursor-pointer" 
+                                                            for="checkbox-sm-activity-{{$rindex+1}}-{{$act_index+1}}">
+                                                            {{$activity_item->name}} 
+                                                            @if($activity_item->type === "PAID")
+                                                                <span class="badge bg-success text-white cursor-pointer ml-2 tooltip-container">
+                                                                    {{$activity_item->type}}
+                                                                    <span class="tooltip-text">
+                                                                        AP-{{ENV('DEFAULT_CURRENCY_SYMBOL')}}{{ $activity_item->price }},
+                                                                        PP-{{ENV('DEFAULT_CURRENCY_SYMBOL')}}{{ $activity_item->ticket_price }}
+                                                                    </span>
+                                                                </span>
+                                                            @endif
+                                                        </label>
+                                                    </div>
+                                                @empty
+                                                    <div class="alert alert-danger">
+                                                        👉Activities are not available. <a href="{{ route('admin.route.division_wise_activity_list') }}" class="text-primary">click here to add.</a>
+                                                    </div>
+                                                @endforelse
+                                            </td>
+                                            <td>
+                                                {{-- For SightSeeings --}}
+                                                @forelse ($all_sightseeings as $sit_index => $sight_item)
+                                                    <div class="form-check">
+                                                        <input class="form-check-input border-sky-500 new_service_checkbox" type="checkbox" 
+                                                            wire:model="new_service.{{ $rindex }}.selectedSightseeings"
+                                                            value="{{ $sight_item->id }}" 
+                                                            id="checkbox-sm-sight-{{$rindex+1}}-{{$sit_index+1}}"
+                                                            @disabled(!(isset($new_route[$rindex])) || isset($new_route[$rindex]) && $new_route[$rindex] === false)>
+                                                        <label class="form-check-label cursor-pointer" 
+                                                            for="checkbox-sm-sight-{{$rindex+1}}-{{$sit_index+1}}">
+                                                            {{$sight_item->name}} ({{ENV('DEFAULT_CURRENCY_SYMBOL')}}{{ round($sight_item->ticket_price) }})
+                                                        </label>
+                                                    </div>
+                                                @empty
+                                                    <div class="alert alert-danger">
+                                                        👉Sightseeings are not available. <a href="{{ route('admin.route.division_wise_sightseeing_list') }}" class="text-primary">click here to add.</a>
+                                                    </div>
+                                                @endforelse
+                                            </td>
+                                            <td>
+                                                {{-- For Cabs --}}
+                                                @forelse ($all_cabs as $cab_index => $cab_item)
+                                                    <div class="form-check">
+                                                        <input class="form-check-input border-sky-500 new_service_checkbox" type="checkbox" 
+                                                            wire:model="new_service.{{ $rindex }}.selectedCabs"
+                                                            value="{{ $cab_item->id }}" 
+                                                            id="checkbox-sm-cab-{{$rindex+1}}-{{$cab_index+1}}"
+                                                            @disabled(!(isset($new_route[$rindex])) || isset($new_route[$rindex]) && $new_route[$rindex] === false)>
+                                                        <label class="form-check-label cursor-pointer" 
+                                                            for="checkbox-sm-cab-{{$rindex+1}}-{{$cab_index+1}}">
+                                                            {{ $cab_item->cab ? $cab_item->cab->title : "N/A" }}
+                                                            <span class="badge bg-primary/10 text-primary uppercase rounded-full ml-2">
+                                                                {{ $cab_item->cab ? $cab_item->cab->capacity.' Seater' : "N/A" }}
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                @empty
+                                                    <div class="alert alert-danger">
+                                                        👉Cabs are not available. <a href="{{ route('admin.route.division_wise_cab_list') }}" class="text-primary">click here to add.</a>
+                                                    </div>
+                                                @endforelse
+                                            </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4">
+                                            <td colspan="5">
                                                 <div class="alert alert-danger">
-                                                    Currently, no routes are available for this destination. Please <a href="{{ route('admin.route.destination_wise_route_list') }}" class="text-primary">click here to add.</a>
+                                                    👉No routes are available for this destination. <a href="{{ route('admin.route.destination_wise_route_list') }}" class="text-primary">click here to add.</a>
                                                 </div>
                                             </td>
                                         </tr>
                                     @endforelse
+
                                 </tbody>
                             </table>
                         </div>
@@ -558,13 +640,15 @@
                             </div>
                         @endif
                     
+                        {{-- If destination_wise_route is getting --}}
+                        @if(count($destination_wise_route)>0)
                         <div class="text-end mt-3">
                             <button type="submit" class="ti-btn ti-btn-primary-full !py-1 pt-0 ti-btn-wave me-[0.375rem]">
                                 <i class="fa-solid fa-save"></i> Save
                             </button>
                         </div>
+                        @endif
                     </form>
-                    
                 </div>
             </div>
         </div>
@@ -753,6 +837,13 @@
         </div>
     </div>
 </div>
-@push('scripts')
-@endpush
+@section('scripts')
+<script>
+    window.addEventListener('resetCheckboxes', () => {
+        document.querySelectorAll('.new_service_checkbox').forEach((checkbox) => {
+            checkbox.checked = false;
+        });
+    });
+</script>
+@endsection
 
