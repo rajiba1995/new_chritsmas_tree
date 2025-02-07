@@ -14,10 +14,15 @@ use Livewire\Component;
 use App\Helpers\CustomHelper;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use App\Models\RouteServiceSummary;
+use App\Models\ServiceWiseActivity;
+use App\Models\ServiceWiseSightseeing;
+use App\Models\ServiceWiseCab;
 
 class AllRouteAndService extends Component
 {
     public $active_tab = 1;
+    public $service_type = 'Route Wise';
     public $all_activities =[];
     public $all_sightseeings =[];
     public $all_cabs =[];
@@ -31,13 +36,17 @@ class AllRouteAndService extends Component
     public $seasion_types = [];
     public $selected_season_type =0; // Must be public for validation
     public $active_assign_new_modal = 0;
+    public $active_assign_new_per_day_modal = 0;
     public $active_assign_update_modal = 0;
-    public $destination_wise_route = [];
+    public $destination_wise_route_and_service = [];
     public $selected_routes = [];
 
 
     public $new_route = [];
     public $new_service = [];
+
+    public $new_per_destination = [];
+    public $new_per_day_service = [];
     
     public $edit_routes = [];
 
@@ -70,28 +79,29 @@ class AllRouteAndService extends Component
             $this->selectedDivisionName =null;
         }
         
-        $this->destination_wise_route  = $this->GetRoute();
+        $this->destination_wise_route_and_service  = $this->GetRouteAndService();
         $this->all_activities = $this->GetActivities($destination_id);
         $this->all_sightseeings = $this->GetSightseeings($destination_id);
         $this->all_cabs = $this->GetCabs($destination_id);
     }
-    public function GetRoute()
+    public function GetRouteAndService()
     {
-        return DestinationWiseRoute::with('seasonType')
+        return RouteServiceSummary::with('seasonType', 'destination', 'route', 'activities', 'sightseeings', 'cabs')
             ->where('destination_id', $this->selectedDestination)
+            ->where('service_type', $this->service_type)
             ->when($this->selected_season_type > 0, function ($query) {
                 return $query->where('seasion_type_id', $this->selected_season_type);
             })
-            ->when(!empty($this->selected_routes), function ($query) {
-                return $query->whereIn('id', $this->selected_routes);
-            })
-            ->orderBy('route_name', 'ASC')
             ->orderBy('seasion_type_id', 'ASC')
+            ->orderBy('service_type', 'ASC')
             ->get();
     }
     public function FilterRoutePointBySeasionType($value){
         $this->selected_season_type = $value; 
-        $this->destination_wise_route  = $this->GetRoute();
+        $this->destination_wise_route_and_service  = $this->GetRouteAndService();
+        $this->reset(['new_per_destination']);
+        $this->reset(['new_per_day_service']);
+
         $this->reset(['new_route']);
         $this->reset(['new_service']);
         $this->dispatch('resetCheckboxes');
@@ -107,105 +117,194 @@ class AllRouteAndService extends Component
         $this->selectedDivision = $value; 
         $this->selected_routes = DestinationWiseRouteWaypoint::where('division_id', $value)->pluck('route_id')->toArray();
         $this->divisions = City::where('state_id', $this->selectedDestination)->where('status', 1)->orderBy('name', 'ASC')->get();
-        $this->destination_wise_route  = $this->GetRoute();
+        $this->destination_wise_route_and_service  = $this->GetRouteAndService();
     }
 
     public function OpenNewRouteWiseServiceModal($value){
-        $this->active_assign_new_modal = $value=="yes"?1:0;
-        // Reset all new_service fields
-        if ($this->active_assign_new_modal) {
-            $this->new_service = [
-                'route'=>null,
-                'selectedActivities' => [],
-                'selectedSightseeings' => [],
-                'selectedCabs' => [],
-            ];
-        }
-    }
-
-
-    public function AddedNewRoute($isChecked,$value, $key){
-        if ($isChecked) {  // If checkbox is checked
-            if (!isset($this->new_service[$key])) {
-                $this->new_service[$key] = [
-                   'route' => (string) $value,
+            $this->active_assign_new_modal = $value=="yes"?1:0;
+            // Reset all new_service fields
+            if ($this->active_assign_new_modal) {
+                $this->new_service = [
+                    'route'=>null,
                     'selectedActivities' => [],
                     'selectedSightseeings' => [],
                     'selectedCabs' => [],
                 ];
             }
-        } else {  // If checkbox is unchecked
-            $this->reset(['new_service']);
+        $this->dispatch('resetCheckboxes');
+    }
+    public function OpenNewPerDayModal($value){
+        $this->active_assign_new_per_day_modal = $value=="yes"?1:0;
+        if ($this->active_assign_new_per_day_modal) {
+            $this->new_per_day_service = [
+                'destination'=>null,
+                'selectedActivities' => [],
+                'selectedSightseeings' => [],
+                'selectedCabs' => [],
+            ];
         }
+        $this->dispatch('resetCheckboxes');
+    }
+
+
+    public function AddedNewRoute($isChecked,$value, $key){
+        if($this->active_tab==1){
+            if ($isChecked) {  // If checkbox is checked
+                if (!isset($this->new_service[$key])) {
+                    $this->new_service[$key] = [
+                       'route' => (string) $value,
+                        'selectedActivities' => [],
+                        'selectedSightseeings' => [],
+                        'selectedCabs' => [],
+                    ];
+                }
+            } else {  // If checkbox is unchecked
+                $this->reset(['new_service']);
+                $this->dispatch('resetCheckboxes');
+            }
+        }
+        if($this->active_tab==2){
+            if ($isChecked) {  // If checkbox is checked
+                if (!isset($this->new_per_day_service[$key])) {
+                    $this->new_per_day_service[$key] = [
+                        'destination' => (int) $value,
+                        'selectedActivities' => [],
+                        'selectedSightseeings' => [],
+                        'selectedCabs' => [],
+                    ];
+                }
+            } else {  // If checkbox is unchecked
+                $this->reset(['new_per_day_service']);
+                $this->dispatch('resetCheckboxes');
+            }
+        }
+        
     }
     
     public function submitNewService()
     {
-        dd($this->all());
+        // dd($this->all());
         $this->resetErrorBag();
-        if(count($this->new_service)>0){
-            foreach ($this->new_service as $index => $route) {
-                if(count($route['waypoints'])==0){
-                    session()->flash('new-route-error', 'Please choose atleast one waypoint. on this '.$route['route_name']);
-                    return; // Stop further execution 
-                }
+        if($this->active_tab==1){ // For Route Wise
+            if (count($this->new_service) == 0) {
+                session()->flash('new-route-error', 'Please choose at least one route before submitting.');
+                return; // Stop further execution
+            }
+        }elseif($this->active_tab==2){ //For Per Day
+            if (count($this->new_per_day_service) == 0) {
+                session()->flash('new-route-error', 'Please choose at least one item before submitting.');
+                return; // Stop further execution
             }
         }
-       
-        $this->validate([
-            'new_service.*.route_name' => 'required|string|max:255',
-            'new_service.*.waypoints' => 'required|array', // Ensures waypoints exist
-            'new_service.*.waypoints.*.point_name' => 'required|string|max:255',
-            'new_service.*.waypoints.*.division_id' => 'required',
-        ], [
-            'new_service.*.route_name.required' => 'Please enter route name.',
-            'new_service.*.waypoints.required' => 'Waypoints are required.',
-            'new_service.*.waypoints.*.point_name.required' => 'please enter waypoint name.',
-            'new_service.*.waypoints.*.division_id.required' => 'Please choose the division.',
-        ]);
         
-
+        if (!$this->selectedDestination) {
+            session()->flash('new-route-error', 'Please choose a destination!');
+            return; // Stop further execution
+        }
+        if ($this->selected_season_type == 0) {
+            session()->flash('new-route-error', 'Please choose a season type!');
+            return; // Stop further execution
+        }
+        
+    
         try {
             DB::beginTransaction(); // Start transaction
             // Check if the selected season type and division are provided
-            if ($this->selected_season_type == 0) {
-                session()->flash('new-route-error', 'Please choose a season type!');
-                return; // Stop further execution
-            }
-
-            if (count($this->new_service)==0) {
-                session()->flash('new-route-error', 'Please choose atleast one route point!');
-                return; // Stop further execution
-            }
-        // Loop through route and save them to the database
-       
-            foreach ($this->new_service as $index => $route) {
-                // Save the route record
-                $RouteRecord = DestinationWiseRoute::create([
-                    'route_name' => $route['route_name'], // Ensure this key exists
-                    'destination_id' => $this->selectedDestination, // Save 0 if empty
-                    'seasion_type_id' => $this->selected_season_type, // Validate this is set
-                    'total_distance_km' => $route['total_distance_km'], // Validate this is set
-                    'total_travel_time' => $route['total_travel_time'], // Validate this is set
-                ]);
-        
-                if(count($route['waypoints'])>0){
-                    foreach($route['waypoints'] as $k=>$witem){
-                        $waypont = DestinationWiseRouteWaypoint::create([
-                            'route_id'=>$RouteRecord->id, 
-                            'point_name'=>$witem['point_name'],
-                            'division_id'=>$witem['division_id'], 
-                            'sequence'=>$k+1, 
-                            'distance_from_previous_km'=>$witem['distance_from_previous_km'], 
-                            'travel_time_from_previous'=>$witem['travel_time_from_previous']
-                        ]);
+            if($this->active_tab==1){ // For Route Wise
+                foreach($this->new_service as $key=>$item){
+                    $route = DestinationWiseRoute::where('id', $item['route'])->first();
+                    if (count($item['selectedCabs']) == 0) {
+                        session()->flash('new-route-error', 'Please choose at least one cab on this route ('.$route->route_name.')');
+                        return; // Stop further execution
                     }
-                }else{
-                    session()->flash('new-route-error', 'Please choose atleast one waypoint. on this '.$route['route_name']);
-                    return; // Stop further execution 
+                    $storeService = RouteServiceSummary::updateOrCreate(
+                        [
+                            'route_id' => $route->id,
+                            'destination_id' => (int)$this->selectedDestination,
+                            'seasion_type_id' => $this->selected_season_type,
+                        ],
+                        [
+                            'service_type' => $this->service_type,
+                            'division_id' => $this->selectedDivision,
+                        ]
+                    );
+
+                    // For Create Service Wise Activities
+                    if(count($item['selectedActivities'])>0){
+                        foreach($item['selectedActivities'] as $ack_key=>$ack_item){
+                            $storeActivity = ServiceWiseActivity::updateOrCreate([
+                                'service_summary_id'=>$storeService->id,
+                                'activity_id'=>(int)$ack_item,
+                            ]);
+                        }
+                    }
+
+                    // For Create Service Wise Sightseeings
+                    if(count($item['selectedSightseeings'])>0){
+                        foreach($item['selectedSightseeings'] as $s_key=>$s_item){
+                            $storeSightseeing = ServiceWiseSightseeing::updateOrCreate([
+                                'service_summary_id'=>$storeService->id,
+                                'sightseeing_id'=>(int)$s_item,
+                            ]);
+                        }
+                    }
+
+                    // For Create Service Wise Cabs
+                    if(count($item['selectedCabs'])>0){
+                        foreach($item['selectedCabs'] as $c_key=>$c_item){
+                            $storeCabs = ServiceWiseCab::updateOrCreate([
+                                'service_summary_id'=>$storeService->id,
+                                'division_wise_cab_id'=>(int)$c_item,
+                            ]);
+                        }
+                    }
+                
+                }
+            }elseif($this->active_tab==2){ //For Per Day
+                foreach($this->new_per_day_service as $key=>$item){
+                    $storeService = RouteServiceSummary::updateOrCreate(
+                        [
+                            'service_type' =>$this->service_type,
+                            'seasion_type_id'=>$this->selected_season_type,
+                            'destination_id'=>(int)$this->selectedDestination
+                        ],[
+                            'division_id'=>$this->selectedDivision
+                            ]
+                        );
+
+                    // For Create Service Wise Activities
+                    if(count($item['selectedActivities'])>0){
+                        foreach($item['selectedActivities'] as $ack_key=>$ack_item){
+                            $storeActivity = ServiceWiseActivity::updateOrCreate([
+                                'service_summary_id'=>$storeService->id,
+                                'activity_id'=>(int)$ack_item,
+                            ]);
+                        }
+                    }
+
+                    // For Create Service Wise Sightseeings
+                    if(count($item['selectedSightseeings'])>0){
+                        foreach($item['selectedSightseeings'] as $s_key=>$s_item){
+                            $storeSightseeing = ServiceWiseSightseeing::updateOrCreate([
+                                'service_summary_id'=>$storeService->id,
+                                'sightseeing_id'=>(int)$s_item,
+                            ]);
+                        }
+                    }
+
+                    // For Create Service Wise Cabs
+                    if(count($item['selectedCabs'])>0){
+                        foreach($item['selectedCabs'] as $c_key=>$c_item){
+                            $storeCabs = ServiceWiseCab::updateOrCreate([
+                                'service_summary_id'=>$storeService->id,
+                                'division_wise_cab_id'=>(int)$c_item,
+                            ]);
+                        }
+                    }
+                
                 }
             }
-        
+
             DB::commit(); // Commit transaction
             session()->flash('success', 'route point saved successfully!');
         } catch (\Exception $e) {
@@ -217,6 +316,7 @@ class AllRouteAndService extends Component
         // Success message
         session()->flash('success', 'route point saved successfully!');
         $this->active_assign_new_modal = 0;
+        $this->active_assign_new_per_day_modal = 0;
         $this->FilterRoutePointBySeasionType(0); //for All
         $this->new_service = []; // Reset all sightseeings by setting the array to empty
         // If you need to initialize some fields with an empty template, you can add default values like this
@@ -357,8 +457,9 @@ class AllRouteAndService extends Component
     }
 
     // New code
-    public function TabChange($value){
+    public function TabChange($value,$type){
         $this->active_tab = $value;
+        $this->service_type = $type;
     }
 
     public function GetActivities($destination_id){
