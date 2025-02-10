@@ -14,4 +14,7 @@ class ServiceWiseCab extends Model
     public function summary(){
         return $this->belongsTo(RouteServiceSummary::class, 'service_summary_id', 'id');
     }
+    public function divisionCab(){
+        return $this->belongsTo(DivisionWiseCab::class, 'division_wise_cab_id', 'id');
+    }
 }

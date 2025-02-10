@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
 use App\Models\Cab;
+use App\Models\ServiceWiseCab;
 use App\Repositories\CommonRepository;
 
 class RouteManagementController extends Controller
@@ -38,6 +39,20 @@ class RouteManagementController extends Controller
     public function AllServices(Request $request){
         $common = CustomHelper::setHeadersAndTitle('Route Management', 'All Route & Services');
         return view('admin.route.routes-and-services-list', compact('common'));
+    }
+
+    public function UpdateCabServicePrice(Request $request){
+        $id = $request->input('id');
+        $price = $request->input('price');
+
+        // Validate price
+        if (!is_numeric($price) || empty($id)) {
+            return response()->json(["success" => false, "message" => "Invalid input"]);
+        }
+        // Update database (replace 'cabs' with your actual table name)
+        ServiceWiseCab::where('id', $id)->update(['cab_price' => $price]);
+
+        return response()->json(["success" => true, "message" => "Price updated successfully"]);
     }
 
 }

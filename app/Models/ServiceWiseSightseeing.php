@@ -15,4 +15,7 @@ class ServiceWiseSightseeing extends Model
     public function summary(){
         return $this->belongsTo(RouteServiceSummary::class, 'service_summary_id', 'id');
     }
+    public function sightseeing(){
+        return $this->belongsTo(DivisionWiseSightseeing::class, 'sightseeing_id', 'id');
+    }
 }

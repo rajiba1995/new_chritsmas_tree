@@ -101,6 +101,44 @@
                   input.value = parts[0] + '.' + parts[1];
                }
             }
+            function validateCabPrice(input, id) {
+               // Remove any characters that are not digits or a single decimal point
+               input.value = input.value.replace(/[^0-9.]/g, '');
+               
+               // Ensure only one decimal point is allowed
+               const parts = input.value.split('.');
+               if (parts.length > 2) {
+                  input.value = parts[0] + '.' + parts[1];
+               }
+               let price = input.value ? '₹' + input.value : '';
+               input.value = price;
+               // Get CSRF token from meta tag (should be in your Laravel Blade template)
+               let csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+               // Send price data to Laravel via AJAX
+               if (input.value) {
+                  fetch("update-cab-service-price", { 
+                     method: "POST",
+                     headers: {
+                           "Content-Type": "application/json",
+                           "X-CSRF-TOKEN": csrfToken // Include CSRF token
+                     },
+                     body: JSON.stringify({
+                           id: id, 
+                           price: input.value.replace('₹', '') // Remove ₹ before sending
+                     })
+                  })
+                  .then(response => response.json())
+                  .then(data => {
+                     if (data.success) {
+                           console.log("Price updated successfully!");
+                     } else {
+                           console.error("Error updating price:", data.message);
+                     }
+                  })
+                  .catch(error => console.error("AJAX Error:", error));
+               }
+            }
 
             function FetchLoader() {
                const loader = document.getElementById('loader');
