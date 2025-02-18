@@ -1,6 +1,6 @@
-<div class="form-group mb-4">
+<div class="form-group mb-4 px-1">
     @if($label)
-        <label for="{{ $name }}" class="block text-gray-700 font-medium mb-2">{{ $label }}</label>
+        <label for="{{ $name }}" class="block text-gray-700 font-medium">{{ $label }}</label>
     @endif
 
     @if($type === 'text' || $type === 'email' || $type === 'password' || $type === 'number' || $type === 'date')

@@ -67,7 +67,11 @@ class DivisionWiseCabList extends Component
         $this->divisions = City::where('state_id', $this->selectedDestination)->where('status', 1)->orderBy('name', 'ASC')->get();
     }
 
-    public function DeleteCab($id){
+    public function DeleteCabItem($id)
+    {
+        $this->dispatch('showConfirm', ['itemId' => $id]);
+    }
+    public function deleteItem($id){
         $cab = DivisionWiseCab::find($id); // Retrieve the cab by ID
         if ($cab) {
             $cab->delete(); // Delete the record

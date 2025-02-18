@@ -135,7 +135,7 @@
                                             </span>
                                         </th>
                                         <td class="!text-center">
-                                            <span>{{ucwords($cab_item->name)}}</span>
+                                            <span>{{ucwords($cab_item->name)}}</span> <span class="button-control"></span>
                                         </td>
                                         
                                         <td class="!text-center">
@@ -349,6 +349,11 @@
                                                 </td>
                                             </tr>
                                             <tr class="border-t-0">
+                                                <td colspan="5" class="border-l-0">
+                                                   
+                                                </td>
+                                            </tr>
+                                            <tr class="border-t-0">
                                                 <td colspan="3">
                                                     <!-- Display Selected Image Previews -->
                                                         @if (isset($files[$index]) && is_array($files[$index]) && count($files[$index]) > 0)
@@ -365,7 +370,7 @@
                                                         <span class="text-danger">{{ $message }}</span> 
                                                     @enderror
                                                 </td>
-                                                <td colspan="2" class=" border-l-0">
+                                                <td colspan="2" class="border-l-0">
                                                      <!-- Custom File Upload Design -->
                                                      <label class="file-upload-container">
                                                         <span class="choose-text">Choose Images</span>
@@ -632,5 +637,53 @@
         </div>
     </div>
 </div>
-@push('scripts')
-@endpush
+@section('scripts')
+<script type="text/javascript" src="{{ asset('build/ckeditor/ckeditor.js') }}"></script>
+{{-- CK Editor --}}
+<script>
+    window.addEventListener('editor_load', function(event) { 
+    // Handle short_desc_editor
+    var shortDescTextArea = document.getElementById('content');
+    if (shortDescTextArea) {
+      // Check if CKEditor instance already exists and destroy it
+      if (CKEDITOR.instances['content']) {
+        CKEDITOR.instances['content'].destroy(true);
+      }
+      
+      // Initialize CKEditor for short_desc_editor
+      if (typeof CKEDITOR !== 'undefined') {
+        CKEDITOR.replace('content');
+
+        // Sync CKEditor data to Livewire
+        CKEDITOR.instances['content'].on('change', function() {
+            @this.set('content', CKEDITOR.instances['content'].getData());
+        });
+      } else {
+        console.error('CKEditor is not defined!');
+      }
+    }
+  });
+</script>
+
+{{-- Alert --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    window.addEventListener('showConfirm', function (event) {
+        let itemId = event.detail[0].itemId;
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                @this.call('deleteItem', itemId); // Calls Livewire method directly
+                Swal.fire("Deleted!", "Your item has been deleted.", "success");
+            }
+        });
+    });
+</script>
+@endsection

@@ -330,8 +330,11 @@ class DivisionWiseSightseeingList extends Component
     
         // Proceed with the update logic
     }
-    
-    public function DeleteSightSeeingItem($id)
+    public function deleteItem($id)
+    {
+        $this->dispatch('showConfirm', ['itemId' => $id]);
+    }
+    public function DeleteActivityItem($id)
     {
         $activity = DivisionWiseSightseeing::find($id);
         if ($activity) {
@@ -340,6 +343,7 @@ class DivisionWiseSightseeingList extends Component
             session()->flash('success', 'Sightseeing point deleted successfully!');
         } 
     }
+    
 
     public function deleteItemImage($imageId)
     {

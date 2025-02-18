@@ -352,8 +352,11 @@ class DivisionWiseActivityList extends Component
     
         // Proceed with the update logic
     }
-    
     public function DeleteActivityItem($id)
+    {
+        $this->dispatch('showConfirm', ['itemId' => $id]);
+    }
+    public function deleteItem($id)
     {
         $activity = DivisionWiseActivity::find($id);
         if ($activity) {
@@ -362,6 +365,7 @@ class DivisionWiseActivityList extends Component
             session()->flash('success', 'Activity deleted successfully!');
         } 
     }
+    
 
     public function deleteItemImage($imageId)
     {
@@ -392,6 +396,7 @@ class DivisionWiseActivityList extends Component
     }
     public function render()
     {
+        $this->dispatch('editor_load');
         return view('livewire.division-wise-activity-list');
     }
 }

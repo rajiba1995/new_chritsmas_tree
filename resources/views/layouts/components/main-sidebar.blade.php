@@ -94,9 +94,9 @@
 									<li class="slide">
 										<a href="{{route('admin.ammenity.index')}}" class="side-menu__item">Hotel Ammenity</a>
 									</li>
-									<li class="slide">
+									{{-- <li class="slide">
 										<a href="javascript:void(0);" class="side-menu__item">Hotel Meal Plans</a>
-									</li>
+									</li> --}}
 									<li class="slide {{ request()->is('admin/hotel-seasion-plan')? 'active' : '' }}">
 										<a href="{{route('admin.hotel_seasion_plan')}}" class="side-menu__item">Hotel Seasion Plans</a>
 									</li>

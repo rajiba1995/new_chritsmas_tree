@@ -38,18 +38,16 @@
             <div class="box-body">
                 <form action="{{ route('admin.hotel.update',$hotel->id) }}" method="POST">
                     @csrf
-                    @method('POST') 
                     <!-- resources/views/create-lead.blade.php -->
                     <span class="badge gap-2 bg-primary/10 text-primary">
                         <span class="w-1.5 h-1.5 inline-block bg-primary rounded-full"></span>
                         BASIC INFORMATION
                     </span>
-             
                     <div class="container mx-auto px-4">
                         <div class="grid lg:grid-cols-2 gap-3">
                             <div class="space-y-2">
                                 <x-form-field type="text" name="name" label="Hotel Name" :options="[]"
-                                    :value="old('name', $hotel->name)"
+                                    :value="$hotel->name"
                                     class="!bg-gray-100 !form-control-lg placeholder:text-textmuted" />
                                 @error('name')
                                 <span class="text-red-500 text-sm">{{ $message }}</span>
@@ -59,20 +57,20 @@
                             <div class="space-y-2">
                                 <x-form-field type="select" name="hotel_category" label="Hotel Category"
                                     :options="$hotel_categories->pluck('name', 'id')"
-                                    :value="old('hotel_category', $hotel->hotel_category)" class="form-control-lg" />
+                                    :value="$hotel->hotel_category" class="form-control-lg" />
                                 @error('hotel_category')
                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
                             </div>
 
                         </div>
-                        <livewire:destination-wise-division :oldDivision="old('division', $hotel->division)" :oldDestination="old('destination', $hotel->destination)" />
+                        <livewire:destination-wise-division :oldDivision="$hotel->division" :oldDestination="$hotel->destination" />
                         <div class="grid grid-cols-4 gap-4">
                             <div class="space-y-2">
                                 <x-phone-input id="mobile" name="mobile" placeholder="Example: 9876543210"
                                     :countries="['+91']"
-                                    selected-country="{{ old('mobile_country', $hotel->phone_code ?? '+91') }}"
-                                    :value=" old('mobile', $hotel->mobile_number) " />
+                                    selected-country="{{$hotel->phone_code ?? '+91' }}"
+                                    :value="$hotel->mobile_number" />
                                 @error('mobile')
                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -81,8 +79,8 @@
                             <div class="space-y-2">
                                 <x-phone-input id="whatsapp" name="whatsapp" placeholder="Example: 9876543210"
                                     :countries="['+91']"
-                                    selected-country="{{ old('whatsapp_country', $hotel->whatsapp_country ?? '+91') }}"
-                                    :value=" old('whatsapp', $hotel->whatsapp_number)" />
+                                    selected-country="{{$hotel->whatsapp_country ?? '+91' }}"
+                                    :value="$hotel->whatsapp_number" />
                                 @error('whatsapp')
                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -90,7 +88,7 @@
 
                             <div class="space-y-2">
                                 <x-form-field type="text" name="email" label="Email 1" :options="[]"
-                                    :value="old('email', $hotel->email1)" class="placeholder:text-textmuted" />
+                                    :value="$hotel->email1" class="placeholder:text-textmuted" />
                                 @error('email')
                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -99,7 +97,7 @@
 
                             <div class="space-y-2">
                                 <x-form-field type="text" name="secndary_email" label="Email 2" :options="[]"
-                                    :value="old('secndary_email', $hotel->email2)" class="placeholder:text-textmuted" />
+                                    :value="$hotel->email2" class="placeholder:text-textmuted" />
                                 @error('secndary_email')
                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -108,7 +106,7 @@
                         <div class="grid lg:grid-cols-3 gap-3">
                             <div class="space-y-2">
                                 <x-form-field type="textarea" name="address" label="Hotel Address" :options="[]"
-                                    :value="old('address', $hotel->address)" class="placeholder:text-textmuted" />
+                                    :value="$hotel->address" class="placeholder:text-textmuted" />
                                 @error('address')
                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -153,7 +151,7 @@
                                             placeholder="Seasion Start Date" 
                                             ariaLabel="Seasion Start Date" 
                                             class="ti-form-input rounded-none placeholder:text-textmuted text-sm form-control-sm" 
-                                            value="{{ old('seasion_start_date.' . $k, $seasion_dates['start_date']) }}"
+                                            value="{{ $seasion_dates['start_date'] }}"
                                         />
                                         @error('seasion_start_date.' . $k)
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
@@ -169,7 +167,7 @@
                                             placeholder="Seasion End Date" 
                                             ariaLabel="Seasion End Date" 
                                             class="ti-form-input rounded-none placeholder:text-textmuted text-sm form-control-sm" 
-                                            value="{{old('seasion_end_date.' . $k, $seasion_dates['end_date'])}}" 
+                                            value="{{$seasion_dates['end_date']}}" 
                                         />
                                         @error('seasion_end_date.' . $k)
                                             <span class="text-red-500 text-sm">{{ $message }}</span>

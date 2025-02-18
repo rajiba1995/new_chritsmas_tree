@@ -2,7 +2,6 @@
 
 <div class="date-pick-row !mb-3">
     <div class="inputs-wrapper">
-        <!-- Destination Select -->
         <x-form-field 
             type="select" 
             name="destination" 
@@ -11,7 +10,7 @@
             :value="old('destination')" 
             wire:model="selectedDestination"
             wire:change="GetDivisions($event.target.value)" 
-            class="form-control inventory_filter"
+            class="placeholder:text-textmuted text-sm selected_seasion_type"
             :selectedText="'Choose Destination'"
         />
         <!-- Division Select -->
@@ -23,7 +22,7 @@
             :value="old('division')" 
             wire:model="selectedDivision" 
             wire:change="loadCategories($event.target.value)" 
-            class="form-control inventory_filter"
+            class="placeholder:text-textmuted text-sm selected_seasion_type"
             :selectedText="'Choose Division'"
         />
         <!-- Hotel Category Select -->
@@ -35,7 +34,7 @@
             :value="old('hotel_category')" 
             wire:model="selectedCategory" 
             wire:change="loadHotels($event.target.value)" 
-            class="form-control inventory_filter"
+            class="placeholder:text-textmuted text-sm selected_seasion_type"
             :selectedText="'Choose Category'"
         />
         <!-- Hotels Select -->
@@ -47,11 +46,12 @@
             :value="old('hotel', $selectedHotel)" 
             wire:change="FilterDate(startDate.value, endDate.value, $event.target.value)"
             wire:model="selectedHotel" 
-            class="form-control inventory_filter"
+            class="placeholder:text-textmuted text-sm selected_seasion_type"
             :selectedText="'Choose Hotel'"
         />
     </div>
 </div>
+
 <div class="date-pick-row !mb-3">
     <div class="inputs-wrapper">
         <label for="startDate" class="customDatePicker">

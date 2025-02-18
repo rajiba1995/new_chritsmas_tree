@@ -59,7 +59,7 @@
                                 @endphp
                             
                             @foreach($planItems as $index => $item)
-                                <div class="grid grid-cols-12 gap-4 mt-3">
+                                <div class="grid grid-cols-12 gap-2 mt-1">
                                     <div class="col-span-10">
                                         <input type="text" name="plan_item[]" class="form-control form-control-sm" placeholder="Enter Plan Item" value="{{$item}}">
                                         @error("plan_item.$index")
@@ -101,7 +101,7 @@
                             </div>
                             @foreach($value as $index => $item)
                                 @if($index > 0)
-                                <div class="grid grid-cols-12 gap-4 mt-3">
+                                <div class="grid grid-cols-12 gap-2 mt-1">
                                     <div class="col-span-10">
                                         <input type="text" name="plan_item[]" class="form-control form-control-sm" placeholder="Enter Plan Item" value="{{$item}}">
                                         @error("plan_item.$index")
@@ -152,7 +152,7 @@
                                     @endphp
                                 
                                 @foreach($planItems as $index => $item)
-                                    <div class="grid grid-cols-12 gap-4 mt-3">
+                                    <div class="grid grid-cols-12 gap-2 mt-1">
                                         <div class="col-span-10">
                                             <input type="text" name="plan_item[]" class="form-control form-control-sm" placeholder="Enter Plan Item" value="{{$item}}">
                                             @error("plan_item.$index")

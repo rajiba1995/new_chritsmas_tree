@@ -397,6 +397,10 @@ class DestinationWiseRouteMap extends Component
     }
     public function DeleteRouteItem($id)
     {
+        $this->dispatch('showConfirm', ['itemId' => $id]);
+    }
+    public function deleteItem($id)
+    {
         $route = DestinationWiseRoute::find($id);
         if ($route) {
             $route->delete();

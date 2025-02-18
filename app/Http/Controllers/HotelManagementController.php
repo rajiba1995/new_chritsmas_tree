@@ -79,7 +79,7 @@ class HotelManagementController extends Controller
         return view('admin.hotel.create',compact('destinations', 'divisions', 'hotel_categories','common','hotel_ammenities','room_categories','seasion_types'));
     }
     public function store(Request $request){
-        // dd($request->all());
+        
         $validatedData = $request->validate([
             'name' => [
                 'required',
@@ -172,6 +172,7 @@ class HotelManagementController extends Controller
         }
     }
     public function edit($id) {
+
         DB::beginTransaction();
         try {
             $hotel = $this->hotelRepository->getHotelById($id);
@@ -343,6 +344,14 @@ class HotelManagementController extends Controller
         try {
             $this->commonRepository->updateHotelSeasionPlan($request->all());
             return redirect()->back()->with('success', 'Seasion updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+    public function hotel_seasion_plan_destroy($id){
+        try {
+            $this->commonRepository->deleteSeasionPlan($id);
+            return redirect()->back()->with('success', 'Seasion deleted successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }

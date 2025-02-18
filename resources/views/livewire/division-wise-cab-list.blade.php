@@ -106,7 +106,7 @@
                                                 wire:key="status-toggle-{{$cab_item->division_id}}-{{$cab_item->seasion_type_id}}-{{$cab_item->id}}" 
                                             />
                                             <div>
-                                                <button type="button" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20" wire:click="DeleteCab({{$cab_item->id}})" wire:key="delete-item-{{$cab_item->division_id}}-{{$cab_item->seasion_type_id}}-{{$cab_item->id}}" itemId="{{$cab_item->id}}">
+                                                <button type="button" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20" wire:click="DeleteCabItem({{$cab_item->id}})" wire:key="delete-item-{{$cab_item->division_id}}-{{$cab_item->seasion_type_id}}-{{$cab_item->id}}" itemId="{{$cab_item->id}}">
                                                     <i class="ti ti-trash"></i>
                                                 </button>
                                             </div>
@@ -209,6 +209,25 @@
         </div>
     </div>
 </div>
-
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    window.addEventListener('showConfirm', function (event) {
+        let itemId = event.detail[0].itemId;
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                @this.call('deleteItem', itemId); // Calls Livewire method directly
+                Swal.fire("Deleted!", "Your item has been deleted.", "success");
+            }
+        });
+    });
 </script>
+@endsection

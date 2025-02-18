@@ -532,5 +532,25 @@
         </div>
     </div>
 </div>
-@push('scripts')
-@endpush
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    window.addEventListener('showConfirm', function (event) {
+        let itemId = event.detail[0].itemId;
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                @this.call('deleteItem', itemId); // Calls Livewire method directly
+                Swal.fire("Deleted!", "Your item has been deleted.", "success");
+            }
+        });
+    });
+</script>
+@endsection
