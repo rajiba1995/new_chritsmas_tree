@@ -134,8 +134,9 @@
                                                 1
                                             </span>
                                         </th>
-                                        <td class="!text-center">
-                                            <span>{{ucwords($cab_item->name)}}</span> <span class="button-control"></span>
+                                        <td class="!text-center" wire:key="cab-item-{{$cab_item->id}}">
+                                            <span>{{ucwords($cab_item->name)}}</span> 
+                                            <span class="button-control" wire:click="ShowItemContent({{$cab_item->id}})"></span>
                                         </td>
                                         
                                         <td class="!text-center">
@@ -570,13 +571,11 @@
                                         </tbody>
                                     </table>
                                 </div>
-                            
                                 @if (session('edit-activity-error'))
                                     <div class="alert alert-danger">
                                         {{ session('edit-activity-error') }}
                                     </div>
                                 @endif
-                            
                                 <div class="text-end mt-3">
                                     <button type="submit" class="ti-btn ti-btn-primary-full !py-1 pt-0 ti-btn-wave me-[0.375rem]">
                                         <i class="fa-solid fa-save"></i> Save
@@ -630,6 +629,46 @@
         </div>
     </div>
     {{-- End Model For Activity Images --}}
+    {{-- Start Model For Activity Content --}}
+    <div id="show_images" class="hs-overlay {{$active_modal_for_content==0?"hidden":""}} fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_lg_sm_width bg-white rounded-lg">
+            <div class="ti-modal-content p-20">
+                <div class="ti-modal-header flex justify-end items-center">
+                    <button type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none badge gap-2 bg-danger/10 text-danger" wire:click="CloseContentModal">
+                        <i class="fa-solid fa-xmark text-lg text-dark"></i>
+                    </button>
+                </div>
+                <div class="ti-modal-body text-start mt-2">
+                    <form id="updateForm">
+                        @csrf
+                        <div class="badge bg-outline-primary cursor-pointer">
+                            <h6 class="uppercase">{{$content_name}}</6>
+                        </div>
+                        <div>
+                            <input type="hidden" name="activity_id" id="activity_id" value="{{$update_description_id}}">
+                            <label for="">Description</label>
+                            <textarea cols="30" rows="10" name="description" class="form-control form-control-sm text-center" id="description">
+                                {{$description}}
+                            </textarea>
+                        </div>
+                        <div class="text-end mt-3">
+                            @if (session('activity-update-error'))
+                                    <div class="alert alert-danger">
+                                        {{ session('activity-update-error') }}
+                                    </div>
+                                @endif
+                            <button type="submit" class="ti-btn ti-btn-primary-full !py-1 pt-0 ti-btn-wave me-[0.375rem]">
+                                <i class="fa-solid fa-save"></i> Update
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
+    {{-- End Model For Activity Content --}}
 
     <div wire:loading class="loader">
         <div class="spinner">
@@ -641,28 +680,78 @@
 <script type="text/javascript" src="{{ asset('build/ckeditor/ckeditor.js') }}"></script>
 {{-- CK Editor --}}
 <script>
-    window.addEventListener('editor_load', function(event) { 
-    // Handle short_desc_editor
-    var shortDescTextArea = document.getElementById('content');
-    if (shortDescTextArea) {
-      // Check if CKEditor instance already exists and destroy it
-      if (CKEDITOR.instances['content']) {
-        CKEDITOR.instances['content'].destroy(true);
-      }
-      
-      // Initialize CKEditor for short_desc_editor
-      if (typeof CKEDITOR !== 'undefined') {
-        CKEDITOR.replace('content');
+   window.addEventListener('editor_load', function (event) {
+    // Get the textarea element
+    var descriptionTextArea = document.getElementById('description');
 
-        // Sync CKEditor data to Livewire
-        CKEDITOR.instances['content'].on('change', function() {
-            @this.set('content', CKEDITOR.instances['content'].getData());
-        });
-      } else {
-        console.error('CKEditor is not defined!');
-      }
+    if (descriptionTextArea) {
+        // Ensure event.detail[0] exists and contains setDescriptionValue
+        if (event.detail && event.detail[0] && event.detail[0].setDescriptionValue !== undefined) {
+            let setDescriptionValue = event.detail[0].setDescriptionValue;
+            // alert("Existing Description: " + setDescriptionValue);
+        } else {
+            console.warn("No description value received in event.");
+        }
+
+        // Check if CKEditor instance already exists and destroy it
+        if (CKEDITOR.instances['description']) {
+            CKEDITOR.instances['description'].destroy(true);
+        }
+
+        // Initialize CKEditor
+        if (typeof CKEDITOR !== 'undefined') {
+            CKEDITOR.replace('description');
+
+            // Set the received description value to CKEditor
+            if (event.detail && event.detail[0] && event.detail[0].setDescriptionValue !== undefined) {
+                CKEDITOR.instances['description'].setData(event.detail[0].setDescriptionValue);
+            }
+
+            // // Sync CKEditor data to Livewire
+            // CKEDITOR.instances['description'].on('change', function () {
+            //     @this.set('description', CKEDITOR.instances['description'].getData());
+            // });
+        } else {
+            console.error('CKEditor is not defined!');
+        }
     }
-  });
+});
+
+
+</script>
+<script>
+    document.getElementById("updateForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent default form submission
+        // Ensure CKEditor instance exists and get its data
+        if (CKEDITOR.instances['description']) {
+            CKEDITOR.instances['description'].updateElement(); // ✅ Sync CKEditor data to textarea
+        }
+        let formData = new FormData(this); // Get form data
+        // let description = document.getElementById('description').value;
+        // let activity_id = document.getElementById('activity_id').value;
+        // console.log(description);
+        // return false;
+        fetch("{{ route('admin.route.division_wise_activity_update_content') }}", {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value // Get CSRF token
+            },
+            body: formData
+        })
+        .then(response => response.json()) // Convert response to JSON
+        .then(data => {
+            if (data.success) {
+                @this.call('UpdateDescription', 'true');
+                // window.location.reload(); // ✅ Corrected window reload
+            } else {
+                @this.call('UpdateDescription', 'false');
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("An error occurred. Please try again.");
+        });
+    });
 </script>
 
 {{-- Alert --}}

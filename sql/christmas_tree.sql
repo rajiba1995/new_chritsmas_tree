@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 17, 2025 at 09:08 AM
+-- Generation Time: Feb 19, 2025 at 04:00 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -74,7 +74,7 @@ INSERT INTO `ammenities` (`id`, `name`, `status`, `created_at`, `updated_at`, `d
 (2, 'Coffee', 1, '2024-11-18 08:58:54', '2024-11-26 01:34:31', NULL),
 (3, 'Tea Maker', 1, '2024-11-20 05:48:05', '2024-11-26 01:34:46', NULL),
 (4, 'Gyser', 1, '2024-11-26 01:35:01', '2024-11-26 01:35:01', NULL),
-(5, 'Wi-Fi', 1, '2024-11-26 01:35:15', '2024-11-26 01:35:15', NULL),
+(5, 'Wi-Fi', 1, '2024-11-26 01:35:15', '2025-02-18 02:24:54', '2025-02-18 02:24:54'),
 (6, 'Television', 1, '2024-11-26 01:35:27', '2024-11-26 01:35:27', NULL),
 (7, 'Others', 1, '2024-11-26 01:35:41', '2024-11-26 01:35:41', NULL);
 
@@ -101,7 +101,7 @@ CREATE TABLE `cabs` (
 INSERT INTO `cabs` (`id`, `title`, `capacity`, `status`, `deleted_at`, `created_at`, `updated_at`) VALUES
 (1, 'SUV', 4, 1, NULL, '2025-02-10 01:59:26', '2025-02-10 01:59:26'),
 (2, 'Tata Safari', 6, 1, NULL, '2025-02-10 02:00:26', '2025-02-10 02:00:26'),
-(3, 'Kia Carens', 4, 1, NULL, '2025-02-10 02:00:38', '2025-02-10 02:00:38'),
+(3, 'Kia Carens', 4, 1, NULL, '2025-02-10 02:00:38', '2025-02-18 02:14:56'),
 (4, 'Maruti Suzuki', 4, 1, NULL, '2025-02-10 02:00:48', '2025-02-10 02:00:48'),
 (5, 'Mahindra Scorpio', 8, 1, NULL, '2025-02-10 02:00:57', '2025-02-10 02:00:57'),
 (6, 'Toyota', 6, 1, NULL, '2025-02-10 02:01:14', '2025-02-10 02:01:14');
@@ -123,14 +123,8 @@ CREATE TABLE `cache` (
 --
 
 INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
-('356a192b7913b04c54574d18c28d46e6395428ab', 'i:1;', 1733734089),
-('356a192b7913b04c54574d18c28d46e6395428ab:timer', 'i:1733734089;', 1733734089),
-('528ae755e927a1e3d80eb504541d40699476be7b', 'i:1;', 1736155993),
-('528ae755e927a1e3d80eb504541d40699476be7b:timer', 'i:1736155993;', 1736155993),
-('5c785c036466adea360111aa28563bfd556b5fba', 'i:1;', 1739172982),
-('5c785c036466adea360111aa28563bfd556b5fba:timer', 'i:1739172982;', 1739172982),
-('admin@gmail.com|127.0.0.1', 'i:1;', 1736144629),
-('admin@gmail.com|127.0.0.1:timer', 'i:1736144629;', 1736144629);
+('5c785c036466adea360111aa28563bfd556b5fba', 'i:1;', 1739975979),
+('5c785c036466adea360111aa28563bfd556b5fba:timer', 'i:1739975979;', 1739975979);
 
 -- --------------------------------------------------------
 
@@ -168,7 +162,7 @@ INSERT INTO `categories` (`id`, `name`, `status`, `created_at`, `updated_at`, `d
 (2, 'Semi-Delux', 1, '2024-11-18 02:10:31', '2024-11-25 20:06:39', NULL),
 (3, 'Utu', 1, '2024-11-18 02:13:52', '2024-11-18 02:45:24', '2024-11-18 02:45:24'),
 (4, 'Standard', 1, '2024-11-19 02:07:58', '2024-11-25 20:06:29', NULL),
-(5, 'Super-Deluxe', 1, '2024-11-25 20:07:01', '2024-11-25 20:07:01', NULL),
+(5, 'Super-Deluxe', 1, '2024-11-25 20:07:01', '2025-02-18 02:25:22', '2025-02-18 02:25:22'),
 (6, 'Premium', 1, '2024-11-25 20:07:06', '2024-11-25 20:07:06', NULL),
 (7, 'Premium Plus', 1, '2024-11-25 20:07:15', '2024-11-25 20:07:15', NULL),
 (8, 'Luxury', 1, '2024-11-25 20:07:22', '2024-11-25 20:07:22', NULL),
@@ -195,7 +189,7 @@ CREATE TABLE `cities` (
 --
 
 INSERT INTO `cities` (`id`, `state_id`, `name`, `status`, `deleted_at`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Tirumala Temple', 1, NULL, '2024-11-18 05:18:24', '2024-12-11 01:43:26'),
+(1, 1, 'Tirumala Temple', 1, '2025-02-18 07:55:33', '2024-11-18 05:18:24', '2025-02-18 02:25:33'),
 (2, 1, 'Srivari Mettu', 1, NULL, '2024-11-19 07:29:11', '2024-12-11 01:43:37'),
 (3, 1, 'Test3', 1, '2024-11-20 12:19:25', '2024-11-19 07:30:22', '2024-11-20 06:49:25'),
 (4, 2, 'Digha', 1, NULL, '2024-11-20 06:01:41', '2024-12-11 01:42:50'),
@@ -531,6 +525,7 @@ CREATE TABLE `division_wise_activities` (
   `division_id` bigint(20) UNSIGNED NOT NULL,
   `seasion_type_id` bigint(20) UNSIGNED NOT NULL,
   `name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
   `type` enum('PAID','UNPAID') NOT NULL,
   `price` decimal(8,2) DEFAULT NULL,
   `ticket_price` decimal(8,2) DEFAULT NULL,
@@ -542,9 +537,11 @@ CREATE TABLE `division_wise_activities` (
 -- Dumping data for table `division_wise_activities`
 --
 
-INSERT INTO `division_wise_activities` (`id`, `division_id`, `seasion_type_id`, `name`, `type`, `price`, `ticket_price`, `created_at`, `updated_at`) VALUES
-(1, 4, 1, 'digha activity for paid', 'PAID', 1500.00, 50.00, '2025-02-10 02:05:30', '2025-02-10 02:05:30'),
-(2, 4, 3, 'digha off-season activity for unpaid ', 'UNPAID', 0.00, 0.00, '2025-02-10 02:07:42', '2025-02-10 02:07:42');
+INSERT INTO `division_wise_activities` (`id`, `division_id`, `seasion_type_id`, `name`, `description`, `type`, `price`, `ticket_price`, `created_at`, `updated_at`) VALUES
+(1, 4, 1, 'digha activity for paid', '<h4>SMS Template</h4>\r\n\r\n<p>Dear new user {#var#}, You have been chosen by {#var#} to register and join an auction. Details: {#var#} (owned by SMTPL) - Sarv Megh Technology OPC Private Limited</p>\r\n\r\n<p>&nbsp;</p>', 'PAID', 1500.00, 50.00, '2025-02-10 02:05:30', '2025-02-19 06:14:05'),
+(2, 4, 3, 'digha off-season activity for unpaid ', '<p>fdfdfd</p>', 'UNPAID', 0.00, 0.00, '2025-02-10 02:07:42', '2025-02-19 06:13:23'),
+(3, 2, 3, 'Jungle safary', '<h3><span style=\"font-size:22px\"><span style=\"color:#2ecc71\"><strong>HI this is Rajib</strong></span></span></h3>', 'UNPAID', 0.00, 0.00, '2025-02-17 05:39:59', '2025-02-19 06:08:32'),
+(4, 4, 1, 'cssdsdsds', '<p>hi</p>', 'UNPAID', 0.00, 0.00, '2025-02-19 03:03:05', '2025-02-19 06:10:26');
 
 -- --------------------------------------------------------
 
@@ -559,13 +556,6 @@ CREATE TABLE `division_wise_activity_images` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `division_wise_activity_images`
---
-
-INSERT INTO `division_wise_activity_images` (`id`, `division_wise_activity_id`, `file_path`, `created_at`, `updated_at`) VALUES
-(1, 1, 'storage/activities/digha-digha-activity-for-paid-20250210073530.png', '2025-02-10 02:05:30', '2025-02-10 02:05:30');
 
 -- --------------------------------------------------------
 
@@ -593,8 +583,6 @@ INSERT INTO `division_wise_cabs` (`id`, `division_id`, `seasion_type_id`, `cab_i
 (3, 4, 1, 2, 1, '2025-02-10 02:01:34', '2025-02-10 02:01:34'),
 (4, 4, 3, 3, 1, '2025-02-10 02:01:39', '2025-02-10 02:03:43'),
 (5, 4, 3, 1, 1, '2025-02-10 02:01:39', '2025-02-10 02:03:41'),
-(6, 4, 3, 2, 1, '2025-02-10 02:01:39', '2025-02-10 02:03:44'),
-(7, 4, 3, 5, 1, '2025-02-10 02:02:17', '2025-02-10 02:03:45'),
 (8, 4, 2, 3, 1, '2025-02-10 02:04:00', '2025-02-10 02:04:00'),
 (9, 4, 2, 1, 1, '2025-02-10 02:04:00', '2025-02-10 02:04:00'),
 (10, 4, 2, 2, 1, '2025-02-10 02:04:00', '2025-02-10 02:04:00'),
@@ -691,7 +679,7 @@ CREATE TABLE `hotels` (
 
 INSERT INTO `hotels` (`id`, `name`, `destination`, `division`, `hotel_category`, `number_of_rooms`, `phone_code`, `mobile_number`, `whatsapp_number`, `email1`, `email2`, `status`, `address`, `release_trigger`, `policy`, `deleted_at`, `created_by`, `created_at`, `updated_at`) VALUES
 (27, 'Test133', '2', '1', '2', 58, '+91', '8798798111', '8798798222', 'dsdsdd11@gmail.com', 'sdsds22@gmail.com', 1, 'New Adarshapally,Kolkata', 0, NULL, NULL, NULL, '2024-11-22 07:16:25', '2024-12-13 07:59:27'),
-(29, 'Hotel Tower View', '1', '2', '1', 2, '+91', '9876541235', '9876541235', 'amit.s@techmantra.co', 'amit.s@techmantra.co', 1, 'ghatal', 25, NULL, NULL, NULL, '2024-11-26 02:27:33', '2025-01-02 02:14:41'),
+(29, 'Hotel Tower View', '1', '2', '1', 2, '+91', '9876541235', '9876541235', 'amit.s@techmantra.co', 'amit.s@techmantra.co', 1, 'ghatal', 25, NULL, '2025-02-18 02:26:33', NULL, '2024-11-26 02:27:33', '2025-02-18 02:26:33'),
 (33, 'Mountain Top Hotel In Manali', '3', '8', '1', 8, '+91', '9876541235', '9876542587', 'amit.s@techmantra.co', 'amit.s@techmantra.co', 1, 'Near, Hadimba Temple Rd, Dhungri Village, Manali, Himachal Pradesh', 32, NULL, NULL, NULL, '2024-12-09 01:48:43', '2025-01-06 01:56:15'),
 (34, 'Sea Breeze Village', '5', '6', '1', 8, '+91', '9876542589', '9876542589', 'seabreezegoa@gmail.com', NULL, 1, 'H.No.5/188 C, Near Infantaria, Behind Park Avenue, Calangute - Baga Rd, Umtavaddo, Calangute, 403516, India', 69, NULL, NULL, NULL, '2025-01-06 02:51:23', '2025-01-06 03:31:20'),
 (35, 'Abcd', '2', '9', '2', 7, '+91', '9876541235', '9876541235', 'amit.s@techmantra.co', 'amit.s@techmantra.co', 1, 'ghatal', 8, NULL, NULL, NULL, '2025-01-06 06:06:20', '2025-01-06 06:20:27');
@@ -709,13 +697,6 @@ CREATE TABLE `hotel_images` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `hotel_images`
---
-
-INSERT INTO `hotel_images` (`id`, `hotel_id`, `image_path`, `created_at`, `updated_at`) VALUES
-(52, 29, 'hotel_images/20241128135758_413536.jpeg', '2024-11-28 08:27:58', '2024-11-28 08:27:58');
 
 -- --------------------------------------------------------
 
@@ -1227,6 +1208,30 @@ INSERT INTO `inventories` (`id`, `hotel_id`, `room_id`, `date`, `total_sold`, `t
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `itinerary_banners`
+--
+
+CREATE TABLE `itinerary_banners` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `division_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `image` varchar(255) NOT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '1:Active, 0:Inactive',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `itinerary_banners`
+--
+
+INSERT INTO `itinerary_banners` (`id`, `title`, `division_id`, `image`, `status`, `created_at`, `updated_at`) VALUES
+(6, 'csdsds', 2, 'storage/itinerary_banners/srivari-mettu-9774-20250219143628.jpg', 1, '2025-02-19 09:06:28', '2025-02-19 09:06:28'),
+(7, 'dadsds', 2, 'storage/itinerary_banners/srivari-mettu-4038-20250219143845.jpg', 1, '2025-02-19 09:08:45', '2025-02-19 09:08:45');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `jobs`
 --
 
@@ -1384,7 +1389,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (42, '2025_02_05_094508_create_route_service_summaries_table', 13),
 (43, '2025_02_05_100854_create_service_wise_activities_table', 13),
 (44, '2025_02_05_101330_create_service_wise_sightseeings_table', 13),
-(45, '2025_02_05_101657_create_service_wise_cabs_table', 13);
+(45, '2025_02_05_101657_create_service_wise_cabs_table', 13),
+(47, '2025_02_18_123130_add_column_to_division_wise_activities', 14),
+(49, '2025_02_19_120158_create_itinerary_banners_table', 15);
 
 -- --------------------------------------------------------
 
@@ -1461,7 +1468,7 @@ INSERT INTO `room_categories` (`id`, `name`, `status`, `created_at`, `updated_at
 (3, 'Njnddddd', 1, '2024-11-19 04:57:04', '2024-11-19 05:34:02', '2024-11-19 05:34:02'),
 (4, 'Utu', 1, '2024-11-19 04:57:24', '2024-11-19 05:33:51', '2024-11-19 05:33:51'),
 (5, 'Semi-Delux', 1, '2024-11-19 07:37:47', '2024-11-26 01:38:00', NULL),
-(6, 'Super-Deluxe', 1, '2024-11-26 01:38:19', '2024-11-26 01:38:19', NULL),
+(6, 'Super-Deluxe', 1, '2024-11-26 01:38:19', '2025-02-18 02:25:09', '2025-02-18 02:25:09'),
 (7, 'Premium', 1, '2024-11-26 01:38:24', '2024-11-26 01:38:24', NULL),
 (8, 'Premium Plus', 1, '2024-11-26 01:38:31', '2024-11-26 01:38:31', NULL),
 (9, 'Luxury', 1, '2024-11-26 01:38:44', '2024-11-26 01:38:44', NULL),
@@ -1521,7 +1528,7 @@ INSERT INTO `seasion_plans` (`id`, `title`, `plan_item`, `position`, `status`, `
 (2, 'Peak Season', 'ACCOMODATION, CP, MAP, APAI', 2, 1, NULL, '2024-11-18 06:03:31', '2025-01-06 06:28:43', NULL, NULL),
 (3, 'Off-Season', 'ACCOMODATION, CP, MAP, APAI', 3, 1, NULL, '2024-11-22 05:09:53', '2024-12-05 08:37:45', NULL, NULL),
 (4, 'CWB (Addon)', 'ACCOMODATION, CP, MAP, APAI', 5, 1, NULL, '2024-11-26 01:44:15', '2025-01-06 06:28:47', NULL, NULL),
-(5, 'CWNB (Addon)', 'ACCOMODATION, CP, MAP, APAI', 6, 1, NULL, '2024-11-26 01:44:45', '2025-01-06 06:28:47', NULL, NULL),
+(5, 'CWNB (Addon)', 'ACCOMODATION, CP, MAP, APAI', 6, 1, '2025-02-18 02:20:11', '2024-11-26 01:44:45', '2025-02-18 02:20:11', NULL, NULL),
 (6, 'Meal Plan', 'BREAKFAST, LUNCH, DINNER', 4, 1, NULL, '2024-11-26 01:45:04', '2025-01-06 06:28:47', NULL, NULL);
 
 -- --------------------------------------------------------
@@ -1641,7 +1648,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('75FT14X71nrw2TD1yLJYqJj37LmnyOqa0lh0SVWj', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiZlV6UEJ5M0w5MXMxdW1EaG8ybzU2REJrdFJ5RW9Bb1NnQ3pNOGh3UyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9yb3V0ZS9hbGwtc2VydmljZXMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUyOiJsb2dpbl9hZG1pbl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1739198829);
+('Vp9ruQ13IAVP7Me5NLg4scIB4zUgctnZOaPx0kcm', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiemwwazVVY1NVYmZMMDdxeXZlRm1NbnNtenNVZ0Z1RTJhQlBWWW1lMiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjAyOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbGl2ZXdpcmUvcHJldmlldy1maWxlL2lFcVp6SlZFVnp0WVdGcGpjWEw5QWY4ZUFhSEFDdC1tZXRhWkc5M2JteHZZV1FnS0RFcExtcHdadz09LS5qcGc/ZXhwaXJlcz0xNzM5OTgwNzk5JnNpZ25hdHVyZT1jNDNhMWY1ZDUwZjRmMGRiZGRkMTY5MzdkMThjZDkyODdiNDk0YTFiNTQ2MzdlN2RlZDNhMzUyNTNmMjMxYjk5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MjoibG9naW5fYWRtaW5fNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=', 1739975954);
 
 -- --------------------------------------------------------
 
@@ -1667,7 +1674,7 @@ INSERT INTO `states` (`id`, `country_code_id`, `name`, `status`, `deleted_at`, `
 (1, 2, 'Andhra Pradesh', 1, NULL, '2024-11-18 05:17:08', '2025-01-06 03:20:20'),
 (2, NULL, 'West Bangal', 1, NULL, '2024-11-20 02:00:43', '2024-11-20 02:00:43'),
 (3, NULL, 'Himachal pradesh', 1, NULL, '2024-12-11 01:40:32', '2024-12-11 01:40:47'),
-(4, NULL, 'Sikkim', 1, NULL, '2024-12-11 01:41:05', '2024-12-11 01:41:05'),
+(4, NULL, 'Sikkim', 1, '2025-02-18 07:55:50', '2024-12-11 01:41:05', '2025-02-18 02:25:50'),
 (5, NULL, 'Goa', 1, NULL, '2024-12-11 01:41:14', '2024-12-11 01:41:14');
 
 -- --------------------------------------------------------
@@ -1864,6 +1871,13 @@ ALTER TABLE `inventories`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `itinerary_banners`
+--
+ALTER TABLE `itinerary_banners`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `itinerary_banners_division_id_foreign` (`division_id`);
+
+--
 -- Indexes for table `jobs`
 --
 ALTER TABLE `jobs`
@@ -2050,13 +2064,13 @@ ALTER TABLE `destination_wise_route_waypoints`
 -- AUTO_INCREMENT for table `division_wise_activities`
 --
 ALTER TABLE `division_wise_activities`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `division_wise_activity_images`
 --
 ALTER TABLE `division_wise_activity_images`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `division_wise_cabs`
@@ -2119,6 +2133,12 @@ ALTER TABLE `inventories`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
 
 --
+-- AUTO_INCREMENT for table `itinerary_banners`
+--
+ALTER TABLE `itinerary_banners`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
 -- AUTO_INCREMENT for table `jobs`
 --
 ALTER TABLE `jobs`
@@ -2140,7 +2160,7 @@ ALTER TABLE `leads_status`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `rooms`
@@ -2158,7 +2178,7 @@ ALTER TABLE `room_categories`
 -- AUTO_INCREMENT for table `route_service_summaries`
 --
 ALTER TABLE `route_service_summaries`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `seasion_plans`
@@ -2176,19 +2196,19 @@ ALTER TABLE `seasion_types`
 -- AUTO_INCREMENT for table `service_wise_activities`
 --
 ALTER TABLE `service_wise_activities`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `service_wise_cabs`
 --
 ALTER TABLE `service_wise_cabs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `service_wise_sightseeings`
 --
 ALTER TABLE `service_wise_sightseeings`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `states`
@@ -2285,6 +2305,12 @@ ALTER TABLE `hotel_price_chart_types`
 ALTER TABLE `hotel_seasion_times`
   ADD CONSTRAINT `hotel_seasion_times_hotel_id_foreign` FOREIGN KEY (`hotel_id`) REFERENCES `hotels` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `hotel_seasion_times_seasion_type_id_foreign` FOREIGN KEY (`seasion_type_id`) REFERENCES `seasion_types` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `itinerary_banners`
+--
+ALTER TABLE `itinerary_banners`
+  ADD CONSTRAINT `itinerary_banners_division_id_foreign` FOREIGN KEY (`division_id`) REFERENCES `cities` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `leads`

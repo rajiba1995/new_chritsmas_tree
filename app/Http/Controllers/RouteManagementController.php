@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
 use App\Models\Cab;
+use App\Models\DivisionWiseActivity;
 use App\Models\ServiceWiseCab;
 use App\Repositories\CommonRepository;
 
@@ -25,6 +26,16 @@ class RouteManagementController extends Controller
     {
         $common = CustomHelper::setHeadersAndTitle('Route Management', 'Division Wise Activity');
         return view('admin.route.division-wise-activity-list', compact('common'));
+    }
+
+    public function DivisionWiseActivityUpdateContent(Request $request){
+        $update = DivisionWiseActivity::find($request->activity_id);
+        if (!$update) {
+            return response()->json(['success' => false, 'message' => 'Activity not found!'], 404);
+        }
+        $update->description = $request->description;
+        $update->save();
+        return response()->json(['success' => true, 'message' => 'Content updated successfully!']);
     }
 
     public function DivisionWiseSightseeingList(Request $request){

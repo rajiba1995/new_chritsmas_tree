@@ -15,6 +15,7 @@ use App\Http\Controllers\PagesController;
 use App\Http\Controllers\TablesController;
 use App\Http\Controllers\UtilitiesController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\ItineraryController;
 use App\Http\Controllers\RouteManagementController;
 
 
@@ -47,102 +48,102 @@ Route::middleware('auth')->group(function () {
 
 });
 Route::get('dashboard', [DashboardsController::class, 'index'])->name('admin.dashboard');
-Route::prefix('admin')->middleware('auth:admin')->group(function () {
-    // Admin dashboard (only accessible if the user is authenticated as an admin)
-    Route::get('dashboard', [DashboardsController::class, 'index'])->name('admin.dashboard');
+    Route::prefix('admin')->middleware('auth:admin')->group(function () {
+        // Admin dashboard (only accessible if the user is authenticated as an admin)
+        Route::get('dashboard', [DashboardsController::class, 'index'])->name('admin.dashboard');
 
-    // Admin logout route
-    Route::post('logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+        // Admin logout route
+        Route::post('logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
-        // Lead Management
-    Route::prefix('leads')->group(function(){
-        Route::get('/', [LeadManagementController::class, 'index'])->name('admin.leads.index');
-        Route::get('/create', [LeadManagementController::class, 'create'])->name('admin.leads.create');
-        Route::post('/store', [LeadManagementController::class, 'store'])->name('admin.leads.store');
-        Route::post('/update/status/{id}', [LeadManagementController::class, 'update_status'])->name('admin.leads.update_status');
-        // Additional CRUD routes
-    });
+            // Lead Management
+        Route::prefix('leads')->group(function(){
+            Route::get('/', [LeadManagementController::class, 'index'])->name('admin.leads.index');
+            Route::get('/create', [LeadManagementController::class, 'create'])->name('admin.leads.create');
+            Route::post('/store', [LeadManagementController::class, 'store'])->name('admin.leads.store');
+            Route::post('/update/status/{id}', [LeadManagementController::class, 'update_status'])->name('admin.leads.update_status');
+            // Additional CRUD routes
+        });
 
     
-    // Hotel master
-    Route::prefix('hotel')->group(function(){
-        Route::get('/', [HotelManagementController::class,'index'])->name('admin.hotel.index');
-        Route::get('/create', [HotelManagementController::class,'create'])->name('admin.hotel.create');
-        Route::post('/store', [HotelManagementController::class,'store'])->name('admin.hotel.store');
-        Route::get('/edit/{id}', [HotelManagementController::class,'edit'])->name('admin.hotel.edit');
-        Route::post('/update/{id}', [HotelManagementController::class,'update'])->name('admin.hotel.update');
-        Route::post('/room/price/store', [HotelManagementController::class,'room_price_store'])->name('admin.hotel.room.price.store');
-        Route::get('/destroy/{id}', [HotelManagementController::class,'destroy'])->name('admin.hotel.destroy');
-        // Route::post('/image/delete/{imageId}', [HotelManagementController::class, 'deleteImage'])->name('admin.hotel.image.delete');
-        // Route::delete('/image/{imageId}', [HotelController::class, 'deleteImage'])->name('hotel.image.delete');
-        Route::delete('/image/delete/{imageId}', [HotelManagementController::class, 'deleteImage'])->name('admin.hotel.image.delete');
+        // Hotel master
+        Route::prefix('hotel')->group(function(){
+            Route::get('/', [HotelManagementController::class,'index'])->name('admin.hotel.index');
+            Route::get('/create', [HotelManagementController::class,'create'])->name('admin.hotel.create');
+            Route::post('/store', [HotelManagementController::class,'store'])->name('admin.hotel.store');
+            Route::get('/edit/{id}', [HotelManagementController::class,'edit'])->name('admin.hotel.edit');
+            Route::post('/update/{id}', [HotelManagementController::class,'update'])->name('admin.hotel.update');
+            Route::post('/room/price/store', [HotelManagementController::class,'room_price_store'])->name('admin.hotel.room.price.store');
+            Route::get('/destroy/{id}', [HotelManagementController::class,'destroy'])->name('admin.hotel.destroy');
+            // Route::post('/image/delete/{imageId}', [HotelManagementController::class, 'deleteImage'])->name('admin.hotel.image.delete');
+            // Route::delete('/image/{imageId}', [HotelController::class, 'deleteImage'])->name('hotel.image.delete');
+            Route::delete('/image/delete/{imageId}', [HotelManagementController::class, 'deleteImage'])->name('admin.hotel.image.delete');
 
 
-        Route::get('/{id}/images', [HotelManagementController::class, 'showHotelImages'])->name('admin.hotels.images');
-        
+            Route::get('/{id}/images', [HotelManagementController::class, 'showHotelImages'])->name('admin.hotels.images');
+            
 
 
-        // State Master
-        Route::prefix('destination')->group(function(){
-            Route::get('/', [CommonController::class,'state_index'])->name('admin.state.index');
-            Route::post('/store', [CommonController::class,'state_store'])->name('admin.state.store');
-            Route::get('/edit', [CommonController::class,'state_edit'])->name('admin.state.edit');
-            Route::post('/update', [CommonController::class,'state_update'])->name('admin.state.update');
-            Route::get('/destroy/{id}', [CommonController::class,'state_destroy'])->name('admin.state.destroy');
+            // State Master
+            Route::prefix('destination')->group(function(){
+                Route::get('/', [CommonController::class,'state_index'])->name('admin.state.index');
+                Route::post('/store', [CommonController::class,'state_store'])->name('admin.state.store');
+                Route::get('/edit', [CommonController::class,'state_edit'])->name('admin.state.edit');
+                Route::post('/update', [CommonController::class,'state_update'])->name('admin.state.update');
+                Route::get('/destroy/{id}', [CommonController::class,'state_destroy'])->name('admin.state.destroy');
+            });
+
+            // Division Master
+            Route::prefix('division')->group(function(){
+                Route::get('/', [CommonController::class,'division_index'])->name('admin.division.index');
+                Route::post('/store', [CommonController::class,'division_store'])->name('admin.division.store');
+                Route::get('/edit', [CommonController::class,'division_edit'])->name('admin.division.edit');
+                Route::post('/update', [CommonController::class,'division_update'])->name('admin.division.update');
+                Route::get('/destroy/{id}', [CommonController::class,'division_destroy'])->name('admin.division.destroy');
+            });
+            // Hotel Seasion Plan  Master
+            Route::prefix('seasion-plan')->group(function(){
+                Route::get('/', [HotelManagementController::class,'hotel_seasion_plan'])->name('admin.hotel_seasion_plan');
+                Route::post('/store', [HotelManagementController::class,'hotel_seasion_plan_store'])->name('admin.hotel_seasion_plan_store');
+                Route::post('/update', [HotelManagementController::class,'hotel_seasion_plan_update'])->name('admin.hotel_seasion_plan_update');
+                Route::get('/destroy/{id}', [HotelManagementController::class,'hotel_seasion_plan_destroy'])->name('admin.hotel_seasion_plan_destroy');
+            // web.php (Route definition)
+            Route::post('/update-order', [HotelManagementController::class, 'updateOrder'])->name('admin.hotel_seasion_plan_order');                              
+
+            
+            });
+
+            // Category Master
+            Route::prefix('category')->group(function(){
+                Route::get('/', [CommonController::class,'category_index'])->name('admin.category.index');
+                Route::post('/store', [CommonController::class,'category_store'])->name('admin.category.store');
+                // Route::get('/edit', [CommonController::class,'category_edit'])->name('admin.category.edit');
+                Route::post('/update', [CommonController::class,'category_update'])->name('admin.category.update');
+                Route::get('/destroy/{id}', [CommonController::class,'category_destroy'])->name('admin.category.destroy');
+            });
+            // Ammenity Master
+            Route::prefix('ammenity')->group(function(){
+                Route::get('/', [CommonController::class,'ammenity_index'])->name('admin.ammenity.index');
+                Route::post('/store', [CommonController::class,'ammenity_store'])->name('admin.ammenity.store');
+                Route::get('/edit', [CommonController::class,'ammenity_edit'])->name('admin.ammenity.edit');
+                Route::post('/update', [CommonController::class,'ammenity_update'])->name('admin.ammenity.update');
+                Route::get('/destroy/{id}', [CommonController::class,'ammenity_destroy'])->name('admin.ammenity.destroy');
+            });
+
+
+                // Room Category Master
+                Route::prefix('room-category')->group(function(){
+                Route::get('/', [CommonController::class,'room_category_index'])->name('admin.room.category.index');
+                Route::post('/store', [CommonController::class,'room_category_store'])->name('admin.room.category.store');
+                Route::get('/edit', [CommonController::class,'room_category_edit'])->name('admin.room.category.edit');
+                Route::post('/update', [CommonController::class,'room_category_update'])->name('admin.room.category.update');
+                Route::get('/destroy/{id}', [CommonController::class,'room_category_destroy'])->name('admin.room.category.destroy');
+            });
         });
-
-        // Division Master
-        Route::prefix('division')->group(function(){
-            Route::get('/', [CommonController::class,'division_index'])->name('admin.division.index');
-            Route::post('/store', [CommonController::class,'division_store'])->name('admin.division.store');
-            Route::get('/edit', [CommonController::class,'division_edit'])->name('admin.division.edit');
-            Route::post('/update', [CommonController::class,'division_update'])->name('admin.division.update');
-            Route::get('/destroy/{id}', [CommonController::class,'division_destroy'])->name('admin.division.destroy');
-        });
-        // Hotel Seasion Plan  Master
-        Route::prefix('seasion-plan')->group(function(){
-            Route::get('/', [HotelManagementController::class,'hotel_seasion_plan'])->name('admin.hotel_seasion_plan');
-            Route::post('/store', [HotelManagementController::class,'hotel_seasion_plan_store'])->name('admin.hotel_seasion_plan_store');
-            Route::post('/update', [HotelManagementController::class,'hotel_seasion_plan_update'])->name('admin.hotel_seasion_plan_update');
-            Route::get('/destroy/{id}', [HotelManagementController::class,'hotel_seasion_plan_destroy'])->name('admin.hotel_seasion_plan_destroy');
-        // web.php (Route definition)
-        Route::post('/update-order', [HotelManagementController::class, 'updateOrder'])->name('admin.hotel_seasion_plan_order');                              
-
-        
-        });
-
-        // Category Master
-        Route::prefix('category')->group(function(){
-            Route::get('/', [CommonController::class,'category_index'])->name('admin.category.index');
-            Route::post('/store', [CommonController::class,'category_store'])->name('admin.category.store');
-            // Route::get('/edit', [CommonController::class,'category_edit'])->name('admin.category.edit');
-            Route::post('/update', [CommonController::class,'category_update'])->name('admin.category.update');
-            Route::get('/destroy/{id}', [CommonController::class,'category_destroy'])->name('admin.category.destroy');
-        });
-        // Ammenity Master
-        Route::prefix('ammenity')->group(function(){
-            Route::get('/', [CommonController::class,'ammenity_index'])->name('admin.ammenity.index');
-            Route::post('/store', [CommonController::class,'ammenity_store'])->name('admin.ammenity.store');
-            Route::get('/edit', [CommonController::class,'ammenity_edit'])->name('admin.ammenity.edit');
-            Route::post('/update', [CommonController::class,'ammenity_update'])->name('admin.ammenity.update');
-            Route::get('/destroy/{id}', [CommonController::class,'ammenity_destroy'])->name('admin.ammenity.destroy');
-        });
-
-
-            // Room Category Master
-            Route::prefix('room-category')->group(function(){
-            Route::get('/', [CommonController::class,'room_category_index'])->name('admin.room.category.index');
-            Route::post('/store', [CommonController::class,'room_category_store'])->name('admin.room.category.store');
-            Route::get('/edit', [CommonController::class,'room_category_edit'])->name('admin.room.category.edit');
-            Route::post('/update', [CommonController::class,'room_category_update'])->name('admin.room.category.update');
-            Route::get('/destroy/{id}', [CommonController::class,'room_category_destroy'])->name('admin.room.category.destroy');
-        });
-    });
-    Route::prefix('inventory')->group(function(){
-        Route::get('/', [InventoryController::class, 'index'])->name('admin.inventory.index');
-        Route::get('/page1', [InventoryController::class, 'page1'])->name('admin.inventory.page1');
-        Route::get('/page2', [InventoryController::class, 'page2'])->name('admin.inventory.page2');
-        Route::get('get-divisions/{destination}', [InventoryController::class, 'getDivisions'])->name('admin.inventory.get.divisions');
+        Route::prefix('inventory')->group(function(){
+            Route::get('/', [InventoryController::class, 'index'])->name('admin.inventory.index');
+            Route::get('/page1', [InventoryController::class, 'page1'])->name('admin.inventory.page1');
+            Route::get('/page2', [InventoryController::class, 'page2'])->name('admin.inventory.page2');
+            Route::get('get-divisions/{destination}', [InventoryController::class, 'getDivisions'])->name('admin.inventory.get.divisions');
         });
 
         Route::prefix('master')->group(function(){
@@ -160,16 +161,23 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
         Route::prefix('route')->group(function(){
             Route::get('division-wise-cabs', [RouteManagementController::class, 'DivisionWiseCabList'])->name('admin.route.division_wise_cab_list');
             Route::get('division-wise-activities', [RouteManagementController::class, 'DivisionWiseActivityList'])->name('admin.route.division_wise_activity_list');
+            Route::post('division-wise-activities/update/content', [RouteManagementController::class, 'DivisionWiseActivityUpdateContent'])->name('admin.route.division_wise_activity_update_content');
             Route::get('division-wise-sightseeings', [RouteManagementController::class, 'DivisionWiseSightseeingList'])->name('admin.route.division_wise_sightseeing_list');
             Route::get('destination-wise-route-list', [RouteManagementController::class, 'DestinationWiseRouteList'])->name('admin.route.destination_wise_route_list');
             Route::get('all-services', [RouteManagementController::class, 'AllServices'])->name('admin.route.all_services');
             Route::post('update-cab-service-price', [RouteManagementController::class, 'UpdateCabServicePrice']);
         });
+
+        // Itinerary Management
+        Route::prefix('itinerary')->group(function(){
+            Route::prefix('division')->group(function(){
+                Route::get('banners', [ItineraryController::class, 'banners'])->name('admin.itinerary.division.banners');
+            });
+        });
     });
+
    
-    
-
-
+   
 require __DIR__.'/auth.php';
 
     Route::prefix('tem')->group(function () {

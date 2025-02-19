@@ -477,6 +477,14 @@
   overflow: hidden;
   border-radius: 5px;
 }
+.new-activity .banner-image-preview {
+  margin: 5px;
+  /* width: 50px; */
+  height: 100px;
+  border: 1px solid #ddd;
+  overflow: hidden;
+  border-radius: 5px;
+}
 
 .new-activity .image-thumbnail {
   width: 100%;

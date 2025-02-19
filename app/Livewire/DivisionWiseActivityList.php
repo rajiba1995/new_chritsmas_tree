@@ -28,6 +28,11 @@ class DivisionWiseActivityList extends Component
     public $active_assign_new_modal = 0;
     public $active_assign_update_modal = 0;
     public $active_modal_for_image = 0;
+    public $active_modal_for_content = 0;
+    public $content_name;
+    public $description;
+    public $setDescriptionValue;
+    public $update_description_id;
     public $division_wise_cabs = [];
     public $active_activity_images = [];
 
@@ -132,7 +137,30 @@ class DivisionWiseActivityList extends Component
         $this->active_modal_for_image = 1;
         $this->active_activity_images = DivisionWiseActivityImage::where('division_wise_activity_id', $id)->get();
     }
-
+    public function ShowItemContent($id){
+        // Reset fields to prevent old data from showing
+        $this->reset(['content_name','description','update_description_id','setDescriptionValue']);
+    
+        // Find the content
+        $content = DivisionWiseActivity::find($id);
+        
+        // Check if content exists before assigning
+        if ($content) {
+            $this->update_description_id = $id;
+            $this->content_name = $content->name;
+            
+            $this->description = $content->description;
+        } else {
+            // Handle case where item does not exist (optional)
+            $this->description = null;
+        }
+    
+        // Show modal
+        // dd($this->description);
+        $this->dispatch('editor_load',['setDescriptionValue'=>$this->description]);
+        $this->active_modal_for_content = 1;
+    }
+    
     
     public function EditActivityItem($id){
         $this->active_assign_update_modal = 1;
@@ -143,6 +171,9 @@ class DivisionWiseActivityList extends Component
     public function CloseImageModal(){
         $this->active_modal_for_image = 0;
         $this->active_activity_images = [];
+    }
+    public function CloseContentModal(){
+        $this->active_modal_for_content = 0;
     }
     public function CloseEditModal(){
         $this->active_assign_update_modal = 0;
@@ -365,6 +396,15 @@ class DivisionWiseActivityList extends Component
             session()->flash('success', 'Activity deleted successfully!');
         } 
     }
+    public function UpdateDescription($status){
+        if($status==="true"){
+            $this->mount(); 
+            $this->active_modal_for_content = 0;
+            session()->flash('success', 'Activity content updated successfully!');
+        }else{
+            session()->flash('activity-update-error', 'Something went wrong!');
+        }
+    }
     
 
     public function deleteItemImage($imageId)
@@ -396,7 +436,6 @@ class DivisionWiseActivityList extends Component
     }
     public function render()
     {
-        $this->dispatch('editor_load');
         return view('livewire.division-wise-activity-list');
     }
 }
