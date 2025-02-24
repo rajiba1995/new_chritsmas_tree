@@ -20,5 +20,8 @@ class State extends Model
     {
         return $this->belongsTo(CountryCode::class, 'country_code_id', 'id');
     }
+    public function seasonPeriod(){
+        return $this->hasMany(DestinationSeasonPeriod::class,'destination_id','id');
+    }
 
 }

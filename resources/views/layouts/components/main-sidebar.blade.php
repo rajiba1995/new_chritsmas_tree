@@ -41,6 +41,15 @@
 									<li class="slide">
 										<a href="{{route('admin.cab.index')}}" class="side-menu__item">Cabs</a>
 									</li>
+									<li class="slide">
+										<a href="{{route('admin.state.index')}}" class="side-menu__item">Destinations</a>
+									</li>
+									<li class="slide">
+										<a href="{{route('admin.destination_wise_season')}}" class="side-menu__item">Destination Wise Season</a>
+									</li>
+									<li class="slide">
+										<a href="{{route('admin.division.index')}}" class="side-menu__item">Divisions</a>
+									</li>
 								</ul>
 							</li>
 							<!-- Start::slide -->
@@ -78,12 +87,6 @@
 									</li>
 									<li class="slide {{ request()->is('admin/hotel*')? 'active' : '' }}">
 										<a href="{{route('admin.hotel.index')}}" class="side-menu__item">Hotels</a>
-									</li>
-									<li class="slide">
-										<a href="{{route('admin.state.index')}}" class="side-menu__item">Hotel Destinations</a>
-									</li>
-									<li class="slide">
-										<a href="{{route('admin.division.index')}}" class="side-menu__item">Hotel Divisions</a>
 									</li>
 									<li class="slide">
 										<a href="{{route('admin.category.index')}}" class="side-menu__item">Hotel Categories</a>
@@ -129,7 +132,7 @@
 									<span class="side-menu__label">Route Management</span>
 									<i class="fe fe-chevron-right side-menu__angle"></i>
 								</a>
-								<ul class="slide-menu child1 {{ request()->is('admin/route/division-wise-cabs*') ? 'active' : '' }}">
+								<ul class="slide-menu child1 {{ request()->is('admin/route*') ? 'active' : '' }}">
 										<li class="slide {{ request()->is('admin/route/division-wise-cab*')? 'active' : '' }}">
 											<a href="{{route('admin.route.division_wise_cab_list')}}" class="side-menu__item">Division Wise Cabs</a>
 										</li>
@@ -157,9 +160,12 @@
 									<span class="side-menu__label">Itinerary Management</span>
 									<i class="fe fe-chevron-right side-menu__angle"></i>
 								</a>
-								<ul class="slide-menu child1 {{ request()->is('admin/itinerary/division/banners*') ? 'active' : '' }}">
+								<ul class="slide-menu child1 {{ request()->is('admin/itinerary*') ? 'active' : '' }}">
 										<li class="slide {{ request()->is('admin/itinerary/division/banners')? 'active' : '' }}">
 											<a href="{{route('admin.itinerary.division.banners')}}" class="side-menu__item">Division Wise Banners</a>
+										</li>
+										<li class="slide {{ request()->is('admin/itinerary/preset-builder')? 'active' : '' }}">
+											<a href="{{route('admin.itinerary.preset.builder',[2,8])}}" class="side-menu__item">Preset Itinerary Builder</a>
 										</li>
 								</ul>
 							</li>

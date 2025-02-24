@@ -1,11 +1,13 @@
 <?php
 
 namespace App\Helpers;
+use App\Models\Hotel;
 use App\Models\HotelPriceChart;
 use App\Models\HotelPriceChartType;
 use App\Models\HotelSeasionTime;
 use App\Models\Inventory;
 use App\Models\DateWiseHotelPrice;
+use App\Models\DestinationSeasonPeriod;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -117,7 +119,10 @@ class CustomHelper
     }
     public static function get_hotel_seasion_time($hotel_id, $seasion_type_id){
         $data = [];
-        $item = HotelSeasionTime::where('seasion_type_id', $seasion_type_id)->where('hotel_id', $hotel_id)->first();
+        $hotel = Hotel::find($hotel_id);
+        $item = DestinationSeasonPeriod::where('destination_id', $hotel->destination)
+        ->where('season_type_id', $seasion_type_id)
+        ->first(['start_date', 'end_date']); 
         $data['start_date']= $item?$item->start_date:null;
         $data['end_date']= $item?$item->end_date:null;
         return $data;
@@ -253,6 +258,11 @@ class CustomHelper
     
         // Return the stored file path
         return 'storage/'.$path;
+    }
+    public static function DestinationWiseSeasonDate($season_id, $destination_id) {
+        return DestinationSeasonPeriod::where('destination_id', $destination_id)
+            ->where('season_type_id', $season_id)
+            ->first(['start_date', 'end_date']); // Returns a single object or null
     }
     
 }

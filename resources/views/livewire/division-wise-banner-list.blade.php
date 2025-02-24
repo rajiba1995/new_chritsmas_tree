@@ -79,12 +79,12 @@
                                         </div>
                                         <div class="flex justify-between items-center px-1 cab_status_activity">
                                             <livewire:master-status-toggle 
-                                                modelName="DivisionWiseCab" 
+                                                modelName="ItineraryBanner" 
                                                 :item="$banner_item" 
                                                 wire:key="status-toggle-{{$banner_item->division_id}}-{{$banner_item->id}}" 
                                             />
                                             <div>
-                                                <button type="button" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20" wire:click="DeleteCabItem({{$banner_item->id}})" wire:key="delete-item-{{$banner_item->division_id}}-{{$banner_item->id}}" itemId="{{$banner_item->id}}">
+                                                <button type="button" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20" wire:click="DeleteBannerItem({{$banner_item->id}})" wire:key="delete-item-{{$banner_item->division_id}}-{{$banner_item->id}}" itemId="{{$banner_item->id}}">
                                                     <i class="ti ti-trash"></i>
                                                 </button>
                                             </div>
@@ -121,7 +121,7 @@
                         <!-- Cab Dropdown -->
                         <div class="my-3 items-center gap-2">
                                 <span class="badge gap-2 bg-primary/10 text-primary mb-2">Title</span>
-                            <x-input-field type="text" wire:model="banner_title" name="" placeholder="Enter banner titile here" ariaLabel="" class="form-control form-control-sm"/>
+                            <x-input-field type="text" wire:model="banner_title" name="" placeholder="Enter banner title here" ariaLabel="" class="form-control form-control-sm"/>
                             @error('banner_title') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
                         <div class="mt-2">

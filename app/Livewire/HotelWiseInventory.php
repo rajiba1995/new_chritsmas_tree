@@ -12,6 +12,7 @@ use App\Models\Inventory;
 use App\Models\Room;
 use App\Models\HotelPolicy;
 use App\Models\HotelSeasionTime;
+use App\Models\DestinationSeasonPeriod;
 use App\Models\HotelPriceChart;
 use App\Models\DateWiseHotelPrice;
 use Carbon\Carbon;
@@ -32,6 +33,7 @@ class HotelWiseInventory extends Component
     public $selectedCategory = null;
     public $selectedHotelName = null;
     public $selectedHotel = null;
+    public $selectedHotelDestination = null;
     public $start_date = null;
     public $end_date = null;
     public $currentMonth;
@@ -175,6 +177,7 @@ class HotelWiseInventory extends Component
         $this->selectedHotel = $hotel_id;
         $hotel = Hotel::where('id', $hotel_id)->first();
         $this->selectedHotelName = $hotel ? $hotel->name : null;
+        $this->selectedHotelDestination = $hotel ? $hotel->destination : null;
 
 
         if(!empty($this->start_date) && !empty($this->end_date)){
@@ -216,13 +219,14 @@ class HotelWiseInventory extends Component
 
     public function RoomCatWisePriceChart($room_id=null, $hotel_seasion_item_type=null){
         $this->selectedRoomId = $room_id;
-        $this->hotel_seasion_times = HotelSeasionTime::where('hotel_id', $this->selectedHotel)
+        $hotel = Hotel::find($this->selectedHotel);
+        $this->hotel_seasion_times = DestinationSeasonPeriod::with('season')->where('destination_id', $hotel->destination)
         ->where(function ($query) {
-            $query->whereBetween('start_date', [$this->start_date, $this->end_date])
-                  ->orWhereBetween('end_date', [$this->start_date, $this->end_date])
+            $query->whereBetween('start_date', [date('m-d',strtotime($this->start_date)), date('m-d',strtotime($this->end_date))])
+                  ->orWhereBetween('end_date', [date('m-d',strtotime($this->start_date)), date('m-d',strtotime($this->end_date))])
                   ->orWhere(function ($query) {
-                      $query->where('start_date', '<=', $this->start_date)
-                            ->where('end_date', '>=', $this->end_date);
+                      $query->where('start_date', '<=', date('m-d',strtotime($this->start_date)))
+                            ->where('end_date', '>=', date('m-d',strtotime($this->end_date)));
                   });
         })
         ->first();
@@ -245,7 +249,7 @@ class HotelWiseInventory extends Component
             ->where('hotel_price_charts.item_price', '>', 0)
             ->where('hotel_price_charts.hotel_id', $this->selectedHotel)
             ->where('hotel_price_charts.room_id', $this->selectedRoomId)
-            ->where('hotel_price_charts.plan_title', $this->hotel_seasion_times->seasion_type)
+            ->where('hotel_price_charts.plan_title', $this->hotel_seasion_times->season->title)
             ->orderBy('hotel_price_charts.plan_item','ASC')->get()
             ->toArray();
             if (count($this->room_plan_items)>0) {
@@ -265,9 +269,18 @@ class HotelWiseInventory extends Component
         }
     }
     public function RoomWiseAddonPriceChart($room_id){
-        $existing_seasion_times = HotelSeasionTime::where('hotel_id', $this->selectedHotel)->pluck('seasion_type')->toArray();
+        $hotel = Hotel::find($this->selectedHotel);
+        $existing_season_times = DestinationSeasonPeriod::with('seasion')
+        ->where('destination_id', $hotel->destination)
+        ->get()
+        ->map(function ($item) {
+            return $item->seasion->title ?? null; // Handle cases where `seasion` might be null
+        })
+        ->filter() // Removes null values if any
+        ->toArray();
+    
         // Getting Add on plans 
-        $this->hotel_addon_plan_title = HotelPriceChart::where('hotel_id', $this->selectedHotel)->where('room_id', $room_id)->whereNotIn('plan_title', $existing_seasion_times)->groupBy('plan_title')->pluck('plan_title')->toArray();
+        $this->hotel_addon_plan_title = HotelPriceChart::where('hotel_id', $this->selectedHotel)->where('room_id', $room_id)->whereNotIn('plan_title', $existing_season_times)->groupBy('plan_title')->pluck('plan_title')->toArray();
     }
 
     public function accordionItem($id){

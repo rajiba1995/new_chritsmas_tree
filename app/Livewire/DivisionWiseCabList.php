@@ -90,36 +90,43 @@ class DivisionWiseCabList extends Component
     {
         // Validate the form inputs
         $this->validate([
-            'assign_season_type' => 'required',
+            // 'assign_season_type' => 'required',
             'assign_cab_id' => 'required|array|min:1', // Validate as an array with at least one selected item
         ], [
-            'assign_season_type.required' => 'Please select a season type.',
+            // 'assign_season_type.required' => 'Please select a season type.',
             'assign_cab_id.required' => 'Please select at least one cab.',
             'assign_cab_id.min' => 'Please select at least one cab.',
         ]);
      
         // Check if the combination of season type and cab(s) already exists in the division_wise_cabs table
-        foreach ($this->assign_cab_id as $cab_id) {
-            $existingRecord = DivisionWiseCab::where('division_id', $this->selectedDivision)
-                                            ->where('seasion_type_id', $this->assign_season_type)
-                                            ->where('cab_id', $cab_id)
-                                            ->exists(); // Check if the record exists
+        // foreach ($this->assign_cab_id as $cab_id) {
+        //     $existingRecord = DivisionWiseCab::where('division_id', $this->selectedDivision)
+        //                                     ->where('seasion_type_id', $this->assign_season_type)
+        //                                     ->where('cab_id', $cab_id)
+        //                                     ->exists(); // Check if the record exists
 
-            // If any record exists, return with a message
-            if ($existingRecord) {
-                session()->flash('assign_error', 'This combination already exists.');
-                return; // Prevent further processing if record exists
-            }
-        }
+        //     // If any record exists, return with a message
+        //     if ($existingRecord) {
+        //         session()->flash('assign_error', 'This combination already exists.');
+        //         return; // Prevent further processing if record exists
+        //     }
+        // }
 
         // Save the data if no existing record is found
         // dd($this->assign_cab_id);
         foreach ($this->assign_cab_id as $cab_id) {
-            DivisionWiseCab::create([
-                'division_id' => $this->selectedDivision,
-                'seasion_type_id' => $this->assign_season_type,
-                'cab_id' => $cab_id,
-            ]);
+            foreach($this->seasion_types as $type_item){
+                DivisionWiseCab::updateOrCreate(
+                    [
+                        'division_id' => $this->selectedDivision,
+                        'seasion_type_id' => $type_item->id,
+                        'cab_id' => $cab_id,
+                    ],
+                    [   // Only put fields that may change or need updating
+                        'updated_at' => now(),
+                    ]
+                );
+            }
         }
 
         // $this->reset(['assign_cab_id', 'assign_season_type']);
@@ -127,7 +134,7 @@ class DivisionWiseCabList extends Component
         session()->flash('success', 'Data submitted successfully!');
         $this->division_wise_cabs  = $this->GetCab();
         $this->active_assign_new_modal = 0;
-        $this->selected_season_type = $this->assign_season_type;
+        // $this->selected_season_type = $this->assign_season_type;
     }
 
     public function resetPage()

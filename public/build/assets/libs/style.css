@@ -592,6 +592,11 @@
     left: 50%;
     transform: translate(-50%, -50%);
   }
+  .division_title{
+    padding: 4px 26px 4px 10px;
+    border-radius: 10px;
+    border: 1px solid #0162e8;
+  }
   
 
   

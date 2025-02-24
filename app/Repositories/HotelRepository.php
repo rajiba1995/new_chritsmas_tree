@@ -107,17 +107,17 @@ class HotelRepository
             $hotel->save();
 
             // Hotel Seasion Time
-            foreach($data['seasion_type'] as $type_key=>$type){
-                if(!empty($data['seasion_start_date'][$type_key]) && !empty($data['seasion_end_date'][$type_key])){
-                    $seasion_time = new HotelSeasionTime;
-                    $seasion_time->seasion_type_id = $type;
-                    $seasion_time->hotel_id =$hotel->id;
-                    $seasion_time->seasion_type = $data['seasion_type_title'][$type_key];
-                    $seasion_time->start_date = $data['seasion_start_date'][$type_key];
-                    $seasion_time->end_date = $data['seasion_end_date'][$type_key];
-                    $seasion_time->save();
-                }
-            }
+            // foreach($data['seasion_type'] as $type_key=>$type){
+            //     if(!empty($data['seasion_start_date'][$type_key]) && !empty($data['seasion_end_date'][$type_key])){
+            //         $seasion_time = new HotelSeasionTime;
+            //         $seasion_time->seasion_type_id = $type;
+            //         $seasion_time->hotel_id =$hotel->id;
+            //         $seasion_time->seasion_type = $data['seasion_type_title'][$type_key];
+            //         $seasion_time->start_date = $data['seasion_start_date'][$type_key];
+            //         $seasion_time->end_date = $data['seasion_end_date'][$type_key];
+            //         $seasion_time->save();
+            //     }
+            // }
 
             // Create New hotel Rooms
           
@@ -209,20 +209,20 @@ class HotelRepository
 
              // Hotel Seasion Time
          
-             foreach($data['seasion_type'] as $type_key=>$type){
+            //  foreach($data['seasion_type'] as $type_key=>$type){
             
-                if(!empty($data['seasion_start_date'][$type_key]) && !empty($data['seasion_end_date'][$type_key])){
-                    HotelSeasionTime::updateOrCreate( [
-                            'seasion_type_id' => $type,
-                            'hotel_id' => $hotel->id,
-                        ],
-                        [
-                            'start_date' => $data['seasion_start_date'][$type_key],
-                            'end_date' => $data['seasion_end_date'][$type_key],
-                            'seasion_type' => $data['seasion_type_title'][$type_key],
-                        ] );
-                }
-            }
+            //     if(!empty($data['seasion_start_date'][$type_key]) && !empty($data['seasion_end_date'][$type_key])){
+            //         HotelSeasionTime::updateOrCreate( [
+            //                 'seasion_type_id' => $type,
+            //                 'hotel_id' => $hotel->id,
+            //             ],
+            //             [
+            //                 'start_date' => $data['seasion_start_date'][$type_key],
+            //                 'end_date' => $data['seasion_end_date'][$type_key],
+            //                 'seasion_type' => $data['seasion_type_title'][$type_key],
+            //             ] );
+            //     }
+            // }
 
             // Update room data
             $existingRoomIds = $hotel->rooms->pluck('id')->toArray();

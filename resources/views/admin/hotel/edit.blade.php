@@ -113,7 +113,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mt-6">
+                    {{-- <div class="mt-6">
                         <span class="badge gap-2 bg-primary/10 text-primary">
                             <span class="w-1.5 h-1.5 inline-block bg-primary rounded-full"></span>
                             HOTEL SEASION PERIODS
@@ -180,7 +180,7 @@
                                 <p>No session type has been added. Please contact the admin.</p>
                             </div>
                         @endforelse
-                    </div>
+                    </div> --}}
                     <div class="mt-6">
                         <span class="badge gap-2 bg-primary/10 text-primary">
                             <span class="w-1.5 h-1.5 inline-block bg-primary rounded-full"></span>

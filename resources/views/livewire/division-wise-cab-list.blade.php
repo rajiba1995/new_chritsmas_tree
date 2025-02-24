@@ -47,10 +47,10 @@
                     </div>
                     <div>
                         <select 
-                            name="selected_seasion_type" 
-                            class="placeholder:text-textmuted text-sm selected_seasion_type"  
+                            class="placeholder:text-textmuted text-sm selected_seasion_type" 
+                            wire:model="selected_season_type" 
                             wire:change="FilterCabBySeasionType($event.target.value)" 
-                            wire:key="select-seasion-type">
+                            wire:key="seasion-type">
                             <option value="" hidden>Filter by Seasion</option>
                             <option value="0" wire:key="seasion-type-0">ALL</option>
                             @foreach ($seasion_types as $types_item)
@@ -144,7 +144,7 @@
                             <h6 class="ti-modal-title">
                                 <span class="badge gap-2 bg-primary/10 text-primary">Seasion Type</span>
                              </h6>
-                            <div class="mb-2 flex items-center gap-2">
+                            {{-- <div class="mb-2 flex items-center gap-2">
                                 @foreach($seasion_types as $seasion_types_item)
                                 <div class="check-form">
                                     <span class="badge !rounded-full bg-outline-secondary">
@@ -158,7 +158,7 @@
                                 </div>
                                 @endforeach
                             </div>
-                            @error('assign_season_type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            @error('assign_season_type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror --}}
                 
                         <!-- Cab Dropdown -->
                         <h6 class="ti-modal-title mb-2">

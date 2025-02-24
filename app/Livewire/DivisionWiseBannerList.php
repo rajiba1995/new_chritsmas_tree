@@ -21,7 +21,7 @@ class DivisionWiseBannerList extends Component
     public $selectedDestinationName;
     public $selectedDivisionName;
     public $active_assign_new_modal;
-    public $banner_title;
+    public $banner_title ="";
     public $banner_image;
 
     protected $rules = [
@@ -76,9 +76,24 @@ class DivisionWiseBannerList extends Component
     }
     public function OpenNewCabModal($value){
         // $this->reset(['assign_season_type', 'assign_cab_id']);
+        $this->banner_title = "";
+        $this->reset(['banner_title', 'banner_image']);
         $this->active_assign_new_modal = $value=="yes"?1:0;
     }
 
+    public function DeleteBannerItem($id)
+    {
+        $this->dispatch('showConfirm', ['itemId' => $id]);
+    }
+    public function deleteItem($id)
+    {
+        $banner = ItineraryBanner::find($id);
+        if ($banner) {
+            $banner->delete();
+            $this->mount(); // Or call any method to refresh data
+            session()->flash('success', 'Banner deleted successfully!');
+        } 
+    }
     public function submitForm(){
         $this->validate();
         try {
@@ -96,9 +111,10 @@ class DivisionWiseBannerList extends Component
             }
             $store->save();
             DB::commit(); // Commit transaction
+            $this->banner_title = "";
             $this->reset(['banner_title', 'banner_image']);
             $this->active_assign_new_modal = 0;
-            $this->division_wise_banners  = $this->GetBanner();
+            $this->mount();
             session()->flash('success', 'Banner saved successfully!');
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback transaction on error

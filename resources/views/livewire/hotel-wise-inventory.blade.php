@@ -385,7 +385,7 @@
                                         <div class="right-content">
                                             <div class="my-4">
                                                     <p>No plan item selling price have been assigned to this room category: <strong>{{ $room->room_name }}</strong> 
-                                                        <a href="{{ route('admin.hotel.index', ['quick_search'=>$selectedHotel]) }}" class="badge bg-danger/10 text-danger custom_button_text">
+                                                        <a href="{{ route('admin.destination_wise_season') }}" class="badge bg-danger/10 text-danger custom_button_text">
                                                             Click here to add plan item price
                                                         </a>
                                                     </p>
@@ -398,7 +398,7 @@
                                     <div class="right-content">
                                         <div class="my-4">
                                                 <p>No seasion dates have been assigned to this hotel yet. 
-                                                    <a href="{{ route('admin.hotel.edit', $selectedHotel) }}" class="badge bg-danger/10 text-danger custom_button_text">
+                                                    <a href="{{ route('admin.destination_wise_season') }}" class="badge bg-danger/10 text-danger custom_button_text">
                                                         Click here to add seasion date range
                                                     </a>
                                                 </p>
@@ -768,7 +768,7 @@
                                                     <div class="right-content">
                                                         <div class="my-4">
                                                                 <p>No plan item selling price have been assigned to this room category: <strong>{{ $room->room_name }}</strong> 
-                                                                    <a href="{{ route('admin.hotel.index', ['quick_search'=>$selectedHotel]) }}" class="badge bg-danger/10 text-danger custom_button_text">
+                                                                    <a href="{{ route('admin.destination_wise_season') }}" class="badge bg-danger/10 text-danger custom_button_text">
                                                                         Click here to add plan item price
                                                                     </a>
                                                                 </p>
@@ -781,7 +781,7 @@
                                                 <div class="right-content">
                                                     <div class="my-4">
                                                             <p>No seasion dates have been assigned to this hotel yet. 
-                                                                <a href="{{ route('admin.hotel.edit', $selectedHotel) }}" class="badge bg-danger/10 text-danger custom_button_text">
+                                                                <a href="{{ route('admin.destination_wise_season') }}" class="badge bg-danger/10 text-danger custom_button_text">
                                                                     Click here to add seasion date range
                                                                 </a>
                                                             </p>

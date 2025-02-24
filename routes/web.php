@@ -81,25 +81,6 @@ Route::get('dashboard', [DashboardsController::class, 'index'])->name('admin.das
 
             Route::get('/{id}/images', [HotelManagementController::class, 'showHotelImages'])->name('admin.hotels.images');
             
-
-
-            // State Master
-            Route::prefix('destination')->group(function(){
-                Route::get('/', [CommonController::class,'state_index'])->name('admin.state.index');
-                Route::post('/store', [CommonController::class,'state_store'])->name('admin.state.store');
-                Route::get('/edit', [CommonController::class,'state_edit'])->name('admin.state.edit');
-                Route::post('/update', [CommonController::class,'state_update'])->name('admin.state.update');
-                Route::get('/destroy/{id}', [CommonController::class,'state_destroy'])->name('admin.state.destroy');
-            });
-
-            // Division Master
-            Route::prefix('division')->group(function(){
-                Route::get('/', [CommonController::class,'division_index'])->name('admin.division.index');
-                Route::post('/store', [CommonController::class,'division_store'])->name('admin.division.store');
-                Route::get('/edit', [CommonController::class,'division_edit'])->name('admin.division.edit');
-                Route::post('/update', [CommonController::class,'division_update'])->name('admin.division.update');
-                Route::get('/destroy/{id}', [CommonController::class,'division_destroy'])->name('admin.division.destroy');
-            });
             // Hotel Seasion Plan  Master
             Route::prefix('seasion-plan')->group(function(){
                 Route::get('/', [HotelManagementController::class,'hotel_seasion_plan'])->name('admin.hotel_seasion_plan');
@@ -157,6 +138,26 @@ Route::get('dashboard', [DashboardsController::class, 'index'])->name('admin.das
                 Route::post('/update', [CommonController::class,'cab_update'])->name('admin.cab.update');
                 Route::get('/destroy/{id}', [CommonController::class,'cab_destroy'])->name('admin.cab.destroy');
             });
+             // State Master
+             Route::prefix('destination')->group(function(){
+                Route::get('/', [CommonController::class,'state_index'])->name('admin.state.index');
+                Route::post('/store', [CommonController::class,'state_store'])->name('admin.state.store');
+                Route::get('/edit', [CommonController::class,'state_edit'])->name('admin.state.edit');
+                Route::post('/update', [CommonController::class,'state_update'])->name('admin.state.update');
+                Route::get('/destroy/{id}', [CommonController::class,'state_destroy'])->name('admin.state.destroy');
+            });
+             Route::prefix('destination-wise-season')->group(function(){
+                Route::get('/', [CommonController::class,'destination_wise_season'])->name('admin.destination_wise_season');
+            });
+
+            // Division Master
+            Route::prefix('division')->group(function(){
+                Route::get('/', [CommonController::class,'division_index'])->name('admin.division.index');
+                Route::post('/store', [CommonController::class,'division_store'])->name('admin.division.store');
+                Route::get('/edit', [CommonController::class,'division_edit'])->name('admin.division.edit');
+                Route::post('/update', [CommonController::class,'division_update'])->name('admin.division.update');
+                Route::get('/destroy/{id}', [CommonController::class,'division_destroy'])->name('admin.division.destroy');
+            });
         });
         Route::prefix('route')->group(function(){
             Route::get('division-wise-cabs', [RouteManagementController::class, 'DivisionWiseCabList'])->name('admin.route.division_wise_cab_list');
@@ -172,6 +173,9 @@ Route::get('dashboard', [DashboardsController::class, 'index'])->name('admin.das
         Route::prefix('itinerary')->group(function(){
             Route::prefix('division')->group(function(){
                 Route::get('banners', [ItineraryController::class, 'banners'])->name('admin.itinerary.division.banners');
+            });
+            Route::prefix('preset-builder')->group(function(){
+                Route::get('{destination_id}/{category_id}', [ItineraryController::class, 'DestinationWisePresetItineraryBuilder'])->name('admin.itinerary.preset.builder');
             });
         });
     });

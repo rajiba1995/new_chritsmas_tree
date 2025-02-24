@@ -25,7 +25,7 @@ class CommonController extends Controller
         // $country_codes = $get_countries['country_codes'];
         // dd($country_codes);
         $states = $get_destinations['states'];  // Paginated data
-        $common = CustomHelper::setHeadersAndTitle('Hotel Management', 'Destinations(States)');
+        $common = CustomHelper::setHeadersAndTitle('Master Management', 'Destinations(States)');
         return view('admin.state.index', array_merge(compact('states','update_item','countries'), $common));
     }
 
@@ -113,7 +113,7 @@ class CommonController extends Controller
         // Directly assign the collection
         $destinations = $this->commonRepository->getAllActiveState();
 
-        $common = CustomHelper::setHeadersAndTitle('Hotel Management', 'Division(City)');
+        $common = CustomHelper::setHeadersAndTitle('Master Management', 'Division(City)');
 
         return view('admin.division.index', array_merge(compact('divisions', 'destinations', 'update_item'), $common));
     }
@@ -413,6 +413,11 @@ class CommonController extends Controller
             } catch (\Exception $e) {
                 return redirect()->back()->with('error', $e->getMessage());
             }
+        }
+
+        public function destination_wise_season(){
+            $common = CustomHelper::setHeadersAndTitle('Master Management', 'Destination Wise Season');
+            return view('admin.state.season-period-index', compact('common'));
         }
     
 }

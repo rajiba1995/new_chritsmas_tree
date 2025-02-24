@@ -157,7 +157,6 @@
                                                 icon="ti ti-trash" 
                                                 tooltip="Delete Item"
                                             />
-
                                         </td>
                                     </tr>
                                     @empty
