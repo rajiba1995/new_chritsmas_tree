@@ -19,7 +19,7 @@ class DivisionWiseCabList extends Component
     public $selectedDivision = null;
     public $selectedDivisionName = null;
     public $seasion_types = [];
-    public $selected_season_type =0; // Must be public for validation
+    public $selected_season_type =1; // Must be public for validation
     public $active_assign_new_modal = 0;
     public $division_wise_cabs = [];
 
@@ -34,6 +34,7 @@ class DivisionWiseCabList extends Component
             $this->getDestination($State->id);
         }
         $this->seasion_types = DB::table('seasion_types')->where('status', 1)->orderBy('title', 'ASC')->get();
+        // $this->selected_season_type = $this->seasion_types?$this->seasion_types[0]->id:0;
         $this->cabs = Cab::where('status', 1)->orderBy('title', 'ASC')->get();
     }
     public function getDestination($destination_id){
@@ -54,7 +55,7 @@ class DivisionWiseCabList extends Component
         ->when($this->selected_season_type > 0, function ($query) {
             return $query->where('seasion_type_id', $this->selected_season_type);
         })
-        ->orderBy('seasion_type_id', 'ASC')
+        ->orderBy('cab_id', 'ASC')
         ->get();
     }
     public function FilterCabBySeasionType($value){
@@ -72,10 +73,12 @@ class DivisionWiseCabList extends Component
         $this->dispatch('showConfirm', ['itemId' => $id]);
     }
     public function deleteItem($id){
-        $cab = DivisionWiseCab::find($id); // Retrieve the cab by ID
-        if ($cab) {
-            $cab->delete(); // Delete the record
-            $this->division_wise_cabs  = $this->GetCab();
+        $cabs = DivisionWiseCab::where('cab_id', $id)
+        ->where('division_id', $this->selectedDivision);
+
+        if ($cabs->exists()) {
+            $cabs->delete(); // Deletes all matching records
+            $this->mount(); // Refresh component state
             session()->flash('success', 'Cab deleted successfully.');
         } else {
             session()->flash('error', 'Cab not found.');

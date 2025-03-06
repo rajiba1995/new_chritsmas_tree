@@ -8,6 +8,7 @@ use App\Models\Cab;
 use App\Models\DivisionWiseActivity;
 use App\Models\ServiceWiseCab;
 use App\Repositories\CommonRepository;
+use Illuminate\Support\Facades\DB;
 
 class RouteManagementController extends Controller
 {
@@ -29,12 +30,20 @@ class RouteManagementController extends Controller
     }
 
     public function DivisionWiseActivityUpdateContent(Request $request){
-        $update = DivisionWiseActivity::find($request->activity_id);
-        if (!$update) {
-            return response()->json(['success' => false, 'message' => 'Activity not found!'], 404);
+        $seasion_types = DB::table('seasion_types')->where('status', 1)->orderBy('title', 'ASC')->get();
+        $data = DivisionWiseActivity::find($request->activity_id);
+        $desc = $data->description;
+        $type = $data->type;
+        $division_id = $data->division_id;
+        foreach($seasion_types as $key =>$item){
+            $update = DivisionWiseActivity::where('description', $desc)->where('seasion_type_id', $item->id)->where('type', $type)->where('division_id', $division_id)->first();
+            // dd($item->id, $type, $division_id);
+            if ($update) {
+                $update->description = $request->description;
+                $update->save();
+            }
         }
-        $update->description = $request->description;
-        $update->save();
+       
         return response()->json(['success' => true, 'message' => 'Content updated successfully!']);
     }
 

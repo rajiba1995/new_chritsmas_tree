@@ -23,7 +23,7 @@ class DivisionWiseActivityList extends Component
     public $selectedDivision = null;
     public $selectedDivisionName = null;
     public $seasion_types = [];
-    public $selected_season_type =0; // Must be public for validation
+    public $selected_season_type =1; // Must be public for validation
     public $payment_type =0; // Must be public for validation
     public $active_assign_new_modal = 0;
     public $active_assign_update_modal = 0;
@@ -85,6 +85,7 @@ class DivisionWiseActivityList extends Component
         $this->division_wise_cabs  = $this->GetActivity();
     }
     public function GetActivity(){
+        $this->selected_season_type  = 1;
         return DivisionWiseActivity::with('seasonType')->where('division_id', $this->selectedDivision)
         ->when($this->selected_season_type > 0, function ($query) {
             return $query->where('seasion_type_id', $this->selected_season_type);
@@ -208,6 +209,7 @@ class DivisionWiseActivityList extends Component
     }
     public function submitForm()
     {
+        $this->selected_season_type = 1;
         $this->validate([
             'activities.*.name' => 'required|string|max:255',
             'activities.*.type' => 'required|in:PAID,UNPAID',
@@ -243,30 +245,32 @@ class DivisionWiseActivityList extends Component
                 return; // Stop further execution
             }
         // Loop through activities and save them to the database
-       
-            foreach ($this->activities as $index => $activity) {
-                // Save the activity record
-                $activityRecord = DivisionWiseActivity::create([
-                    'name' => $activity['name'], // Ensure this key exists
-                    'type' => $activity['type'], // Ensure this key exists and is 'PAID' or 'UNPAID'
-                    'price' => !empty($activity['price']) ? $activity['price'] : 0, // Save 0 if empty
-                    'ticket_price' => !empty($activity['ticket_price']) ? $activity['ticket_price'] : 0, // Save 0 if empty
-                    'seasion_type_id' => $this->selected_season_type, // Validate this is set
-                    'division_id' => $this->selectedDivision, // Validate this is set
-                ]);
-        
-                // Handle file uploads
-                $uploadedFiles = $this->files[$index] ?? null;
-                if ($uploadedFiles && is_array($uploadedFiles)) {
-                    foreach ($uploadedFiles as $file) {
-                        $dynamicText = $activity['name'];
-                        $divisionName = $this->selectedDivisionName; // Assuming you have a division name
-                        $uploadedPath = CustomHelper::uploadImage($file, $dynamicText, $divisionName, 'activities');
-                        // Save the uploaded file record
-                        DivisionWiseActivityImage::create([
-                            'division_wise_activity_id' => $activityRecord->id,
-                            'file_path' => $uploadedPath,
-                        ]);
+           
+            foreach($this->seasion_types as $type){
+                foreach ($this->activities as $index => $activity) {
+                    // Save the activity record
+                    $activityRecord = DivisionWiseActivity::create([
+                        'name' => $activity['name'], // Ensure this key exists
+                        'type' => $activity['type'], // Ensure this key exists and is 'PAID' or 'UNPAID'
+                        'price' => !empty($activity['price']) ? $activity['price'] : 0, // Save 0 if empty
+                        'ticket_price' => !empty($activity['ticket_price']) ? $activity['ticket_price'] : 0, // Save 0 if empty
+                        'seasion_type_id' => $type->id, // Validate this is set
+                        'division_id' => $this->selectedDivision, // Validate this is set
+                    ]);
+            
+                    // Handle file uploads
+                    $uploadedFiles = $this->files[$index] ?? null;
+                    if ($uploadedFiles && is_array($uploadedFiles)) {
+                        foreach ($uploadedFiles as $file) {
+                            $dynamicText = $activity['name'];
+                            $divisionName = $this->selectedDivisionName; // Assuming you have a division name
+                            $uploadedPath = CustomHelper::uploadImage($file, $dynamicText, $divisionName, 'activities');
+                            // Save the uploaded file record
+                            DivisionWiseActivityImage::create([
+                                'division_wise_activity_id' => $activityRecord->id,
+                                'file_path' => $uploadedPath,
+                            ]);
+                        }
                     }
                 }
             }
@@ -341,33 +345,39 @@ class DivisionWiseActivityList extends Component
                 session()->flash('edit-activity-error', 'Please Choose a Division!');
                 return; // Stop further execution
             }
+            
+            // dd($this->edit_activities['id']);
+            $existingRecord = DivisionWiseActivity::where('id', $this->edit_activities['id'])
+                ->first('name'); // Fetches the first matching record
 
+            foreach($this->seasion_types as $type){
              // Find the activity record that you want to update
-            $activityRecord = DivisionWiseActivity::findOrFail($this->edit_activities['id']); // Ensure $id is available
-           
-            // Update the activity record with the new data
-            $activityRecord->update([
-                'name' => $this->edit_activities['name'], // Ensure this key exists
-                'type' => $this->edit_activities['type'], // Ensure this key exists and is 'PAID' or 'UNPAID'
-                'price' => $this->edit_activities['type'] ==="PAID" ? $this->edit_activities['price'] : 0, // Save 0 if empty
-                'ticket_price' => $this->edit_activities['type']==="PAID" ? $this->edit_activities['ticket_price'] : 0, // Save 0 if empty
-                'seasion_type_id' => $this->edit_activities['seasion_type_id'], // Validate this is set
-                'division_id' => $this->selectedDivision, // Validate this is set
-            ]);
-           
-    
-            // Handle file uploads
-            $uploadedFiles = $this->update_files[0] ?? null;
-            if ($uploadedFiles && is_array($uploadedFiles)) {
-                foreach ($uploadedFiles as $file) {
-                    $dynamicText = $activityRecord->name;
-                    $divisionName = $this->selectedDivisionName; // Assuming you have a division name
-                    $uploadedPath = CustomHelper::uploadImage($file, $dynamicText, $divisionName, 'activities');
-                    // Save the uploaded file record
-                    DivisionWiseActivityImage::create([
-                        'division_wise_activity_id' => $activityRecord->id,
-                        'file_path' => $uploadedPath,
-                    ]);
+                $activityRecord = DivisionWiseActivity::where('name', $existingRecord->name)->where('seasion_type_id', $type->id)->where('division_id', $this->selectedDivision); // Ensure $id is available
+            
+                // Update the activity record with the new data
+                $activityRecord->update([
+                    'name' => $this->edit_activities['name'], // Ensure this key exists
+                    'type' => $this->edit_activities['type'], // Ensure this key exists and is 'PAID' or 'UNPAID'
+                    'price' => $this->edit_activities['type'] ==="PAID" ? $this->edit_activities['price'] : 0, // Save 0 if empty
+                    'ticket_price' => $this->edit_activities['type']==="PAID" ? $this->edit_activities['ticket_price'] : 0, // Save 0 if empty
+                    'seasion_type_id' => $type->id, // Validate this is set
+                    'division_id' => $this->selectedDivision, // Validate this is set
+                ]);
+            
+        
+                // Handle file uploads
+                $uploadedFiles = $this->update_files[0] ?? null;
+                if ($uploadedFiles && is_array($uploadedFiles)) {
+                    foreach ($uploadedFiles as $file) {
+                        $dynamicText = $activityRecord->name;
+                        $divisionName = $this->selectedDivisionName; // Assuming you have a division name
+                        $uploadedPath = CustomHelper::uploadImage($file, $dynamicText, $divisionName, 'activities');
+                        // Save the uploaded file record
+                        DivisionWiseActivityImage::create([
+                            'division_wise_activity_id' => $activityRecord->id,
+                            'file_path' => $uploadedPath,
+                        ]);
+                    }
                 }
             }
            
@@ -390,8 +400,11 @@ class DivisionWiseActivityList extends Component
     public function deleteItem($id)
     {
         $activity = DivisionWiseActivity::find($id);
-        if ($activity) {
-            $activity->delete();
+        $name = $activity->name;
+        $data = DivisionWiseActivity::where('name', $name)
+        ->where('division_id', $this->selectedDivision)->where('type', $activity->type);
+        if ($data->exists()) {
+            $data->delete();
             $this->mount(); // Or call any method to refresh data
             session()->flash('success', 'Activity deleted successfully!');
         } 

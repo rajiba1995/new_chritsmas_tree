@@ -77,7 +77,7 @@
                                 wire:change="FilterCabByPaymentType($event.target.value)" 
                                 wire:key="select-payment-type">
                                 <option value="" hidden>Filter Type</option>
-                                <option value="0" wire:key="select-payment-type-0">All</option>
+                                {{-- <option value="0" wire:key="select-payment-type-0">All</option> --}}
                                     <option value="PAID" wire:key="select-payment-type-1">Paid</option>
                                     <option value="UNPAID" wire:key="select-payment-type-2">Unpaid</option>
                             </select>
@@ -101,14 +101,14 @@
                         </div>
                         <div>
                             {{-- <input type="text" class="badge bg-outline-primary !w-56" placeholder="Quick Search.."> --}}
-                            @foreach ($seasion_types as $types_item)
+                            {{-- @foreach ($seasion_types as $types_item)
                             <div class="badge bg-outline-primary cursor-pointer {{$selected_season_type==$types_item->id?"active-primary-badge":""}}" wire:click="FilterCabBySeasionType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
                                 <span>{{ strtoupper($types_item->title) }}</span>
                             </div>
-                            @endforeach
-                            <div class="badge bg-outline-primary cursor-pointer {{$selected_season_type==0?"active-primary-badge":""}}" wire:click="FilterCabBySeasionType(0)" wire:key="seasion-type-0">
+                            @endforeach --}}
+                            {{-- <div class="badge bg-outline-primary cursor-pointer {{$selected_season_type==0?"active-primary-badge":""}}" wire:click="FilterCabBySeasionType(0)" wire:key="seasion-type-0">
                                 <span>ALL</span>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
                     <div class="mt-4">
@@ -119,7 +119,7 @@
                                     <tr class="border-b !border-primary/30">
                                         <th scope="col" class="!text-center">SL No.</th>
                                         <th scope="col" class="!text-center">Activity Name</th>
-                                        <th scope="col" class="!text-center">Seasion</th>
+                                        {{-- <th scope="col" class="!text-center">Seasion</th> --}}
                                         <th scope="col" class="!text-center">Activity Type</th>
                                         <th scope="col" class="!text-center">Activity Price</th>
                                         <th scope="col" class="!text-center">Ticket Price (PP)</th>
@@ -127,11 +127,11 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($division_wise_cabs as $cab_item)
+                                    @forelse($division_wise_cabs as $key=>$cab_item)
                                     <tr>
                                         <th scope="row" class="!text-center">
                                             <span class="badge bg-primary/10 text-primary">
-                                                1
+                                               {{$key+1}}
                                             </span>
                                         </th>
                                         <td class="!text-center" wire:key="cab-item-{{$cab_item->id}}">
@@ -139,13 +139,13 @@
                                             <span class="button-control" wire:click="ShowItemContent({{$cab_item->id}})"></span>
                                         </td>
                                         
-                                        <td class="!text-center">
+                                        {{-- <td class="!text-center">
                                             @if($cab_item->seasonType)
                                                 <span class="badge badge-{{ $cab_item->seasion_type_id == 3 ? 'purple' : ($cab_item->seasion_type_id == 1 ? 'info' : 'warning') }}-gradient">
                                                     {{$cab_item->seasonType?$cab_item->seasonType->title:"N/A"}}
                                                 </span>
                                             @endif
-                                        </td>
+                                        </td> --}}
 
                                         <td class="!text-center">
                                             <span class="badge {{$cab_item->type=="PAID"?"bg-primary text-light":"bg-light text-dark"}}">{{$cab_item->type}}</span>
@@ -217,7 +217,7 @@
                     </button>
                 </div>
                 <div class="ti-modal-body text-start">
-                    <div class="flex items-center">
+                    <div class="flex items-center mb-2">
                         <div class="grid grid-cols-1 hover:grid-cols-6 mx-1">
                             <label for="">
                                 <span class="badge gap-2 bg-danger/10 text-danger uppercase">
@@ -263,7 +263,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="my-3">
+                    {{-- <div class="my-3">
                         <div clas="flex item-center">
                             <label for="">
                                 <span class="badge gap-2 bg-danger/10 text-danger uppercase">
@@ -276,7 +276,7 @@
                             </div>
                             @endforeach
                         </div>
-                    </div>
+                    </div> --}}
                     <form wire:submit.prevent="submitForm">
                         <div class="table-responsive">
                             <table class="table whitespace-nowrap table-bordered table-bordered-primary border-primary/10 min-w-full new-activity">
@@ -414,7 +414,7 @@
                     </div>
                     @if(!empty($edit_activities))
                         <div class="ti-modal-body text-start">
-                            <div class="flex items-center">
+                            <div class="flex items-center mb-2">
                                 <div class="grid grid-cols-1 hover:grid-cols-6 mx-1">
                                     <label for="">
                                         <span class="badge gap-2 bg-danger/10 text-danger uppercase">
@@ -460,7 +460,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="my-3">
+                            {{-- <div class="my-3">
                                 <div clas="flex item-center">
                                     <label for="">
                                         <span class="badge gap-2 bg-danger/10 text-danger uppercase">
@@ -473,7 +473,7 @@
                                     </div>
                                     @endforeach
                                 </div>
-                            </div>
+                            </div> --}}
                             <form wire:submit.prevent="updateActivity">
                                 <div class="table-responsive">
                                     <table class="table whitespace-nowrap table-bordered table-bordered-primary border-primary/10 min-w-full new-activity">

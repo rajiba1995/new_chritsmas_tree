@@ -50,13 +50,12 @@
                             class="placeholder:text-textmuted text-sm selected_seasion_type" 
                             wire:model="selected_season_type" 
                             wire:change="FilterCabBySeasionType($event.target.value)" 
-                            wire:key="seasion-type">
+                            wire:key="seasion-type-100">
                             <option value="" hidden>Filter by Seasion</option>
-                            <option value="0" wire:key="seasion-type-0">ALL</option>
+                            {{-- <option value="0" wire:key="seasion-type-0">ALL</option> --}}
                             @foreach ($seasion_types as $types_item)
                                 <option 
                                     value="{{ $types_item->id }}" 
-                                    {{$selected_season_type == $types_item->id ? "selected" : ""}} 
                                     wire:key="seasion-type-{{ $types_item->id }}">
                                     {{ strtoupper($types_item->title) }}
                                 </option>
@@ -106,7 +105,7 @@
                                                 wire:key="status-toggle-{{$cab_item->division_id}}-{{$cab_item->seasion_type_id}}-{{$cab_item->id}}" 
                                             />
                                             <div>
-                                                <button type="button" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20" wire:click="DeleteCabItem({{$cab_item->id}})" wire:key="delete-item-{{$cab_item->division_id}}-{{$cab_item->seasion_type_id}}-{{$cab_item->id}}" itemId="{{$cab_item->id}}">
+                                                <button type="button" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20" wire:click="DeleteCabItem({{$cab_item->cab_id}})" wire:key="delete-item-{{$cab_item->division_id}}-{{$cab_item->seasion_type_id}}-{{$cab_item->id}}" itemId="{{$cab_item->id}}">
                                                     <i class="ti ti-trash"></i>
                                                 </button>
                                             </div>
