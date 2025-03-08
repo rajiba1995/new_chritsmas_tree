@@ -45,23 +45,6 @@
                             <span class="w-1.5 h-1.5 inline-block bg-danger rounded-full "></span>Divisions</span>
                         </span> 
                     </div>
-                    <div>
-                        <select 
-                            class="placeholder:text-textmuted text-sm selected_seasion_type" 
-                            wire:model="selected_season_type" 
-                            wire:change="FilterCabBySeasionType($event.target.value)" 
-                            wire:key="seasion-type-100">
-                            <option value="" hidden>Filter by Seasion</option>
-                            {{-- <option value="0" wire:key="seasion-type-0">ALL</option> --}}
-                            @foreach ($seasion_types as $types_item)
-                                <option 
-                                    value="{{ $types_item->id }}" 
-                                    wire:key="seasion-type-{{ $types_item->id }}">
-                                    {{ strtoupper($types_item->title) }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
                     <div class="prism-toggle">
                         <a href="javascript:void(0)" wire:click="OpenNewCabModal('yes')" class="ti-btn ti-btn-primary-full !py-1 pt-0 ti-btn-wave  me-[0.375rem]"><i class="fa-solid fa-plus"></i>Assign New Cab</a>
                     </div>
@@ -89,11 +72,6 @@
                                     </div>
                                     <div class="box-body cab-card !p-0">
                                         <div class="items-center mb-2">
-                                            <div class="text-center seasion_title">
-                                                <span class="badge badge-{{ $cab_item->seasion_type_id == 3 ? 'purple' : ($cab_item->seasion_type_id == 1 ? 'info' : 'warning') }}-gradient">
-                                                    {{ $cab_item->stype ? $cab_item->stype->title : 'All Season' }}
-                                                </span>
-                                            </div>
                                             <span class="cab-avatar">
                                                 <img src="{{asset('assets/img/cab.png')}}"alt="img" width="100%">
                                             </span>
@@ -105,7 +83,7 @@
                                                 wire:key="status-toggle-{{$cab_item->division_id}}-{{$cab_item->seasion_type_id}}-{{$cab_item->id}}" 
                                             />
                                             <div>
-                                                <button type="button" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20" wire:click="DeleteCabItem({{$cab_item->cab_id}})" wire:key="delete-item-{{$cab_item->division_id}}-{{$cab_item->seasion_type_id}}-{{$cab_item->id}}" itemId="{{$cab_item->id}}">
+                                                <button type="button" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20" wire:click="DeleteCabItem({{$cab_item->id}})" wire:key="delete-item-{{$cab_item->division_id}}-{{$cab_item->seasion_type_id}}-{{$cab_item->id}}" itemId="{{$cab_item->id}}">
                                                     <i class="ti ti-trash"></i>
                                                 </button>
                                             </div>
@@ -140,25 +118,6 @@
                 <div class="ti-modal-body text-start">
                     <form wire:submit.prevent="submitForm">
                             <!-- Season Type Dropdown -->
-                            <h6 class="ti-modal-title">
-                                <span class="badge gap-2 bg-primary/10 text-primary">Seasion Type</span>
-                             </h6>
-                            {{-- <div class="mb-2 flex items-center gap-2">
-                                @foreach($seasion_types as $seasion_types_item)
-                                <div class="check-form">
-                                    <span class="badge !rounded-full bg-outline-secondary">
-                                        <!-- Radio Button -->
-                                        <input class="form-check-input" type="radio" name="assign_season_type" wire:model="assign_season_type" 
-                                               id="Radio-{{$seasion_types_item->id}}" value="{{$seasion_types_item->id}}">
-                                        <label class="form-check-label" for="Radio-{{$seasion_types_item->id}}">
-                                            {{$seasion_types_item->title}}
-                                        </label>
-                                    </span>
-                                </div>
-                                @endforeach
-                            </div>
-                            @error('assign_season_type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror --}}
-                
                         <!-- Cab Dropdown -->
                         <h6 class="ti-modal-title mb-2">
                             <span class="badge gap-2 bg-primary/10 text-primary">Cabs</span>
@@ -166,7 +125,7 @@
                         <div class="mb-3 items-center gap-2 col-cab-list">
                             @foreach($cabs as $cabs_item)
                             <div class="check-form">
-                                <input class="form-check-input" type="checkbox" wire:model="assign_cab_id" 
+                                <input class="form-check-input cab-input" type="checkbox" wire:model="assign_cab_id" 
                                        id="Checkbox-{{$cabs_item->id}}" value="{{$cabs_item->id}}">
                                 <label class="form-check-label font-semibold uppercase text-secondary cursor-pointer" for="Checkbox-{{$cabs_item->id}}">
                                     {{$cabs_item->title}}
@@ -211,6 +170,12 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    window.addEventListener('FieldUncheck', function (event){
+        let className = event.detail[0].class;
+        document.querySelectorAll('.' + className).forEach(function (checkbox) {
+            checkbox.checked = false;
+        });
+    });
     window.addEventListener('showConfirm', function (event) {
         let itemId = event.detail[0].itemId;
         Swal.fire({

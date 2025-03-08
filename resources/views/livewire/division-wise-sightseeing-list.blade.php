@@ -79,17 +79,7 @@
                         <div class="badge bg-outline-success cursor-pointer">
                             <span>No of Result: {{$division_wise_sightseeing->count()}}</span>
                         </div>
-                        <div>
-                            {{-- <input type="text" class="badge bg-outline-primary !w-56" placeholder="Quick Search.."> --}}
-                            @foreach ($seasion_types as $types_item)
-                            <div class="badge bg-outline-primary cursor-pointer {{$selected_season_type==$types_item->id?"active-primary-badge":""}}" wire:click="FilterSightseeingPointBySeasionType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
-                                <span>{{ strtoupper($types_item->title) }}</span>
-                            </div>
-                            @endforeach
-                            <div class="badge bg-outline-primary cursor-pointer {{$selected_season_type==0?"active-primary-badge":""}}" wire:click="FilterSightseeingPointBySeasionType(0)" wire:key="seasion-type-0">
-                                <span>ALL</span>
-                            </div>
-                        </div>
+                        
                     </div>
                     <div class="mt-4">
                         <div class="table-responsive">
@@ -99,7 +89,6 @@
                                     <tr class="border-b !border-primary/30">
                                         <th scope="col" class="!text-center">SL No.</th>
                                         <th scope="col" class="!text-center">Sightseeing Point</th>
-                                        <th scope="col" class="!text-center">Seasion</th>
                                         <th scope="col" class="!text-center">Ticket Price (PP)</th>
                                         <th scope="col" class="!text-center">Actions</th>
                                     </tr>
@@ -115,15 +104,7 @@
                                         <td class="!text-center">
                                             <span>{{ucwords($sightseeing_item->name)}}</span>
                                         </td>
-                                        
-                                        <td class="!text-center">
-                                            @if($sightseeing_item->seasonType)
-                                                <span class="badge badge-{{ $sightseeing_item->seasion_type_id == 3 ? 'purple' : ($sightseeing_item->seasion_type_id == 1 ? 'info' : 'warning') }}-gradient">
-                                                    {{$sightseeing_item->seasonType?$sightseeing_item->seasonType->title:"N/A"}}
-                                                </span>
-                                            @endif
-                                        </td>
-
+                                       
                                         <td class="!text-center">
                                             {{env('DEFAULT_CURRENCY_SYMBOL')}}{{number_format($sightseeing_item->ticket_price,2)}}
                                         </td>
@@ -187,7 +168,7 @@
                     </button>
                 </div>
                 <div class="ti-modal-body text-start">
-                    <div class="flex items-center">
+                    <div class="flex items-center mb-2">
                         <div class="grid grid-cols-1 hover:grid-cols-6 mx-1">
                             <label for="">
                                 <span class="badge gap-2 bg-danger/10 text-danger uppercase">
@@ -233,20 +214,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="my-3">
-                        <div clas="flex item-center">
-                            <label for="">
-                                <span class="badge gap-2 bg-danger/10 text-danger uppercase">
-                                    Seasion Type
-                                 </span>
-                            </label>
-                            @foreach ($seasion_types as $types_item)
-                            <div class="badge bg-outline-primary cursor-pointer !py-2 {{$selected_season_type==$types_item->id?"active-primary-badge":""}}" wire:click="FilterSightseeingPointBySeasionType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
-                                <span>{{ strtoupper($types_item->title) }}</span>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
+                    
                     <form wire:submit.prevent="submitForm">
                         <div class="table-responsive">
                             <table class="table whitespace-nowrap table-bordered table-bordered-primary border-primary/10 min-w-full new-activity">
@@ -343,7 +311,7 @@
                     </div>
                     @if(!empty($edit_sightseeings))
                         <div class="ti-modal-body text-start">
-                            <div class="flex items-center">
+                            <div class="flex items-center mb-2">
                                 <div class="grid grid-cols-1 hover:grid-cols-6 mx-1">
                                     <label for="">
                                         <span class="badge gap-2 bg-danger/10 text-danger uppercase">
@@ -389,20 +357,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="my-3">
-                                <div clas="flex item-center">
-                                    <label for="">
-                                        <span class="badge gap-2 bg-danger/10 text-danger uppercase">
-                                            Seasion Type
-                                        </span>
-                                    </label>
-                                    @foreach ($seasion_types as $types_item)
-                                    <div class="badge bg-outline-primary cursor-pointer !py-2 {{$edit_sightseeings['seasion_type_id']==$types_item->id?"active-primary-badge":""}}" wire:click="UpdateSeasonType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
-                                        <span>{{ strtoupper($types_item->title) }}</span>
-                                    </div>
-                                    @endforeach
-                                </div>
-                            </div>
+                            
                             <form wire:submit.prevent="updateActivity">
                                 <div class="table-responsive">
                                     <table class="table whitespace-nowrap table-bordered table-bordered-primary border-primary/10 min-w-full new-activity">

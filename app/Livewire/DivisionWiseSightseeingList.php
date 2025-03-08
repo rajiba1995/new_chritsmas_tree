@@ -21,8 +21,6 @@ class DivisionWiseSightseeingList extends Component
     public $selectedDestinationName = null;
     public $selectedDivision = null;
     public $selectedDivisionName = null;
-    public $seasion_types = [];
-    public $selected_season_type =0; // Must be public for validation
     public $active_assign_new_modal = 0;
     public $active_assign_update_modal = 0;
     public $active_modal_for_image = 0;
@@ -51,7 +49,6 @@ class DivisionWiseSightseeingList extends Component
             $this->selectedDestinationName = $State->name;
             $this->getDestination($State->id);
         }
-        $this->seasion_types = DB::table('seasion_types')->where('status', 1)->orderBy('title', 'ASC')->get();
         $this->addSightseeing(); // Start with one activity
         $this->files = collect();
     }
@@ -78,22 +75,12 @@ class DivisionWiseSightseeingList extends Component
         $this->division_wise_sightseeing  = $this->GetSightseeing();
     }
     public function GetSightseeing(){
-        return DivisionWiseSightseeing::with('seasonType')->where('division_id', $this->selectedDivision)
-        ->when($this->selected_season_type > 0, function ($query) {
-            return $query->where('seasion_type_id', $this->selected_season_type);
-        })
+        return DivisionWiseSightseeing::where('division_id', $this->selectedDivision)
         ->orderBy('name', 'ASC')
-        ->orderBy('seasion_type_id', 'ASC')
+        ->orderBy('id', 'DESC')
         ->get();
     }
-    public function FilterSightseeingPointBySeasionType($value){
-        $this->selected_season_type = $value; 
-        $this->division_wise_sightseeing  = $this->GetSightseeing();
-    }
-   
-    public function UpdateSeasonType($value){
-        $this->edit_sightseeings['seasion_type_id'] = $value; 
-    }
+    
     public function FilterCabByDivision($value){
         $this->selectedDivision = $value; 
         $this->division_wise_sightseeing  = $this->GetSightseeing();
@@ -142,7 +129,6 @@ class DivisionWiseSightseeingList extends Component
             'id' => null,
             'name' => '',
             'division_id' => null,
-            'seasion_type_id' => null,
             'ticket_price' => '',
             'images' => [],
         ], $activity->toArray());
@@ -178,13 +164,11 @@ class DivisionWiseSightseeingList extends Component
     {
         $this->validate([
             'sightseeings.*.name' => 'required|string|max:255',
-            'selected_season_type' => 'required',
             'selectedDivision' => 'required',
             'files.*.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'sightseeings.*.ticket_price' => 'required|numeric',
         ], [
             'sightseeings.*.name.required' => 'This field is required.',
-            'selected_season_type.required' => 'This field is required.',
             'selectedDivision.required' => 'This field is required.',
             'files.*.*.required' => 'This field is required.',
             'sightseeings.*.ticket_price.required' => 'This field is required',
@@ -192,11 +176,6 @@ class DivisionWiseSightseeingList extends Component
 
         try {
             DB::beginTransaction(); // Start transaction
-            // Check if the selected season type and division are provided
-            if ($this->selected_season_type == 0) {
-                session()->flash('new-sightseeing-error', 'Please Choose a Season Type!');
-                return; // Stop further execution
-            }
 
             if (!$this->selectedDivision) {
                 session()->flash('new-sightseeing-error', 'Please Choose a Division!');
@@ -213,7 +192,6 @@ class DivisionWiseSightseeingList extends Component
                 $activityRecord = DivisionWiseSightseeing::create([
                     'name' => $activity['name'], // Ensure this key exists
                     'ticket_price' => !empty($activity['ticket_price']) ? $activity['ticket_price'] : 0, // Save 0 if empty
-                    'seasion_type_id' => $this->selected_season_type, // Validate this is set
                     'division_id' => $this->selectedDivision, // Validate this is set
                 ]);
         
@@ -235,6 +213,7 @@ class DivisionWiseSightseeingList extends Component
         
             DB::commit(); // Commit transaction
             session()->flash('success', 'Sightseeing point saved successfully!');
+            $this->division_wise_sightseeing  = $this->GetSightseeing();
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback transaction on error
             session()->flash('new-sightseeing-error', 'Error: ' . $e->getMessage());
@@ -244,7 +223,6 @@ class DivisionWiseSightseeingList extends Component
         // Success message
         session()->flash('success', 'Sightseeing point saved successfully!');
         $this->active_assign_new_modal = 0;
-        $this->FilterSightseeingPointBySeasionType(0); //for All
         $this->sightseeings = []; // Reset all sightseeings by setting the array to empty
         // If you need to initialize some fields with an empty template, you can add default values like this
         $this->sightseeings[] = [
@@ -260,14 +238,12 @@ class DivisionWiseSightseeingList extends Component
         $this->validate(
             [
                 'edit_sightseeings.name' => 'required|string|max:255',
-                'edit_sightseeings.seasion_type_id' => 'required|exists:seasion_types,id',
                 'selectedDivision' => 'required|exists:cities,id',
                 'edit_sightseeings.ticket_price' => 'required|numeric',
                 // 'update_files.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             ],
             [
                 'edit_sightseeings.name.required' => 'The activity name is required.',
-                'edit_sightseeings.seasion_type_id.required' => 'The season type is required.',
                 'selectedDivision.required' => 'The division is required.',
                 'edit_sightseeings.ticket_price.required' => 'This field is required',
                 'edit_sightseeings.ticket_price.numeric' => 'Price must be a valid number.',
@@ -280,11 +256,6 @@ class DivisionWiseSightseeingList extends Component
         // Start transaction
         try {
             DB::beginTransaction();
-            // Check if the selected season type and division are provided
-            if ($this->edit_sightseeings['seasion_type_id'] == 0) {
-                session()->flash('edit-activity-error', 'Please Choose a Season Type!');
-                return; // Stop further execution
-            }
 
             if (!$this->selectedDivision) {
                 session()->flash('edit-activity-error', 'Please Choose a Division!');
@@ -298,7 +269,6 @@ class DivisionWiseSightseeingList extends Component
             $activityRecord->update([
                 'name' => $this->edit_sightseeings['name'], // Ensure this key exists
                 'ticket_price' => $this->edit_sightseeings['ticket_price']? $this->edit_sightseeings['ticket_price'] : 0, // Save 0 if empty
-                'seasion_type_id' => $this->edit_sightseeings['seasion_type_id'], // Validate this is set
                 'division_id' => $this->selectedDivision, // Validate this is set
             ]);
            
@@ -321,7 +291,7 @@ class DivisionWiseSightseeingList extends Component
             DB::commit(); // Commit transaction
             session()->flash('success', 'Sightseeing point update successfully!');
             $this->CloseEditModal();
-            $this->FilterSightseeingPointBySeasionType(0); //for All
+            $this->division_wise_sightseeing  = $this->GetSightseeing();
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback transaction on error
             session()->flash('edit-activity-error', 'Error: ' . $e->getMessage());
@@ -330,16 +300,16 @@ class DivisionWiseSightseeingList extends Component
     
         // Proceed with the update logic
     }
-    public function deleteItem($id)
+    public function DeleteSightSeeingItem($id)
     {
         $this->dispatch('showConfirm', ['itemId' => $id]);
     }
-    public function DeleteActivityItem($id)
+    public function deleteItem($id)
     {
         $activity = DivisionWiseSightseeing::find($id);
         if ($activity) {
             $activity->delete();
-            $this->mount(); // Or call any method to refresh data
+            $this->division_wise_sightseeing  = $this->GetSightseeing();
             session()->flash('success', 'Sightseeing point deleted successfully!');
         } 
     }

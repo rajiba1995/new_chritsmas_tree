@@ -22,8 +22,6 @@ class DestinationWiseRouteMap extends Component
     public $selectedDestinationName = null;
     public $selectedDivision = null;
     public $selectedDivisionName = null;
-    public $seasion_types = [];
-    public $selected_season_type =0; // Must be public for validation
     public $active_assign_new_modal = 0;
     public $active_assign_update_modal = 0;
     public $destination_wise_route = [];
@@ -49,7 +47,6 @@ class DestinationWiseRouteMap extends Component
             $this->selectedDestinationName = $State->name;
             $this->getDestination($State->id);
         }
-        $this->seasion_types = DB::table('seasion_types')->where('status', 1)->orderBy('title', 'ASC')->get();
         $this->addRoute(); // Start with one route
     }
     public function getDestination($destination_id){
@@ -76,24 +73,13 @@ class DestinationWiseRouteMap extends Component
     }
     public function GetRoute()
     {
-        return DestinationWiseRoute::with('seasonType')
-            ->where('destination_id', $this->selectedDestination)
-            ->when($this->selected_season_type > 0, function ($query) {
-                return $query->where('seasion_type_id', $this->selected_season_type);
-            })
+        return DestinationWiseRoute::where('destination_id', $this->selectedDestination)
             ->when(!empty($this->selected_routes), function ($query) {
                 return $query->whereIn('id', $this->selected_routes);
             })
+            ->orderBy('id', 'desc')
             ->orderBy('route_name', 'ASC')
-            ->orderBy('seasion_type_id', 'ASC')
             ->get();
-    }
-    public function FilterRoutePointBySeasionType($value){
-        $this->selected_season_type = $value; 
-        $this->destination_wise_route  = $this->GetRoute();
-    }
-    public function UpdateSeasonType($value){
-        $this->edit_sightseeings['seasion_type_id'] = $value; 
     }
     public function FilterRouteWayByDivision($value){
         $this->selectedDivision = $value; 
@@ -163,7 +149,6 @@ class DestinationWiseRouteMap extends Component
         ];
     }
     
-
     public function removeWayPoint($routeIndex, $waypointIndex)
     {
         unset($this->new_routes[$routeIndex]['waypoints'][$waypointIndex]);
@@ -175,13 +160,9 @@ class DestinationWiseRouteMap extends Component
     {
         // dd($this->all());
         $this->resetErrorBag();
-        if ($this->selected_season_type == 0) {
-            session()->flash('new-route-error', 'Please choose a season type!');
-            return; // Stop further execution
-        }
         if(count($this->new_routes)>0){
             foreach ($this->new_routes as $index => $route) {
-                $checkExisting = DestinationWiseRoute::where('route_name', $route['route_name'])->where('seasion_type_id', $this->selected_season_type)
+                $checkExisting = DestinationWiseRoute::where('route_name', $route['route_name'])
                 ->where('destination_id', $this->selectedDestination)
                 ->first();
             
@@ -224,7 +205,6 @@ class DestinationWiseRouteMap extends Component
                 $RouteRecord = DestinationWiseRoute::create([
                     'route_name' => $route['route_name'], // Ensure this key exists
                     'destination_id' => $this->selectedDestination, // Save 0 if empty
-                    'seasion_type_id' => $this->selected_season_type, // Validate this is set
                     'total_distance_km' => $route['total_distance_km'], // Validate this is set
                     'total_travel_time' => $route['total_travel_time'], // Validate this is set
                 ]);
@@ -248,6 +228,7 @@ class DestinationWiseRouteMap extends Component
         
             DB::commit(); // Commit transaction
             session()->flash('success', 'route point saved successfully!');
+            $this->FilterRouteWayByDivision($this->selectedDivision);
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback transaction on error
             session()->flash('new-route-error', 'Error: ' . $e->getMessage());
@@ -257,7 +238,6 @@ class DestinationWiseRouteMap extends Component
         // Success message
         session()->flash('success', 'route point saved successfully!');
         $this->active_assign_new_modal = 0;
-        $this->FilterRoutePointBySeasionType(0); //for All
         $this->new_routes = []; // Reset all sightseeings by setting the array to empty
         // If you need to initialize some fields with an empty template, you can add default values like this
        $this->addRoute();
@@ -269,7 +249,7 @@ class DestinationWiseRouteMap extends Component
        
         $this->resetErrorBag();
         $checkExisting = DestinationWiseRoute::where('route_name', $this->edit_routes['route_name'])
-                ->where('destination_id', $this->edit_routes['destination_id'])->where('seasion_type_id', $this->edit_routes['seasion_type_id'])->where('id', '!=', $this->edit_routes['id'])
+                ->where('destination_id', $this->edit_routes['destination_id'])->where('id', '!=', $this->edit_routes['id'])
                 ->first();
             
         if ($checkExisting) {
@@ -297,11 +277,6 @@ class DestinationWiseRouteMap extends Component
         try {
             DB::beginTransaction(); // Start transaction
             // Check if the selected season type and division are provided
-            if ($this->edit_routes['seasion_type_id'] == 0) {
-                session()->flash('edit-route-error', 'Please choose a season type!');
-                return; // Stop further execution
-            }
-
             if (count($this->edit_routes)==0) {
                 session()->flash('edit-route-error', 'Please choose atleast one route point!');
                 return; // Stop further execution
@@ -315,7 +290,6 @@ class DestinationWiseRouteMap extends Component
                 $RouteRecord->update([
                     'route_name' => $this->edit_routes['route_name'],
                     'destination_id' => $this->edit_routes['destination_id'], // Default to 0 if empty
-                    'seasion_type_id' => $this->edit_routes['seasion_type_id'],
                     'total_distance_km' => $this->edit_routes['total_distance_km'],
                     'total_travel_time' => $this->edit_routes['total_travel_time'],
                 ]);
@@ -369,6 +343,7 @@ class DestinationWiseRouteMap extends Component
         
             DB::commit(); // Commit transaction
             session()->flash('success', 'route point updated successfully!');
+            $this->FilterRouteWayByDivision($this->selectedDivision);
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback transaction on error
             // dd($e->getMessage());
@@ -379,7 +354,6 @@ class DestinationWiseRouteMap extends Component
         // Success message
         session()->flash('success', 'route point saved successfully!');
         $this->active_assign_update_modal = 0;
-        $this->FilterRoutePointBySeasionType(0); //for All
         $this->edit_routes = []; // Reset all sightseeings by setting the array to empty
         // If you need to initialize some fields with an empty template, you can add default values like this
     }
@@ -404,7 +378,7 @@ class DestinationWiseRouteMap extends Component
         $route = DestinationWiseRoute::find($id);
         if ($route) {
             $route->delete();
-            $this->mount(); // Or call any method to refresh data
+            $this->FilterRouteWayByDivision($this->selectedDivision);
             session()->flash('success', 'Route deleted successfully!');
         } 
     }

@@ -18,7 +18,6 @@ class DivisionWiseCabList extends Component
     public $selectedDestinationName = null;
     public $selectedDivision = null;
     public $selectedDivisionName = null;
-    public $seasion_types = [];
     public $selected_season_type =1; // Must be public for validation
     public $active_assign_new_modal = 0;
     public $division_wise_cabs = [];
@@ -33,8 +32,6 @@ class DivisionWiseCabList extends Component
         if($State->id){
             $this->getDestination($State->id);
         }
-        $this->seasion_types = DB::table('seasion_types')->where('status', 1)->orderBy('title', 'ASC')->get();
-        // $this->selected_season_type = $this->seasion_types?$this->seasion_types[0]->id:0;
         $this->cabs = Cab::where('status', 1)->orderBy('title', 'ASC')->get();
     }
     public function getDestination($destination_id){
@@ -52,15 +49,8 @@ class DivisionWiseCabList extends Component
     }
     public function GetCab(){
         return DivisionWiseCab::where('division_id', $this->selectedDivision)
-        ->when($this->selected_season_type > 0, function ($query) {
-            return $query->where('seasion_type_id', $this->selected_season_type);
-        })
         ->orderBy('cab_id', 'ASC')
         ->get();
-    }
-    public function FilterCabBySeasionType($value){
-        $this->selected_season_type = $value; 
-        $this->division_wise_cabs  = $this->GetCab();
     }
     public function FilterCabByDivision($value){
         $this->selectedDivision = $value; 
@@ -73,12 +63,10 @@ class DivisionWiseCabList extends Component
         $this->dispatch('showConfirm', ['itemId' => $id]);
     }
     public function deleteItem($id){
-        $cabs = DivisionWiseCab::where('cab_id', $id)
-        ->where('division_id', $this->selectedDivision);
-
-        if ($cabs->exists()) {
+        $cabs = DivisionWiseCab::find($id);
+        if ($cabs) {
             $cabs->delete(); // Deletes all matching records
-            $this->mount(); // Refresh component state
+            $this->division_wise_cabs  = $this->GetCab();
             session()->flash('success', 'Cab deleted successfully.');
         } else {
             session()->flash('error', 'Cab not found.');
@@ -101,41 +89,27 @@ class DivisionWiseCabList extends Component
             'assign_cab_id.min' => 'Please select at least one cab.',
         ]);
      
-        // Check if the combination of season type and cab(s) already exists in the division_wise_cabs table
-        // foreach ($this->assign_cab_id as $cab_id) {
-        //     $existingRecord = DivisionWiseCab::where('division_id', $this->selectedDivision)
-        //                                     ->where('seasion_type_id', $this->assign_season_type)
-        //                                     ->where('cab_id', $cab_id)
-        //                                     ->exists(); // Check if the record exists
-
-        //     // If any record exists, return with a message
-        //     if ($existingRecord) {
-        //         session()->flash('assign_error', 'This combination already exists.');
-        //         return; // Prevent further processing if record exists
-        //     }
-        // }
 
         // Save the data if no existing record is found
         // dd($this->assign_cab_id);
         foreach ($this->assign_cab_id as $cab_id) {
-            foreach($this->seasion_types as $type_item){
-                DivisionWiseCab::updateOrCreate(
-                    [
-                        'division_id' => $this->selectedDivision,
-                        'seasion_type_id' => $type_item->id,
-                        'cab_id' => $cab_id,
-                    ],
-                    [   // Only put fields that may change or need updating
-                        'updated_at' => now(),
-                    ]
-                );
-            }
+            DivisionWiseCab::updateOrCreate(
+                [
+                    'division_id' => $this->selectedDivision,
+                    'cab_id' => $cab_id,
+                ],
+                [   // Only put fields that may change or need updating
+                    'updated_at' => now(),
+                ]
+            );
         }
 
         // $this->reset(['assign_cab_id', 'assign_season_type']);
         // Optionally, send feedback
         session()->flash('success', 'Data submitted successfully!');
         $this->division_wise_cabs  = $this->GetCab();
+        $this->reset(['assign_cab_id']);
+        $this->dispatch('FieldUncheck', ['class' => 'cab-input']);
         $this->active_assign_new_modal = 0;
         // $this->selected_season_type = $this->assign_season_type;
     }

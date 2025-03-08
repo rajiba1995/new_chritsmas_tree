@@ -79,16 +79,6 @@
                         <div class="badge bg-outline-success cursor-pointer">
                             <span>No of Result: {{$destination_wise_route->count()}}</span>
                         </div>
-                        <div>
-                            @foreach ($seasion_types as $types_item)
-                            <div class="badge bg-outline-primary cursor-pointer {{$selected_season_type==$types_item->id?"active-primary-badge":""}}" wire:click="FilterRoutePointBySeasionType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
-                                <span>{{ strtoupper($types_item->title) }}</span>
-                            </div>
-                            @endforeach
-                            <div class="badge bg-outline-primary cursor-pointer {{$selected_season_type==0?"active-primary-badge":""}}" wire:click="FilterRoutePointBySeasionType(0)" wire:key="seasion-type-0">
-                                <span>ALL</span>
-                            </div>
-                        </div>
                     </div>
                     <div class="mt-4">
                         <div class="table-responsive">
@@ -100,7 +90,6 @@
                                         <th scope="col" class="!text-center w-1/3">Route Name</th>
                                         <th scope="col" class="!text-center w-1/5">Divisions</th>
                                         <th scope="col" class="!text-center">Details</th>
-                                        <th scope="col" class="!text-center" width="5%">Seasion</th>
                                         <th scope="col" class="!text-center" width="5%">Actions</th>
                                     </tr>
                                 </thead>
@@ -208,13 +197,6 @@
                                                     </table>
                                                 </div>
                                             </td>
-                                            <td class="!text-center">
-                                                @if($route_item->seasonType)
-                                                    <span class="badge badge-{{ $route_item->seasion_type_id == 3 ? 'purple' : ($route_item->seasion_type_id == 1 ? 'info' : 'warning') }}-gradient">
-                                                        {{$route_item->seasonType?$route_item->seasonType->title:"N/A"}}
-                                                    </span>
-                                                @endif
-                                            </td>
                                             
                                             <td>
 
@@ -267,7 +249,7 @@
                     </button>
                 </div>
                 <div class="ti-modal-body text-start">
-                    <div class="flex items-center">
+                    <div class="flex items-center mb-2">
                         <div class="grid grid-cols-1 hover:grid-cols-6 mx-1">
                             <label for="">
                                 <span class="badge gap-2 bg-danger/10 text-danger uppercase">
@@ -291,20 +273,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="my-3">
-                        <div clas="flex item-center">
-                            <label for="">
-                                <span class="badge gap-2 bg-danger/10 text-danger uppercase">
-                                    Seasion Type
-                                 </span>
-                            </label>
-                            @foreach ($seasion_types as $types_item)
-                            <div class="badge bg-outline-primary cursor-pointer !py-2 {{$selected_season_type==$types_item->id?"active-primary-badge":""}}" wire:click="FilterRoutePointBySeasionType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
-                                <span>{{ strtoupper($types_item->title) }}</span>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
+                    
                     <form wire:submit.prevent="submitForm">
                         <div class="table-responsive mb-2">
                             <table class="table whitespace-nowrap table-bordered table-bordered-primary border-primary/10 min-w-full new-activity">
@@ -453,7 +422,7 @@
                     </div>
                     <div class="ti-modal-body text-start">
                         @if($edit_routes)
-                            <div class="flex items-center">
+                            <div class="flex items-center mb-2">
                                 <div class="grid grid-cols-1 hover:grid-cols-6 mx-1">
                                     <label for="">
                                         <span class="badge gap-2 bg-danger/10 text-danger uppercase">
@@ -477,20 +446,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="my-3">
-                                <div class="flex item-center">
-                                    <label for="">
-                                        <span class="badge gap-2 bg-danger/10 text-danger uppercase">
-                                            Seasion Type
-                                        </span>
-                                    </label>
-                                    @foreach ($seasion_types as $types_item)
-                                        <div class="badge bg-outline-primary cursor-pointer !py-2 {{$edit_routes['seasion_type_id']==$types_item->id?"active-primary-badge":""}}" wire:click="FilterRoutePointBySeasionType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
-                                            <span>{{ strtoupper($types_item->title) }}</span>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
+                            
                             <form wire:submit.prevent="submitEditForm">
                                 <div class="table-responsive mb-2">
                                     <table class="table whitespace-nowrap table-bordered table-bordered-primary border-primary/10 min-w-full new-activity">
@@ -640,7 +596,6 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 @this.call('deleteItem', itemId); // Calls Livewire method directly
-                Swal.fire("Deleted!", "Your item has been deleted.", "success");
             }
         });
     });

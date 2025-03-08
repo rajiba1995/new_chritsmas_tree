@@ -103,14 +103,7 @@
                                 <div class="badge bg-outline-success cursor-pointer">
                                     <span>No of Result: {{$destination_wise_route_and_service->count()}}</span>
                                 </div>
-                                @foreach ($seasion_types as $types_item)
-                                <div class="badge bg-outline-primary cursor-pointer {{$selected_season_type==$types_item->id?"active-primary-badge":""}}" wire:click="FilterRoutePointBySeasionType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
-                                    <span>{{ strtoupper($types_item->title) }}</span>
-                                </div>
-                                @endforeach
-                                <div class="badge bg-outline-primary cursor-pointer {{$selected_season_type==0?"active-primary-badge":""}}" wire:click="FilterRoutePointBySeasionType(0)" wire:key="seasion-type-0">
-                                    <span>ALL</span>
-                                </div>
+                               
                             </div>
                             <div>
                                <input type="text" class="badge bg-outline-primary w-xs" placeholder="Quick Search..">
@@ -129,7 +122,6 @@
                                             <th scope="col" class="!text-center">Route</th>
                                             <th scope="col" class="!text-center">Activity</th>
                                             <th scope="col" class="!text-center">Sightseeings</th>
-                                            <th scope="col" class="!text-center">Seasion</th>
                                             <th scope="col" class="!text-center w-1/3">Cabs</th>
                                             <th scope="col" class="!text-center">Actions</th>
                                         </tr>
@@ -220,13 +212,6 @@
                                                         </div>
                                                     @endforelse
                                                 </td>
-                                                <td class="!text-center">
-                                                    @if($route_item->seasonType)
-                                                        <span class="badge badge-{{ $route_item->seasion_type_id == 3 ? 'purple' : ($route_item->seasion_type_id == 1 ? 'info' : 'warning') }}-gradient">
-                                                            {{$route_item->seasonType?$route_item->seasonType->title:"N/A"}}
-                                                        </span>
-                                                    @endif
-                                                </td>
                                                 <td class="!p-0 align-top">
                                                     <div class="table-responsive -mt-9">
                                                         @if(count($route_item->cabs)>0)
@@ -234,7 +219,10 @@
                                                                 <thead class="bg-warning/10">
                                                                     <tr class="border-b border-defaultborder">
                                                                         @foreach ($route_item->cabs as $cabs_key=> $cabs_item)
-                                                                            <th class="text-center uppercase route_details">    {{$cabs_item->divisionCab->cab->title}}</th>
+                                                                            <th class="text-center uppercase route_details">    {{$cabs_item->divisionCab->cab->title}}
+                                                                                <br>
+                                                                                <span>{{$cabs_item->divisionCab->cab->capacity}} SEATER</span>
+                                                                            </th>
                                                                         @endforeach
                                                                     </tr>
                                                                 </thead>
@@ -300,14 +288,6 @@
                                 <div class="badge bg-outline-success cursor-pointer">
                                     <span>No of Result: {{$destination_wise_route_and_service->count()}}</span>
                                 </div>
-                                @foreach ($seasion_types as $types_item)
-                                <div class="badge bg-outline-primary cursor-pointer {{$selected_season_type==$types_item->id?"active-primary-badge":""}}" wire:click="FilterRoutePointBySeasionType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
-                                    <span>{{ strtoupper($types_item->title) }}</span>
-                                </div>
-                                @endforeach
-                                <div class="badge bg-outline-primary cursor-pointer {{$selected_season_type==0?"active-primary-badge":""}}" wire:click="FilterRoutePointBySeasionType(0)" wire:key="seasion-type-0">
-                                    <span>ALL</span>
-                                </div>
                             </div>
                             <div>
                                <input type="text" class="badge bg-outline-primary w-xs" placeholder="Quick Search..">
@@ -326,7 +306,6 @@
                                             <th scope="col" class="!text-center">Destination</th>
                                             <th scope="col" class="!text-center">Activity</th>
                                             {{-- <th scope="col" class="!text-center">Sightseeings</th> --}}
-                                            <th scope="col" class="!text-center">Seasion</th>
                                             <th scope="col" class="!text-center w-1/3">Cabs</th>
                                             <th scope="col" class="!text-center">Actions</th>
                                         </tr>
@@ -381,13 +360,6 @@
                                                         @endforelse
                                                     </div>
                                                 </td>
-                                                <td class="!text-center">
-                                                    @if($route_item->seasonType)
-                                                        <span class="badge badge-{{ $route_item->seasion_type_id == 3 ? 'purple' : ($route_item->seasion_type_id == 1 ? 'info' : 'warning') }}-gradient">
-                                                            {{$route_item->seasonType?$route_item->seasonType->title:"N/A"}}
-                                                        </span>
-                                                    @endif
-                                                </td>
                                                 <td class="!p-0 align-top">
                                                     <div class="table-responsive -mt-9">
                                                         @if(count($route_item->cabs)>0)
@@ -395,7 +367,10 @@
                                                                 <thead class="bg-warning/10">
                                                                     <tr class="border-b border-defaultborder">
                                                                         @foreach ($route_item->cabs as $cabs_key=> $cabs_item)
-                                                                            <th class="text-center uppercase route_details">    {{$cabs_item->divisionCab->cab->title}}</th>
+                                                                            <th class="text-center uppercase route_details">    {{$cabs_item->divisionCab->cab->title}}
+                                                                                <br>
+                                                                               <span>{{$cabs_item->divisionCab->cab->capacity}} SEATER</span>
+                                                                            </th>
                                                                         @endforeach
                                                                     </tr>
                                                                 </thead>
@@ -488,18 +463,6 @@
                         <form wire:submit.prevent="submitNewService">
                             <div class="my-3">
                                 <div class="flex justify-between">
-                                    <div>
-                                        <label for="">
-                                            <span class="badge gap-2 bg-danger/10 text-danger uppercase">
-                                                Seasion Type
-                                            </span>
-                                        </label>
-                                        @foreach ($seasion_types as $types_item)
-                                        <div class="badge bg-outline-primary cursor-pointer !py-2 {{$selected_season_type==$types_item->id?"active-primary-badge":""}}" wire:click="FilterRoutePointBySeasionType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
-                                            <span>{{ strtoupper($types_item->title) }}</span>
-                                        </div>
-                                        @endforeach
-                                    </div>
                                     <div>
                                         <label for="">
                                             <span class="badge gap-2 bg-danger/10 text-danger uppercase">
@@ -688,18 +651,7 @@
                         <form wire:submit.prevent="submitNewService">
                             <div class="my-3">
                                 <div class="flex justify-between">
-                                    <div>
-                                        <label for="">
-                                            <span class="badge gap-2 bg-danger/10 text-danger uppercase">
-                                                Seasion Type
-                                            </span>
-                                        </label>
-                                        @foreach ($seasion_types as $types_item)
-                                        <div class="badge bg-outline-primary cursor-pointer !py-2 {{$selected_season_type==$types_item->id?"active-primary-badge":""}}" wire:click="FilterRoutePointBySeasionType({{$types_item->id}})" wire:key="seasion-type-{{ $types_item->id }}">
-                                            <span>{{ strtoupper($types_item->title) }}</span>
-                                        </div>
-                                        @endforeach
-                                    </div>
+                                    
                                     <div>
                                         <label for="">
                                             <span class="badge gap-2 bg-danger/10 text-danger uppercase">
@@ -878,17 +830,6 @@
                 <form wire:submit.prevent="submitEditSummary">
                     <div class="my-3">
                     <div class="flex justify-between">
-                        <div>
-                        <label for="">
-                            <span class="badge gap-2 bg-danger/10 text-danger uppercase">Season Type</span>
-                        </label>
-                        @foreach ($seasion_types as $types_item)
-                        <div
-                            class="badge bg-outline-primary cursor-pointer !py-2 {{$edit_summary['seasion_type_id'] == $types_item->id ? 'active-primary-badge' : ''}}">
-                            <span>{{ strtoupper($types_item->title) }}</span>
-                        </div>
-                        @endforeach
-                        </div>
                         <div>
                         <label for="">
                             <span class="badge gap-2 bg-danger/10 text-danger uppercase">Destination</span>

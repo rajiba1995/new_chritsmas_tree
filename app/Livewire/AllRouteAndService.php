@@ -34,8 +34,6 @@ class AllRouteAndService extends Component
     public $selectedDestinationName = null;
     public $selectedDivision = null;
     public $selectedDivisionName = null;
-    public $seasion_types = [];
-    public $selected_season_type =0; // Must be public for validation
     public $active_assign_new_modal = 0;
     public $active_assign_new_per_day_modal = 0;
     public $active_assign_update_modal = 0;
@@ -68,7 +66,6 @@ class AllRouteAndService extends Component
             $this->selectedDestinationName = $State->name;
             $this->getDestination($State->id);
         }
-        $this->seasion_types = DB::table('seasion_types')->where('status', 1)->orderBy('title', 'ASC')->get();
         
     }
     public function getDestination($destination_id){
@@ -91,34 +88,13 @@ class AllRouteAndService extends Component
     }
     public function GetRouteAndService()
     {
-        return RouteServiceSummary::with('seasonType', 'destination', 'route', 'activities', 'sightseeings', 'cabs')
+        return RouteServiceSummary::with('destination', 'route', 'activities', 'sightseeings', 'cabs')
             ->where('destination_id', $this->selectedDestination)
             ->where('service_type', $this->service_type)
-            ->when($this->selected_season_type > 0, function ($query) {
-                return $query->where('seasion_type_id', $this->selected_season_type);
-            })
-            ->orderBy('seasion_type_id', 'ASC')
             ->orderBy('service_type', 'ASC')
             ->get();
     }
-    public function FilterRoutePointBySeasionType($value){
-        $this->selected_season_type = $value; 
-        $this->destination_wise_route_and_service  = $this->GetRouteAndService();
-        $this->reset(['new_per_destination']);
-        $this->reset(['new_per_day_service']);
-
-        $this->reset(['new_route']);
-        $this->reset(['new_service']);
-        $this->dispatch('resetCheckboxes');
-        
-        $this->all_activities = $this->GetActivities($this->selectedDestination);
-        $this->all_sightseeings =  $this->GetSightseeings($this->selectedDestination);
-        $this->all_cabs =  $this->GetCabs($this->selectedDestination);
-        $this->destination_wise_route  = $this->GetRoute($this->selectedDestination);
-    }
-    public function UpdateSeasonType($value){
-        $this->edit_sightseeings['seasion_type_id'] = $value; 
-    }
+    
     public function FilterRouteWayByDivision($value){
         $this->selectedDivision = $value; 
         $this->selected_routes = DestinationWiseRouteWaypoint::where('division_id', $value)->pluck('route_id')->toArray();
@@ -129,26 +105,26 @@ class AllRouteAndService extends Component
     public function OpenNewRouteWiseServiceModal($value){
             $this->active_assign_new_modal = $value=="yes"?1:0;
             // Reset all new_service fields
-            if ($this->active_assign_new_modal) {
-                $this->new_service = [
-                    'route'=>null,
-                    'selectedActivities' => [],
-                    'selectedSightseeings' => [],
-                    'selectedCabs' => [],
-                ];
-            }
+            // if ($this->active_assign_new_modal) {
+            //     $this->new_service = [
+            //         'route'=>null,
+            //         'selectedActivities' => [],
+            //         'selectedSightseeings' => [],
+            //         'selectedCabs' => [],
+            //     ];
+            // }
         $this->dispatch('resetCheckboxes');
     }
     public function OpenNewPerDayModal($value){
         $this->active_assign_new_per_day_modal = $value=="yes"?1:0;
-        if ($this->active_assign_new_per_day_modal) {
-            $this->new_per_day_service = [
-                'destination'=>null,
-                'selectedActivities' => [],
-                'selectedSightseeings' => [],
-                'selectedCabs' => [],
-            ];
-        }
+        // if ($this->active_assign_new_per_day_modal) {
+        //     $this->new_per_day_service = [
+        //         'destination'=>null,
+        //         'selectedActivities' => [],
+        //         'selectedSightseeings' => [],
+        //         'selectedCabs' => [],
+        //     ];
+        // }
         $this->dispatch('resetCheckboxes');
     }
 
@@ -206,18 +182,16 @@ class AllRouteAndService extends Component
             session()->flash('new-route-error', 'Please choose a destination!');
             return; // Stop further execution
         }
-        if ($this->selected_season_type == 0) {
-            session()->flash('new-route-error', 'Please choose a season type!');
-            return; // Stop further execution
-        }
         
-    
+      
         try {
             DB::beginTransaction(); // Start transaction
             // Check if the selected season type and division are provided
             if($this->active_tab==1){ // For Route Wise
+             
                 foreach($this->new_service as $key=>$item){
                     $route = DestinationWiseRoute::where('id', $item['route'])->first();
+                
                     if (count($item['selectedCabs']) == 0) {
                         session()->flash('new-route-error', 'Please choose at least one cab on this route ('.$route->route_name.')');
                         return; // Stop further execution
@@ -226,7 +200,6 @@ class AllRouteAndService extends Component
                         [
                             'route_id' => $route->id,
                             'destination_id' => (int)$this->selectedDestination,
-                            'seasion_type_id' => $this->selected_season_type,
                         ],
                         [
                             'service_type' => $this->service_type,
@@ -263,14 +236,12 @@ class AllRouteAndService extends Component
                             ]);
                         }
                     }
-                
                 }
             }elseif($this->active_tab==2){ //For Per Day
                 foreach($this->new_per_day_service as $key=>$item){
                     $storeService = RouteServiceSummary::updateOrCreate(
                         [
                             'service_type' =>$this->service_type,
-                            'seasion_type_id'=>$this->selected_season_type,
                             'destination_id'=>(int)$this->selectedDestination
                         ],[
                             'division_id'=>$this->selectedDivision
@@ -312,6 +283,7 @@ class AllRouteAndService extends Component
 
             DB::commit(); // Commit transaction
             session()->flash('success', 'route point saved successfully!');
+            $this->destination_wise_route_and_service  = $this->GetRouteAndService();
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback transaction on error
             session()->flash('new-route-error', 'Error: ' . $e->getMessage());
@@ -322,7 +294,6 @@ class AllRouteAndService extends Component
         session()->flash('success', 'route point saved successfully!');
         $this->active_assign_new_modal = 0;
         $this->active_assign_new_per_day_modal = 0;
-        $this->FilterRoutePointBySeasionType(0); //for All
         $this->new_service = []; // Reset all sightseeings by setting the array to empty
     }
 
@@ -382,6 +353,7 @@ class AllRouteAndService extends Component
 
             DB::commit(); // Commit transaction
             session()->flash('success', 'Data updated successfully!');
+            $this->destination_wise_route_and_service  = $this->GetRouteAndService();
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback transaction on error
             session()->flash('edit-route-error', 'Error: ' . $e->getMessage());
@@ -391,12 +363,11 @@ class AllRouteAndService extends Component
         // Success message
         session()->flash('success', 'Data updated successfully!');
         $this->active_assign_update_modal = 0;
-        $this->FilterRoutePointBySeasionType(0); //for All
         $this->reset(['edit_summary']);
     }
     public function GetSummaryById($id){
         $this->active_assign_update_modal = 1;
-        $summary = RouteServiceSummary::with('seasonType', 'destination', 'route', 'activities', 'activities.activity', 'sightseeings', 'sightseeings.sightseeing', 'cabs', 'cabs.divisionCab.cab')
+        $summary = RouteServiceSummary::with('destination', 'route', 'activities', 'activities.activity', 'sightseeings', 'sightseeings.sightseeing', 'cabs', 'cabs.divisionCab.cab')
         ->where('id', $id)
         ->first();
         $this->edit_summary = $summary->toArray();
@@ -418,7 +389,7 @@ class AllRouteAndService extends Component
         $route = RouteServiceSummary::find($itemId);
         if ($route) {
             $route->delete();
-            $this->mount(); // Or call any method to refresh data
+            $this->destination_wise_route_and_service  = $this->GetRouteAndService();
             session()->flash('success', 'Route deleted successfully!');
         } 
     }
@@ -430,24 +401,22 @@ class AllRouteAndService extends Component
         $this->destination_wise_route_and_service  = $this->GetRouteAndService();
     }
     public function GetRoute($destination_id){
-        // $exsiting_service_summaries = RouteServiceSummary::where('service_type', 'Route Wise')->where('destination_id', $destination_id)->where('seasion_type_id', $this->selected_season_type)->pluck('route_id')->toArray();
         return DestinationWiseRoute::where('destination_id', $destination_id)
-        ->where('seasion_type_id', $this->selected_season_type)
         // ->whereNotIn('id', $exsiting_service_summaries) // Missing -> fixed
         ->get();
     }
     public function GetActivities($destination_id){
        
         $divisions = City::where('state_id', $destination_id)->pluck('id')->toArray();
-        return DivisionWiseActivity::whereIn('division_id', $divisions)->where('seasion_type_id', $this->selected_season_type)->get();
+        return DivisionWiseActivity::whereIn('division_id', $divisions)->get();
     }
     public function GetSightseeings($destination_id){
         $divisions = City::where('state_id', $destination_id)->pluck('id')->toArray();
-        return DivisionWiseSightseeing::whereIn('division_id', $divisions)->where('seasion_type_id', $this->selected_season_type)->get();
+        return DivisionWiseSightseeing::whereIn('division_id', $divisions)->get();
     }
     public function GetCabs($destination_id){
         $divisions = City::where('state_id', $destination_id)->pluck('id')->toArray();
-        return DivisionWiseCab::whereIn('division_id', $divisions)->where('seasion_type_id', $this->selected_season_type)->get();
+        return DivisionWiseCab::whereIn('division_id', $divisions)->get();
     }
 
 
