@@ -17,9 +17,12 @@
             </ol>
         </nav>
     </div>
+    <div class="ti-btn-list">
+        <a href="{{route('admin.itinerary.preset.list')}}" class="ti-btn ti-btn-danger-full !py-1 !px-2 ti-btn-wave  me-[0.375rem]"><i class="fa-solid fa-caret-left"></i>Back</a>
+    </div>
 </div>
     <!-- Start:: row-10 -->
-    <livewire:itinerary.create-preset-itinerary :destinationId="$destination_id" :categoryId="$category_id" />
+    <livewire:itinerary.create-preset-itinerary :encryptedId="$id" />
 
 
 <!-- End:: row-10 -->

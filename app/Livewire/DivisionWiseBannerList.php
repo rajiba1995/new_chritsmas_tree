@@ -101,6 +101,7 @@ class DivisionWiseBannerList extends Component
             $store =new ItineraryBanner;
             $store->title = $this->banner_title;
             $store->division_id = $this->selectedDivision;
+            $store->destination_id = $this->selectedDestination;
 
             $uploadedFiles = $this->banner_image ?? null;
             if ($uploadedFiles) {

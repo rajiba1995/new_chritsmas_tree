@@ -9,7 +9,7 @@ class DivisionWiseSightseeingImage extends Model
 {
    use HasFactory;
    protected $fillable = [
-        'sightseeing_id', 'file_path'
+        'sightseeing_id', 'file_path', 'destination_id'
    ];
 
    public function sightseeing()

@@ -137,6 +137,19 @@ class PresetItineraryList extends Component
            // Convert arrays to string format
             $itinerary_journey = implode(',', $this->itinerary_journey);
             $itinerary_journey_divisions = implode(',', $this->itinerary_journey_divisions);
+          
+            $stay_by_journey = [];
+            foreach($this->itinerary_journey as $index=>$item){
+                for ($i = 0; $i < $item; $i++) { 
+                    $stay_by_journey[] = $this->itinerary_journey_divisions[$index] ?? null;
+                }
+            }
+            $stay_by_journey = array_filter($stay_by_journey); // Ensure no null values
+            if (!empty($stay_by_journey)) {
+                $stay_by_journey[] = end($stay_by_journey); // Duplicate last value
+            }
+            $stay_by_journey = implode(',', $stay_by_journey);
+
             $formattedString = CustomHelper::formatNightJourney($itinerary_journey, $itinerary_journey_divisions);
             // Find existing record or create a new one
             $itinerary_syntax = $this->day.'D/'.$this->night.'N';
@@ -152,7 +165,8 @@ class PresetItineraryList extends Component
                     'itinerary_journey' => $formattedString, // Corrected placement
                     'itinerary_syntax' => $itinerary_syntax,
                     'night_journey' => $itinerary_journey,
-                    'divisions_journey' => $itinerary_journey_divisions
+                    'divisions_journey' => $itinerary_journey_divisions,
+                    'stay_by_journey' => $stay_by_journey
                 ] // Data to update or insert
             );
             

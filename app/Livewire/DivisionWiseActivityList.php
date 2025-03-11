@@ -239,12 +239,14 @@ class DivisionWiseActivityList extends Component
                 $uploadedFiles = $this->files[$index] ?? null;
                 if ($uploadedFiles && is_array($uploadedFiles)) {
                     foreach ($uploadedFiles as $file) {
-                        $dynamicText = $activity['name'];
+                        // $dynamicText = $activity['name'];
+                        $dynamicText = $activity['name'].rand(1111,9999);
                         $divisionName = $this->selectedDivisionName; // Assuming you have a division name
                         $uploadedPath = CustomHelper::uploadImage($file, $dynamicText, $divisionName, 'activities');
                         // Save the uploaded file record
                         DivisionWiseActivityImage::create([
                             'division_wise_activity_id' => $activityRecord->id,
+                            'destination_id' => $this->selectedDestination,
                             'file_path' => $uploadedPath,
                         ]);
                     }
@@ -332,12 +334,13 @@ class DivisionWiseActivityList extends Component
             $uploadedFiles = $this->update_files[0] ?? null;
             if ($uploadedFiles && is_array($uploadedFiles)) {
                 foreach ($uploadedFiles as $file) {
-                    $dynamicText = $activityRecord->name;
+                    $dynamicText = $activityRecord->name.rand(1111,9999);
                     $divisionName = $this->selectedDivisionName; // Assuming you have a division name
                     $uploadedPath = CustomHelper::uploadImage($file, $dynamicText, $divisionName, 'activities');
                     // Save the uploaded file record
                     DivisionWiseActivityImage::create([
                         'division_wise_activity_id' => $activityRecord->id,
+                        'destination_id' => $this->selectedDestination,
                         'file_path' => $uploadedPath,
                     ]);
                 }

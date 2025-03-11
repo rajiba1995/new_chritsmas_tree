@@ -57,6 +57,30 @@
                             </select>
                        </div>
                     </div>
+                    <div>
+                        <div class="grid grid-cols-1 hover:grid-cols-6">
+                            <label for="">
+                                <span class="badge gap-2 bg-danger/10 text-danger uppercase">
+                                    Category
+                                 </span>
+                            </label>
+                            <select 
+                                name="division_list" 
+                                class="placeholder:text-textmuted text-sm selected_seasion_type"  
+                                wire:change="GetCategory($event.target.value)" 
+                                wire:key="category-0">
+                                <option value="" hidden>Filter category</option>
+                                @foreach ($categories as $category)
+                                    <option 
+                                        value="{{ $category->id }}" 
+                                        {{$selectedCategory==$category->id?"selected":""}} 
+                                        wire:key="category-{{ $category->id }}">
+                                        {{ $category->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                       </div>
+                    </div>
                     
                     <div class="prism-toggle mt-5">
                         <a href="javascript:void(0)" wire:click="NewPresetItinerary('yes')" class="ti-btn ti-btn-primary-full !py-1 pt-0 ti-btn-wave  me-[0.375rem]"><i class="fa-solid fa-plus"></i>Preset Itinerary Builder</a>
@@ -72,7 +96,12 @@
                         <div class="badge bg-outline-success cursor-pointer">
                             <span>No of Result: {{count($preset_itineraries)}}</span>
                         </div>
-                        
+                        <div>
+                            <input type="text" class="badge bg-outline-primary w-xs" placeholder="Quick Search..">
+                            <a href="javascript:void(0)" class="badge bg-outline-danger cursor-pointer">
+                                Reset
+                            </a>
+                        </div>
                     </div>
                     <div class="mt-4">
                         <div class="table-responsive">
@@ -94,11 +123,14 @@
                                         <td class="!text-center">{{ucwords($pre_item->type)}}</td>
                                         <td class="!text-center">{{$pre_item->hotelCategory->name}}</td>
                                         <td class="!text-center">
-                                            {{$pre_item->total_days}}D/{{$pre_item->total_nights}}N 
+                                            {{$pre_item->itinerary_syntax}}
                                             <span class="badge bg-danger/10 text-danger">{{$pre_item->itinerary_journey}}</span>
                                         </td>
                                         <td class="!text-center">
-                                            <a href="#" class="badge bg-primary/10 text-primary">Build</a>
+                                            @php
+                                                $encryptedId = Crypt::encrypt($pre_item->id);
+                                            @endphp
+                                            <a href="{{route('admin.itinerary.preset.build', $encryptedId)}}" class="badge bg-primary/10 text-primary">Build</a>
                                         </td>
                                     </tr>
                                    @empty
@@ -163,7 +195,7 @@
                                 class="placeholder:text-textmuted text-sm selected_seasion_type"  
                                 wire:change="GetCategory($event.target.value)" 
                                 wire:key="category-0">
-                                <option value="" hidden>Filter Divisions</option>
+                                <option value="" hidden>Filter category</option>
                                 @foreach ($categories as $category)
                                     <option 
                                         value="{{ $category->id }}" 

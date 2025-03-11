@@ -10,7 +10,7 @@ class ItineraryBanner extends Model
     use HasFactory;
     protected $table = "itinerary_banners";
     protected $fillable = [
-        'title', 'division_id', 'image', 'status', 'created_at', 'updated_at'
+        'title', 'division_id','destination_id', 'image', 'status', 'created_at', 'updated_at'
     ];
 
     public function division(){

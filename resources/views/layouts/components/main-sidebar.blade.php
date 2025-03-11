@@ -167,9 +167,6 @@
 										<li class="slide {{ request()->is('admin/itinerary/preset/list')? 'active' : '' }}">
 											<a href="{{route('admin.itinerary.preset.list')}}" class="side-menu__item">Preset Itinerary List</a>
 										</li>
-										<li class="slide {{ request()->is('admin/itinerary/preset-builder')? 'active' : '' }}">
-											<a href="{{route('admin.itinerary.preset.builder',[2,8])}}" class="side-menu__item">Preset Itinerary Builder</a>
-										</li>
 								</ul>
 							</li>
 							<!-- End::slide -->

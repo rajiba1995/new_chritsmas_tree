@@ -679,6 +679,129 @@
 .max-w-75{
   max-width: 75px;
 }
+.itinerary-build .image-preview-label {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.itinerary-build .image-preview {
+  margin-top: 10px;
+  width: 150px;
+  height: 65px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+  transition: border-color 0.3s ease-in-out; /* Smooth transition */
+}
+
+.itinerary-build .image-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.itinerary-build .image-preview img {
+  padding: 5px;
+}
+
+.itinerary-build input[type="radio"] {
+  display: none; /* Hide the radio button */
+}
+
+.itinerary-build input[type="radio"]:checked + .image-preview {
+  border-color: #007bff !important; /* Blue border when selected */
+}
+
+.itinerary-build input[type="radio"]:checked + .image-preview::after {
+  content: "SELECTED";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #007bff;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  padding: 3px 0;
+  border-radius: 0 0 5px 5px;
+}
+.itinerary-build input[type="checkbox"] {
+  display: none; /* Hide the checkbox */
+}
+
+.itinerary-build input[type="checkbox"]:checked + .image-preview {
+  border-color: #007bff !important; /* Blue border when selected */
+}
+
+.itinerary-build input[type="checkbox"]:checked + .image-preview::after {
+  content: "SELECTED";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #007bff;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  padding: 3px 0;
+  border-radius: 0 0 5px 5px;
+}
+
+/* For Hotel by radio */
+
+.hotel-preview-label {
+  display: inline-block;
+  width: 140px;
+}
+
+.hotel-card {
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 3px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  background: #f9f9f9;
+  transition: all 0.3s ease-in-out;
+  position: relative;
+  cursor: pointer;
+}
+
+.hotel-card:hover {
+  background: #eef6ff;
+  border-color: #007bff;
+}
+
+input[type="radio"]:checked + .hotel-card {
+  border-color: #007bff;
+  background: #cce5ff;
+  color: #0056b3;
+}
+
+.checkmark {
+  display: none;
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  background: #f21515;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  line-height: 20px;
+}
+
+input[type="radio"]:checked + .hotel-card .checkmark {
+  display: block;
+}
+
+
+
 
 
 

@@ -9,7 +9,7 @@ class DivisionWiseActivityImage extends Model
 {
     use HasFactory;
     protected $fillable = [
-         'division_wise_activity_id', 'file_path'
+         'division_wise_activity_id', 'file_path', 'destination_id'
     ];
 
     public function activity()
