@@ -90,7 +90,7 @@ class DivisionWiseBannerList extends Component
         $banner = ItineraryBanner::find($id);
         if ($banner) {
             $banner->delete();
-            $this->mount(); // Or call any method to refresh data
+            $this->division_wise_banners  = $this->GetBanner();
             session()->flash('success', 'Banner deleted successfully!');
         } 
     }
@@ -114,7 +114,7 @@ class DivisionWiseBannerList extends Component
             $this->banner_title = "";
             $this->reset(['banner_title', 'banner_image']);
             $this->active_assign_new_modal = 0;
-            $this->mount();
+            $this->division_wise_banners  = $this->GetBanner();
             session()->flash('success', 'Banner saved successfully!');
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback transaction on error

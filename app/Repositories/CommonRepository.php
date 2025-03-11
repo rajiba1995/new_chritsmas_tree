@@ -54,6 +54,7 @@ class CommonRepository
     public function createCity(array $data){
         $division = new City;
         $division->name = ucwords($data['name']);
+        $division->code = strtoupper($data['code']);
         $division->state_id = ucwords($data['state_id']);
         $division->save();
         return $division;
@@ -64,6 +65,7 @@ class CommonRepository
     public function updateCity(array $data){
         $division  = City::findOrFail($data['id']);
         $division->name = ucwords($data['name']);
+        $division->code = strtoupper($data['code']);
         $division->state_id = ucwords($data['state_id']);
         $division->save();
         return $division;

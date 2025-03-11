@@ -315,6 +315,10 @@
   background: #0162e8;
   color: #fff !important;
 }
+.active-success-badge{
+  background: #22c148;
+  color: #fff !important;
+}
 .cab-card{
   background-color: #ecf0fa;
 }
@@ -602,7 +606,79 @@
   
 /* Activity Iage slider  */
 
+.custom-fulldiv {
+  display:flex;
+  align-items: center;
+}
+.nd-field {
+  max-width: 125px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-left: 13px;
+}
 
+.nd-group {
+  display: flex;
+  align-items: center;
+  border: 1px solid #f0eded;
+  border-radius: 6px;
+
+}
+.nd-group input{
+  border:none;
+  text-align: right;
+  padding: 8px 0 !important;
+}
+
+.nd-group span {
+  padding: 6px;
+  font-size: 0.8rem;
+}
+.night-group {
+  display: flex;
+  align-items: center;
+  border: 1px solid #f0eded;
+  border-radius: 6px;
+
+}
+.night-group input{
+  border:none;
+  text-align: right;
+  padding: 5px 7px !important;
+  font-size: .8rem !important;
+}
+
+.night-group span {
+  padding: 6px;
+  font-size: 0.8rem;
+}
+
+.spacer {
+  padding: 0 5px;
+  font-size: 0.8rem;
+}
+
+.nd-group-wide {
+  max-width: 200px;
+  margin-left: 13px;
+}
+
+.nd-group-wide span {
+  width: 100%;
+  display: block;
+  font-size: 10px;
+  color: #928282;
+  margin-top: 0px;
+  text-transform: capitalize;
+}
+.nd-input-placeholder::placeholder {
+  font-size: 12px;
+  color: #949eb7;
+}
+.max-w-75{
+  max-width: 75px;
+}
 
 
 

@@ -122,11 +122,14 @@ class CommonController extends Controller
     public function division_store(Request $request){
         $validatedData = $request->validate([
             'name' => 'required|string|max:255|unique:cities,name',
+            'code' => 'required|string|max:255|unique:cities,code',
             'state_id' => 'required',
         ], [
             'name.required' => 'Please enter division name.',
+            'name.code' => 'Please enter division code.',
             'state_id.required' => 'Please enter destination name.',
             'name.unique' => 'This division name already exists.',
+            'name.code' => 'This division code already exists.',
         ]);
         try {
             $this->commonRepository->createCity($validatedData);
@@ -144,10 +147,18 @@ class CommonController extends Controller
                 'max:255',
                 Rule::unique('cities', 'name')->ignore($request->id)->whereNull('deleted_at'),
             ],
+            'code' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('cities', 'code')->ignore($request->id)->whereNull('deleted_at'),
+            ],
           'state_id' => 'required',
         ], [
             'name.required' => 'The name field is required.',
+            'code.required' => 'The code field is required.',
             'name.unique' => 'This division name already exists.',
+            'code.unique' => 'This division code already exists.',
             'state_id.required' => 'Please enter destination name.',
         ]);
           // After validation, proceed to save the data

@@ -74,6 +74,16 @@
                         @error('name')
                             <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror
+                        <x-form-field 
+                            type="text" 
+                            name="code" 
+                            label="Division Code" 
+                            :options="[]" 
+                            :value="old('code', $update_item->code ?? '')"
+                        />
+                        @error('code')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
 
                         <!-- Destination Dropdown -->
                         <x-form-field 
@@ -115,6 +125,16 @@
                             :value="old('name')" 
                         />
                         @error('name')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                        <x-form-field 
+                            type="text" 
+                            name="code" 
+                            label="Division Code" 
+                            :options="[]" 
+                            :value="old('code')" 
+                        />
+                        @error('code')
                             <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror
 

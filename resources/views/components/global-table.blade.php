@@ -145,7 +145,7 @@
             @elseif($dataType=='division')
                 <tr class="text-grey" id="delete{{$item->id}}">
                     <td scope="row" class="text-start !p-1">{{ $index + 1 }}</td>
-                    <td scope="row" class="!p-1">{{$item->name}}</td>
+                    <td scope="row" class="!p-1">{{$item->name}} <span class="text-danger">({{$item->code}})</span></td>
                     <td scope="row" class="!p-1">{{$item->DestinationData?$item->DestinationData->name:""}}</td>
                     <td scope="row" class="!p-1">
                         <livewire:master-status-toggle 

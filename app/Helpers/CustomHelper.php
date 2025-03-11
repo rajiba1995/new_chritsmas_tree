@@ -6,6 +6,7 @@ use App\Models\HotelPriceChart;
 use App\Models\HotelPriceChartType;
 use App\Models\HotelSeasionTime;
 use App\Models\Inventory;
+use App\Models\City;
 use App\Models\DateWiseHotelPrice;
 use App\Models\DestinationSeasonPeriod;
 use Illuminate\Support\Facades\Storage;
@@ -263,6 +264,21 @@ class CustomHelper
         return DestinationSeasonPeriod::where('destination_id', $destination_id)
             ->where('season_type_id', $season_id)
             ->first(['start_date', 'end_date']); // Returns a single object or null
+    }
+    public static function formatNightJourney($night_journey_str, $divisions_journey_str)
+    {
+        $night_journey = explode(',', $night_journey_str);
+        $divisions_journey = explode(',', $divisions_journey_str);
+
+        $result = [];
+        foreach ($night_journey as $index => $night) {
+            $division_id = $divisions_journey[$index] ?? null;
+            $division = City::find($division_id);
+            $division_code = $division ? $division->code : 'N/A'; // Handle null cases
+            $result[] = $night . 'N' . $division_code;
+        }
+
+        return implode('+', $result);
     }
     
 }

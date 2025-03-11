@@ -14,6 +14,11 @@ class ItineraryController extends Controller
         $common = CustomHelper::setHeadersAndTitle('Itinerary Management', 'Division Wise Banners');
         return view('admin.itinerary.division-wise-banners', compact('common'));
     }
+    public function DestinationWisePresetItineraryList(){
+        $common = CustomHelper::setHeadersAndTitle('Itinerary Management', 'Preset Itinerary');
+        return view('admin.itinerary.destination-wise-preset-itinerary-list', compact('common'));
+    }
+
     public function DestinationWisePresetItineraryBuilder($destination_id,$category_id){
         $destinationExists = State::find($destination_id);
         $categoryExists = Category::where('id', $category_id)->first();

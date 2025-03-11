@@ -174,8 +174,9 @@ Route::get('dashboard', [DashboardsController::class, 'index'])->name('admin.das
             Route::prefix('division')->group(function(){
                 Route::get('banners', [ItineraryController::class, 'banners'])->name('admin.itinerary.division.banners');
             });
-            Route::prefix('preset-builder')->group(function(){
+            Route::prefix('preset')->group(function(){
                 Route::get('{destination_id}/{category_id}', [ItineraryController::class, 'DestinationWisePresetItineraryBuilder'])->name('admin.itinerary.preset.builder');
+                Route::get('/list', [ItineraryController::class, 'DestinationWisePresetItineraryList'])->name('admin.itinerary.preset.list');
             });
         });
     });
