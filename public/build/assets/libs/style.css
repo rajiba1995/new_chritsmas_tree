@@ -751,16 +751,16 @@
 }
 
 /* For Hotel by radio */
-
 .hotel-preview-label {
   display: inline-block;
-  width: 140px;
+  width: 160px;
+  position: relative;
 }
 
 .hotel-card {
   border: 2px solid #ddd;
-  border-radius: 8px;
-  padding: 3px;
+  border-radius: 10px;
+  padding: 8px;
   text-align: center;
   font-size: 14px;
   font-weight: 600;
@@ -768,11 +768,17 @@
   transition: all 0.3s ease-in-out;
   position: relative;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .hotel-card:hover {
   background: #eef6ff;
   border-color: #007bff;
+  box-shadow: 3px 3px 12px rgba(0, 123, 255, 0.2);
 }
 
 input[type="radio"]:checked + .hotel-card {
@@ -781,10 +787,27 @@ input[type="radio"]:checked + .hotel-card {
   color: #0056b3;
 }
 
+/* Hotel Icon */
+.hotel-icon {
+  font-size: 20px;
+  color: #007bff;
+}
+
+/* Name Styling */
+.hotel-name-container {
+  max-width: 140px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+/* Checkmark for selected hotel */
 .checkmark {
   display: none;
   position: absolute;
-  top: 3px;
+  top: 5px;
   right: 5px;
   background: #f21515;
   color: white;
@@ -798,6 +821,51 @@ input[type="radio"]:checked + .hotel-card {
 
 input[type="radio"]:checked + .hotel-card .checkmark {
   display: block;
+}
+
+/* Custom Tooltip */
+.hotel-preview-label[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 12px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.hotel-preview-label[data-tooltip]:hover::after {
+  opacity: 1;
+}
+
+.delete-icon {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  z-index: 2;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease-in-out;
+}
+
+.delete-icon:hover {
+  background-color: darkred;
 }
 
 
