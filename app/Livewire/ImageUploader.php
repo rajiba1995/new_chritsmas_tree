@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\HotelImage;
+use App\Helpers\CustomHelper;
 
 class ImageUploader extends Component
 {
@@ -27,8 +28,9 @@ class ImageUploader extends Component
     {
         // Validate uploaded images
         $this->validate([
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'images.*' => 'image|mimetypes:image/jpeg,image/png,image/jpg,image/gif,image/svg+xml,image/webp|max:2048',
         ]);
+        
 
         // Check if there are new images to process
         if (!empty($this->images) && $this->hotelId) {
@@ -36,19 +38,21 @@ class ImageUploader extends Component
             foreach ($this->images as $image) {
                 // Generate a unique filename
                
-        
+                $timestamp = now()->format('YmdHis'); // Format: YYYYMMDDHHMMSS
+                $dynamicText = rand(1111, 9999);
+                $uploadedPath = CustomHelper::uploadImage($image, $dynamicText, $timestamp, 'hotel');
                 $imageData = [
                     'name' => $image->getClientOriginalName(),
                     'size' => $image->getSize(),
                     'mime' => $image->getMimeType(),
-                    'file_path' => $path // Add custom path here
+                    'file_path' => $uploadedPath // Add custom path here
                 ];
             
                 // Add this image's data to the images array
                 $this->append_images[] = $imageData;
                 $imageDataForDB[] = [
                     'hotel_id' => $this->hotelId,
-                    'image_path' => $path, // Store the generated path
+                    'image_path' => $uploadedPath, // Store the generated path
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];

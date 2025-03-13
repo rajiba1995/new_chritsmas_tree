@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\HotelImage;
+use App\Helpers\CustomHelper;
 
 class ImagePreview extends Component
 {
@@ -23,28 +24,32 @@ class ImagePreview extends Component
 
     public function updatedImages()
     {
+      
         // Validate uploaded images
         $this->validate([
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'images.*' => 'image|mimetypes:image/jpeg,image/png,image/jpg,image/gif,image/svg+xml,image/webp|max:2048',
         ]);
+        
 
         if (!empty($this->images) ) {
             $imageData = [];
             foreach ($this->images as $image) {
                 // Generate a unique filename
                 $timestamp = now()->format('YmdHis'); // Format: YYYYMMDDHHMMSS
-                $randomNumber = rand(100000, 999999); // Generate a 6-digit random number
-                $extension = $image->getClientOriginalExtension(); // Get the original file extension
-                $uniqueFilename = "{$timestamp}_{$randomNumber}.{$extension}";
+                // $randomNumber = rand(100000, 999999); // Generate a 6-digit random number
+                // $extension = $image->getClientOriginalExtension(); // Get the original file extension
+                // $uniqueFilename = "{$timestamp}_{$randomNumber}.{$extension}";
         
                 // Store the image with the unique filename
-                $path = $image->storeAs('hotel_images', $uniqueFilename, 'public');
+                // $path = $image->storeAs('hotel_images', $uniqueFilename, 'public');
+                $dynamicText = rand(1111, 9999);
+                $uploadedPath = CustomHelper::uploadImage($image, $dynamicText, $timestamp, 'hotel');
         
                 $imageData = [
                     'name' => $image->getClientOriginalName(),
                     'size' => $image->getSize(),
                     'mime' => $image->getMimeType(),
-                    'file_path' => $path // Add custom path here
+                    'file_path' => $uploadedPath // Add custom path here
                 ];
             
                 // Add this image's data to the images array

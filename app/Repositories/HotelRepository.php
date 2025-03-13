@@ -9,6 +9,7 @@ use App\Models\HotelImage;
 use App\Models\HotelPriceChartType;
 use App\Models\HotelSeasionTime;
 use App\Models\HotelPriceChart;
+use App\Helpers\CustomHelper;
 use Illuminate\Support\Facades\DB;
 
 class HotelRepository
@@ -145,18 +146,20 @@ class HotelRepository
             if (isset($data['images']) && is_array($data['images'])) {
                 foreach ($data['images'] as $image) {
                     // Generate a unique filename
-                    $timestamp = now()->format('YmdHis'); // Format: YYYYMMDDHHMMSS
-                    $randomNumber = rand(100000, 999999); // Generate a 6-digit random number
-                    $extension = $image->getClientOriginalExtension(); // Get the original file extension
-                    $uniqueFilename = "{$timestamp}_{$randomNumber}.{$extension}";
+                    // $timestamp = now()->format('YmdHis'); // Format: YYYYMMDDHHMMSS
+                    // $randomNumber = rand(100000, 999999); // Generate a 6-digit random number
+                    // $extension = $image->getClientOriginalExtension(); // Get the original file extension
+                    // $uniqueFilename = "{$timestamp}_{$randomNumber}.{$extension}";
             
-                    // Store the image with the unique filename
-                    $path = $image->storeAs('hotel_images', $uniqueFilename, 'public');
+                    // // Store the image with the unique filename
+                    // $path = $image->storeAs('hotel_images', $uniqueFilename, 'public');
+                    $dynamicText = rand(1111, 9999);
+                    $uploadedPath = CustomHelper::uploadImage($image, $dynamicText, $hotel->name, 'hotel');
             
                     // Add to the batch insert array
                     $imageData[] = [
                         'hotel_id' => $hotel->id,
-                        'image_path' => $path,
+                        'image_path' => $uploadedPath,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];

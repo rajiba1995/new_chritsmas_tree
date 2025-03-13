@@ -282,38 +282,92 @@
                                                             </tbody>
                                                         </table>
                                                         <div class="mt-4">
-                                                            <span class="badge gap-2 bg-danger/10 text-danger uppercase text-small m-2">Hotels in {{$division_item['division_name']}}</span>
+                                                            <span class="badge gap-2 bg-danger/10 text-danger uppercase text-small m-2"><i class="fas fa-hotel"></i> Hotel  <span class="custom-header-separator">|</span> 1 Night<span class="custom-header-separator">|</span> in {{$division_item['division_name']}}</span>
                                                             <div class="grid grid-cols-12 sm:gap-x-6 sm:gap-y-4">
-                                                                <div class="md:col-span-12 col-span-12 mb-4 mx-2 itinerary-build">
-                                                                    <div class="hotel-preview-container flex flex-wrap gap-2">
-                                                                        @forelse ($division_item['division_hotels'] as $hotel_index => $hotel_item)
-                                                                            <label class="hotel-preview-label relative cursor-pointer" data-tooltip="{{ $hotel_item['name'] ?? 'No Name' }}">
-                                                                                <input 
-                                                                                    type="radio" 
-                                                                                    value="{{ $hotel_item['id'] ?? '' }}" 
-                                                                                    class="hidden peer" 
-                                                                                    wire:model="selected_day_wise_itinerary.{{ $division_index }}.hotel"
-                                                                                    wire:key="hotel-{{ $division_index }}-{{ $hotel_index }}"
-                                                                                >
-                                                                            
-                                                                                <!-- Hotel Selection Box -->
-                                                                                <div class="hotel-card">
-                                                                                    <div class="hotel-icon">
-                                                                                        🏨 <!-- Hotel Icon -->
+                                                                <div class="md:col-span-8 col-span-12 mb-4 mx-2 itinerary-build">
+                                                                    <div class="custom-card">
+                                                                        @if(count($division_item['day_hotel'])>0)
+                                                                            <div class="custom-hotel-container relative !overflow-visible">
+                                                                                <div class="custom-hotel-content">
+                                                                                    <div class="custom-hotel-image-container">
+                                                                                        <p class="custom-hotel-rating">4.2<small>/5</small></p>
+                                                                                        <div class="custom-image-carousel">
+                                                                                            <div class="custom-image-wrapper" style="width: 225px; height: 120px;">
+                                                                                                <img class="custom-hotel-image" width="225" height="120" 
+                                                                                                    src="{{asset('build/assets/images/logo/hotel.jpg')}}" 
+                                                                                                    alt="Hotel Image">
+                                                                                            </div>
+                                                                                        </div>
                                                                                     </div>
-                                                                                    <div class="hotel-name-container">
-                                                                                        <span class="hotel-name">
-                                                                                            {{ strlen($hotel_item['name'] ?? '') > 50 ? substr($hotel_item['name'], 0, 50) . '...' : $hotel_item['name'] }}
-                                                                                        </span>
+                                                                                    <div class="custom-hotel-details">
+                                                                                        <div class="custom-hotel-details-top">
+                                                                                            <p class="text-black-600 text-base italic">{{$division_item['day_hotel']['hotel_name']}}</p>
+                                                                                            <p class="text-gray-500 text-small">{{$division_item['day_hotel']['hotel_address']}}</p>
+                                                                                            <p class="badge gap-2 bg-danger/10 text-danger uppercase text-small my-2">Rooms</p>
+                                                                                            <div>
+                                                                                                @forelse ($division_item['day_hotel']['hotel_rooms'] as $room)
+                                                                                                    <label class="hotel-preview-label relative cursor-pointer">
+                                                                                                        <input 
+                                                                                                            type="radio" 
+                                                                                                            value="{{ $room->id ?? '' }}" 
+                                                                                                            class="hidden peer" 
+                                                                                                            wire:model="selected_day_wise_itinerary_hotel.{{ $division_index }}.room"
+                                                                                                            wire:key="hotel-{{ $division_index }}-room-{{ $room->id }}">
+                                                                                                        <!-- Hotel Selection Box -->
+                                                                                                        <div class="hotel-card">
+                                                                                                            <span class="hotel-name">{{$room->room_name}}</span>
+                                                                                                            <!-- Selected Indicator -->
+                                                                                                            <span class="checkmark">✓</span>
+                                                                                                        </div>
+                                                                                                    </label>
+                                                                                                @empty
+                                                                                                    <div class="alert alert-warning text-sm italic">
+                                                                                                        rooms not added on this hotel
+                                                                                                    </div>
+                                                                                                @endforelse
+                                                                                            </div>
+                                                                                        </div>
                                                                                     </div>
-                                                                                    <span class="checkmark">✓</span>
                                                                                 </div>
+                                                                                <button type="button" class="delete-icon">✖
+                                                                                </button>
+                                                                            </div>
+                                                                        @else
+                                                                             <div class="alert alert-warning text-sm italic">
+                                                                                Hotel not added
+                                                                            </div>
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                                <div class="md:col-span-4 col-span-12 mb-4 mx-2 itinerary-build">
+                                                                    <div class="custom-card">
+                                                                        <div class="custom-hotel-container">
+                                                                            <label for="">
+                                                                                <span class="badge gap-2 bg-primary/10 text-primary uppercase">
+                                                                                    Hotels
+                                                                                 </span>
                                                                             </label>
-                                                                        
-                                                                        @empty
-                                                                            <p class="text-gray-500 text-small italic">No hotels found</p>
-                                                                        @endforelse
-
+                                                                            <select
+                                                                                class="placeholder:text-textmuted text-sm selected_seasion_type"  
+                                                                                wire:change="getHotel({{$division_index}},$event.target.value)" 
+                                                                                wire:key="hotel-{{ $division_index }}-100">
+                                                                                <option value="" hidden>Choose hotel</option>
+                                                                                @if (!empty($division_item['division_hotels']) && count($division_item['division_hotels']) > 0)
+                                                                                    @foreach ($division_item['division_hotels'] as $hotel_index => $hotel_item)
+                                                                                        <option 
+                                                                                            value="{{ $hotel_item['id'] ?? '' }}"
+                                                                                            wire:key="hotel-{{ $division_index }}-{{ $hotel_index }}">
+                                                                                            {{ $hotel_item['name'] ?? 'No Name' }}
+                                                                                        </option>
+                                                                                    @endforeach
+                                                                                @else
+                                                                                    <option value="" disabled>No hotels available</option>
+                                                                                @endif
+                                                                            </select>
+                                                                            @error('errorHotel.{{$division_index}}') 
+                                                                                <span class="text-red-500">{{ $message }}</span> 
+                                                                            @enderror
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
