@@ -5,6 +5,7 @@ namespace App\Livewire\Itinerary;
 use Livewire\Component;
 use App\Models\State;
 use App\Models\City;
+use App\Models\Room;
 use App\Models\Hotel;
 use App\Models\Category;
 use App\Models\DivisionWiseSightseeingImage;
@@ -329,6 +330,39 @@ class CreatePresetItinerary extends Component
             session()->flash('error', 'Deletion failed: ' . $e->getMessage());
         }
     }
+
+    public function RemoveDayHotel($index, $field, $hotel_id){
+        DB::beginTransaction();
+        try {
+            $item = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+            ->where('header', 'day_' . $index)
+            ->where('field', $field)
+            ->where('hotel_id', $hotel_id)
+            ->first();
+            $room = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+            ->where('header', 'day_' . $index)
+            ->where('field', 'day_room')
+            ->where('hotel_id', $hotel_id)
+            ->first();
+    
+            if ($item) {
+                // Delete from database
+                $item->delete();
+                if ($room) {
+                    $room->delete();
+                }
+                DB::commit();
+                session()->flash('success', 'Hotel deleted successfully!');
+            } else {
+                session()->flash('error', 'Hotel not found in the database!');
+            }
+            $this->ReloadDayHotels($index);
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Deletion failed: ' . $e->getMessage());
+        }
+    }
    
     public function deleteDayImage($imgPath, $index){
         DB::beginTransaction();
@@ -418,7 +452,48 @@ class CreatePresetItinerary extends Component
             // Store error message for Livewire validation
             $this->errorHotel[$index] = $e->getMessage();
         }
-        
+    }
+    public function getRoom($index,$id){
+        try {
+            // Debugging: Check the received ID
+            if (!$id) {
+                throw new \Exception("Invalid Room ID");
+            }
+    
+            // Find the hotel
+            $room = Room::find($id);
+            if (!$room) {
+                throw new \Exception("Room not found");
+            }
+    
+            // Start database transaction
+            DB::beginTransaction();
+    
+            // Update or create itinerary detail
+            ItineraryDetail::updateOrCreate(
+                [
+                    'itinerary_id' => $this->itinerary_id,
+                    'header' => "day_$index", // Assuming you meant to use 'day_{index}'
+                    'field' => 'day_room',
+                ],
+                [
+                    'hotel_id' => $hotel->id, // Store the hotel ID
+                    'value' => $hotel->name, // Store the hotel ID
+                ]
+            );
+    
+            // Commit transaction
+            
+            DB::commit();
+            $this->ReloadDayHotels($index);
+            $this->errorHotel[$index] = '';
+        } catch (\Exception $e) {
+            // Rollback transaction if there's an error
+            DB::rollBack();
+    
+            // Store error message for Livewire validation
+            $this->errorHotel[$index] = $e->getMessage();
+        }
     }
     public function submitForm(){
         dd($this->all());

@@ -286,11 +286,12 @@
                                                             <div class="grid grid-cols-12 sm:gap-x-6 sm:gap-y-4">
                                                                 <div class="md:col-span-8 col-span-12 mb-4 mx-2 itinerary-build">
                                                                     <div class="custom-card">
+                                                                        
                                                                         @if(count($division_item['day_hotel'])>0)
                                                                             <div class="custom-hotel-container relative !overflow-visible">
                                                                                 <div class="custom-hotel-content">
                                                                                     <div class="custom-hotel-image-container">
-                                                                                        <p class="custom-hotel-rating">4.2<small>/5</small></p>
+                                                                                        {{-- <p class="custom-hotel-rating">4.2<small>/5</small></p> --}}
                                                                                         <div class="custom-image-carousel">
                                                                                             <div class="custom-image-wrapper" style="width: 225px; height: 120px;">
                                                                                                 <img class="custom-hotel-image" width="225" height="120" 
@@ -299,6 +300,7 @@
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
+                                                                                  
                                                                                     <div class="custom-hotel-details">
                                                                                         <div class="custom-hotel-details-top">
                                                                                             <p class="text-black-600 text-base italic">{{$division_item['day_hotel']['hotel_name']}}</p>
@@ -308,9 +310,11 @@
                                                                                                 @forelse ($division_item['day_hotel']['hotel_rooms'] as $room)
                                                                                                     <label class="hotel-preview-label relative cursor-pointer">
                                                                                                         <input 
-                                                                                                            type="radio" 
+                                                                                                            type="radio"
+                                                                                                            name="selected_day_wise_itinerary_hotel.{{ $division_index }}.room" 
                                                                                                             value="{{ $room->id ?? '' }}" 
-                                                                                                            class="hidden peer" 
+                                                                                                            class="hidden peer"
+                                                                                                            wire:click="getRoom({{$division_index}},{{ $room->id}})" 
                                                                                                             wire:model="selected_day_wise_itinerary_hotel.{{ $division_index }}.room"
                                                                                                             wire:key="hotel-{{ $division_index }}-room-{{ $room->id }}">
                                                                                                         <!-- Hotel Selection Box -->
@@ -329,7 +333,7 @@
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
-                                                                                <button type="button" class="delete-icon">✖
+                                                                                <button type="button" wire:click="RemoveDayHotel({{$division_index}},'day_hotel', {{$division_item['day_hotel']['hotel_id']}})" class="delete-icon">✖
                                                                                 </button>
                                                                             </div>
                                                                         @else
