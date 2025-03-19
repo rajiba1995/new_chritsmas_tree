@@ -12,7 +12,7 @@ class DivisionWiseCab extends Model
 
     protected $fillable = [
         'division_id',
-        'seasion_type_id',
+        // 'seasion_type_id',
         'cab_id',
         'status',
     ];

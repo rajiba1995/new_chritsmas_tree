@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\DivisionWiseSightseeingImage;
 use App\Models\DivisionWiseActivityImage;
 use App\Models\Itinerary;
+use App\Models\RouteServiceSummary;
 use App\Models\ItineraryDetail;
 use App\Helpers\CustomHelper;
 use Livewire\WithFileUploads;
@@ -24,6 +25,7 @@ class CreatePresetItinerary extends Component
     use WithFileUploads;
     public $destinationId;
     public $itinerary_id;
+    public $active_new_route_modal;
     public $selectedDivision;
     public $categoryId;
     public $mainBanner = [];
@@ -51,6 +53,7 @@ class CreatePresetItinerary extends Component
     public $trip_highlights = []; // Array to store trip highlights
 
     public $errorHotel = [];
+    public $errorRoute = [];
     public function mount($encryptedId){
         $itineraryExists = Itinerary::find($encryptedId);
         $this->itinerary_id =$encryptedId;
@@ -71,17 +74,22 @@ class CreatePresetItinerary extends Component
         if(count($stay_by_journey)>0){
             $days_journey = [];
             foreach($stay_by_journey as $k=>$journey){
-                $hotels = Hotel::select('id', 'name')->where('division', $journey)->orderBy('name', 'ASC')->get()->toArray();
+
+                $hotels = Hotel::select('id', 'name')->where('hotel_category', $this->categoryId)->where('division', $journey)->orderBy('name', 'ASC')->get()->toArray();
+
+                $destination_route = RouteServiceSummary::with('route')->where('destination_id', $this->destinationId)->where('service_type', 'Route Wise')->get()->toArray();
+
                 $city = City::find($journey);
                 $days_journey[$k+1]['division_id'] = $journey;
                 $days_journey[$k+1]['division_name'] = $city?$city->name:"N/A";
                 $days_journey[$k+1]['division_hotels'] =$hotels;
+                $days_journey[$k+1]['division_routes'] =$destination_route;
                 $days_journey[$k+1]['day_hotel'] =$this->loadDayHotels($k+1);
+                $days_journey[$k+1]['day_route'] =$this->loadDayRoutes($k+1);
                 $this->loadDayImages($k+1);
             }
             $this->day_by_divisions = $days_journey;
         }
-
         $this->ExistingData();
     }
     // Check Existing Itinerary Details
@@ -177,21 +185,23 @@ class CreatePresetItinerary extends Component
         ->where('itinerary_id', $this->itinerary_id)
         ->where('header', 'day_' . $index)
         ->where('field', 'day_hotel')
-        ->first();
+        ->get();
 
         // Ensure hotel data exists before assigning
-        $result = [];
-        if ($data && !empty($data->hotel)) {
-            $result= [
-                'hotel_id'    => optional($data->hotel)->id,
-                'hotel_name'    => optional($data->hotel)->name,
-                'hotel_address' => optional($data->hotel)->address,
-                'hotel_rooms'   => optional($data->hotel)->rooms,
-            ];
-        } else{
-            $result = [];
+        $results = [];
+       // Loop through each itinerary detail and extract hotel data
+        foreach ($data as $item) {
+            if ($item->hotel) {
+                $results[] = [
+                    'hotel_id'      => optional($item->hotel)->id,
+                    'hotel_name'    => optional($item->hotel)->name,
+                    'hotel_address' => optional($item->hotel)->address,
+                    'hotel_rooms'   => optional($item->hotel)->rooms,
+                ];
+            }
         }
-        return $result;
+    
+        return $results;
         // Merge and assign the updated values
     }
     public function ReloadDayHotels($index){
@@ -200,21 +210,69 @@ class CreatePresetItinerary extends Component
         ->where('itinerary_id', $this->itinerary_id)
         ->where('header', 'day_' . $index)
         ->where('field', 'day_hotel')
-        ->first();
+        ->get();
 
         // Ensure hotel data exists before assigning
-        $result = [];
-        if ($data && !empty($data->hotel)) {
-            $result= [
-                'hotel_id'    => optional($data->hotel)->id,
-                'hotel_name'    => optional($data->hotel)->name,
-                'hotel_address' => optional($data->hotel)->address,
-                'hotel_rooms'   => optional($data->hotel)->rooms,
-            ];
-        } else{
-            $result = [];
+        $results = [];
+       // Loop through each itinerary detail and extract hotel data
+        foreach ($data as $item) {
+            if ($item->hotel) {
+                $results[] = [
+                    'hotel_id'      => optional($item->hotel)->id,
+                    'hotel_name'    => optional($item->hotel)->name,
+                    'hotel_address' => optional($item->hotel)->address,
+                    'hotel_rooms'   => optional($item->hotel)->rooms,
+                ];
+            }
         }
-        $this->day_by_divisions[$index]['day_hotel'] = $result;
+
+        $this->day_by_divisions[$index]['day_hotel'] = $results;
+        // Merge and assign the updated values
+    }
+    public function loadDayRoutes($index){
+        // Fetch itinerary detail with hotel relation
+        $data = ItineraryDetail::with('route_service')
+        ->where('itinerary_id', $this->itinerary_id)
+        ->where('header', 'day_' . $index)
+        ->where('field', 'day_route')
+        ->get();
+
+        // Ensure hotel data exists before assigning
+        $results = [];
+       // Loop through each itinerary detail and extract hotel data
+        foreach ($data as $item) {
+            if ($item->route_service) {
+                $results[] = [
+                    'route_service_summary_id'=> optional($item->route_service)->id,
+                    'route_name'    => $item->value,
+                ];
+            }
+        }
+    
+        return $results;
+        // Merge and assign the updated values
+    }
+    public function ReloadDayRoute($index){
+        // Fetch itinerary detail with hotel relation
+        $data = ItineraryDetail::with('hotel')
+        ->where('itinerary_id', $this->itinerary_id)
+        ->where('header', 'day_' . $index)
+        ->where('field', 'day_route')
+        ->get();
+
+        // Ensure hotel data exists before assigning
+        $results = [];
+       // Loop through each itinerary detail and extract hotel data
+        foreach ($data as $item) {
+            if ($item->route_service) {
+                $results[] = [
+                    'route_service_summary_id'=> optional($item->route_service)->id,
+                    'route_name'    => $item->value,
+                ];
+            }
+        }
+
+        $this->day_by_divisions[$index]['day_route'] = $results;
         // Merge and assign the updated values
     }
    
@@ -363,6 +421,30 @@ class CreatePresetItinerary extends Component
             session()->flash('error', 'Deletion failed: ' . $e->getMessage());
         }
     }
+    public function RemoveDayRoute($index, $field, $route_service_summary_id){
+        DB::beginTransaction();
+        try {
+            $item = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+            ->where('header', 'day_' . $index)
+            ->where('field', $field)
+            ->where('route_service_summary_id', $route_service_summary_id)
+            ->first();
+    
+            if ($item) {
+                // Delete from database
+                $item->delete();
+                DB::commit();
+                session()->flash('success', 'Route deleted successfully!');
+            } else {
+                session()->flash('error', 'Route not found in the database!');
+            }
+            $this->ReloadDayRoute($index);
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Deletion failed: ' . $e->getMessage());
+        }
+    }
    
     public function deleteDayImage($imgPath, $index){
         DB::beginTransaction();
@@ -413,7 +495,6 @@ class CreatePresetItinerary extends Component
 
     public function getHotel($index,$id){
         try {
-            // Debugging: Check the received ID
             if (!$id) {
                 throw new \Exception("Invalid hotel ID");
             }
@@ -431,11 +512,11 @@ class CreatePresetItinerary extends Component
             ItineraryDetail::updateOrCreate(
                 [
                     'itinerary_id' => $this->itinerary_id,
+                    'hotel_id' => $hotel->id,
                     'header' => "day_$index", // Assuming you meant to use 'day_{index}'
                     'field' => 'day_hotel',
                 ],
                 [
-                    'hotel_id' => $hotel->id, // Store the hotel ID
                     'value' => $hotel->name, // Store the hotel ID
                 ]
             );
@@ -453,17 +534,16 @@ class CreatePresetItinerary extends Component
             $this->errorHotel[$index] = $e->getMessage();
         }
     }
-    public function getRoom($index,$id){
+    public function getRoute($index,$id){
         try {
-            // Debugging: Check the received ID
             if (!$id) {
-                throw new \Exception("Invalid Room ID");
+                throw new \Exception("Invalid hotel ID");
             }
     
             // Find the hotel
-            $room = Room::find($id);
-            if (!$room) {
-                throw new \Exception("Room not found");
+            $summary = RouteServiceSummary::find($id);
+            if (!$summary) {
+                throw new \Exception("Route Service not found");
             }
     
             // Start database transaction
@@ -473,27 +553,32 @@ class CreatePresetItinerary extends Component
             ItineraryDetail::updateOrCreate(
                 [
                     'itinerary_id' => $this->itinerary_id,
+                    'route_service_summary_id' => $summary->id,
                     'header' => "day_$index", // Assuming you meant to use 'day_{index}'
-                    'field' => 'day_room',
+                    'field' => 'day_route',
                 ],
                 [
-                    'hotel_id' => $hotel->id, // Store the hotel ID
-                    'value' => $hotel->name, // Store the hotel ID
+                    'value' => $summary->route?$summary->route->route_name:"N/A", // Store the hotel ID
                 ]
             );
     
             // Commit transaction
             
             DB::commit();
-            $this->ReloadDayHotels($index);
-            $this->errorHotel[$index] = '';
+          
+            $this->errorRoute[$index] = '';
+            $this->ReloadDayRoute($index);
+            $this->active_new_route_modal = 0;
         } catch (\Exception $e) {
             // Rollback transaction if there's an error
             DB::rollBack();
-    
             // Store error message for Livewire validation
-            $this->errorHotel[$index] = $e->getMessage();
+            $this->errorRoute[$index] = $e->getMessage();
         }
+    }
+   
+    public function OpenNewRouteModal($index){
+        $this->active_new_route_modal = $index;
     }
     public function submitForm(){
         dd($this->all());

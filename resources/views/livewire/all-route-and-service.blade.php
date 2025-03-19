@@ -218,8 +218,8 @@
                                                             <table class="table whitespace-nowrap min-w-full">
                                                                 <thead class="bg-warning/10">
                                                                     <tr class="border-b border-defaultborder">
-                                                                        @foreach ($route_item->cabs as $cabs_key=> $cabs_item)
-                                                                            <th class="text-center uppercase route_details">    {{$cabs_item->divisionCab->cab->title}}
+                                                                        @foreach ($route_item->cabs as $cabs_key=>$cabs_item)
+                                                                            <th class="text-center uppercase route_details"> {{$cabs_item->divisionCab->cab->title}}
                                                                                 <br>
                                                                                 <span>{{$cabs_item->divisionCab->cab->capacity}} SEATER</span>
                                                                             </th>
@@ -564,26 +564,28 @@
                                                 </td>
                                                 <td>
                                                     {{-- For Cabs --}}
-                                                    @forelse ($all_cabs as $cab_index => $cab_item)
-                                                        <div class="form-check">
-                                                            <input class="form-check-input border-sky-500 new_service_checkbox" type="checkbox" 
-                                                                wire:model="new_service.{{ $rindex }}.selectedCabs"
-                                                                value="{{ $cab_item->id }}" 
-                                                                id="checkbox-sm-cab-{{$rindex+1}}-{{$cab_index+1}}"
-                                                                @disabled(!(isset($new_route[$rindex])) || isset($new_route[$rindex]) && $new_route[$rindex] === false)>
-                                                            <label class="form-check-label cursor-pointer" 
-                                                                for="checkbox-sm-cab-{{$rindex+1}}-{{$cab_index+1}}">
-                                                                {{ $cab_item->cab ? $cab_item->cab->title : "N/A" }}
-                                                                <span class="badge bg-primary/10 text-primary uppercase rounded-full ml-2">
-                                                                    {{ $cab_item->cab ? $cab_item->cab->capacity.' Seater' : "N/A" }}
-                                                                </span>
-                                                            </label>
-                                                        </div>
-                                                    @empty
-                                                        <div class="alert alert-danger">
-                                                            👉Cabs are not available. <a href="{{ route('admin.route.division_wise_cab_list') }}" class="text-primary">click here to add.</a>
-                                                        </div>
-                                                    @endforelse
+                                                    @if(count($all_cabs)>0)
+                                                        @forelse ($all_cabs->unique('cab_id') as $cab_index => $cab_item)
+                                                            <div class="form-check">
+                                                                <input class="form-check-input border-sky-500 new_service_checkbox" type="checkbox" 
+                                                                    wire:model="new_service.{{ $rindex }}.selectedCabs"
+                                                                    value="{{ $cab_item->id }}" 
+                                                                    id="checkbox-sm-cab-{{$rindex+1}}-{{$cab_index+1}}"
+                                                                    @disabled(!(isset($new_route[$rindex])) || isset($new_route[$rindex]) && $new_route[$rindex] === false)>
+                                                                <label class="form-check-label cursor-pointer" 
+                                                                    for="checkbox-sm-cab-{{$rindex+1}}-{{$cab_index+1}}">
+                                                                    {{ $cab_item->cab ? $cab_item->cab->title : "N/A" }}
+                                                                    <span class="badge bg-primary/10 text-primary uppercase rounded-full ml-2">
+                                                                        {{ $cab_item->cab ? $cab_item->cab->capacity.' Seater' : "N/A" }}
+                                                                    </span>
+                                                                </label>
+                                                            </div>
+                                                        @empty
+                                                            <div class="alert alert-danger">
+                                                                👉Cabs are not available. <a href="{{ route('admin.route.division_wise_cab_list') }}" class="text-primary">click here to add.</a>
+                                                            </div>
+                                                        @endforelse
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @empty

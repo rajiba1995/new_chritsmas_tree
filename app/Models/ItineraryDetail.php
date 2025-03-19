@@ -10,6 +10,7 @@ class ItineraryDetail extends Model
    use HasFactory;
    protected $fillable = [
         'itinerary_id',
+        'route_service_summary_id',
         'hotel_id',
         'room_id',
         'header',
@@ -22,7 +23,10 @@ class ItineraryDetail extends Model
          return $this->belongsTo(Itinerary::class);
      }
 
-     public function hotel(){
+    public function hotel(){
         return $this->belongsTo(Hotel::class, 'hotel_id', 'id');
+    }
+    public function route_service(){
+        return $this->belongsTo(RouteServiceSummary::class, 'route_service_summary_id', 'id');
     }
 }

@@ -91,7 +91,7 @@ class DivisionWiseCabList extends Component
      
 
         // Save the data if no existing record is found
-        // dd($this->assign_cab_id);
+        // dd($this->selectedDivision);
         foreach ($this->assign_cab_id as $cab_id) {
             DivisionWiseCab::updateOrCreate(
                 [

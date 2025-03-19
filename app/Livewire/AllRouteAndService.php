@@ -192,10 +192,14 @@ class AllRouteAndService extends Component
                 foreach($this->new_service as $key=>$item){
                     $route = DestinationWiseRoute::where('id', $item['route'])->first();
                 
-                    if (count($item['selectedCabs']) == 0) {
-                        session()->flash('new-route-error', 'Please choose at least one cab on this route ('.$route->route_name.')');
-                        return; // Stop further execution
+                    $existingData = RouteServiceSummary::where('route_id', $route->id)->where('destination_id', (int)$this->selectedDestination)->get()->count();
+                    if($existingData==0){
+                        if (count($item['selectedCabs']) == 0) {
+                            session()->flash('new-route-error', 'Please choose at least one cab on this route ('.$route->route_name.')');
+                            return; // Stop further execution
+                        }
                     }
+                    
                     $storeService = RouteServiceSummary::updateOrCreate(
                         [
                             'route_id' => $route->id,

@@ -63,7 +63,7 @@
                                 </thead>
                                 <tbody>
                                     <table class="table table-bordered table-bordered-primary border-primary/10 min-w-full new-activity">
-                                        <thead class="bg-primary/10">
+                                        <thead class="bg-primary/20">
                                             <tr>
                                                 <th class="!text-center">BANNER SECTION</th>
                                             </tr>
@@ -116,7 +116,7 @@
                                         </tbody>
                                     </table>
                                     <table class="table table-bordered table-bordered-primary border-primary/10 min-w-full new-activity">
-                                        <thead class="bg-primary/10">
+                                        <thead class="bg-primary/20">
                                             <tr>
                                                 <th class="!text-center uppercase">About Destination</th>
                                             </tr>
@@ -203,7 +203,7 @@
                                     </table>
                                     @foreach($day_by_divisions as $division_index=>$division_item)
                                         <table class="table table-bordered table-bordered-primary border-primary/10 min-w-full new-activity">
-                                            <thead class="bg-primary/10">
+                                            <thead class="bg-primary/20">
                                                 <tr>
                                                     <th class="!text-center uppercase">Day {{$division_index}} ({{$division_item['division_name']}})</th>
                                                 </tr>
@@ -252,42 +252,119 @@
                                                             </div>
                                                         </div>
                                                         <table class="table table-bordered table-bordered-primary border-primary/10 min-w-full mt-4">
-                                                            <thead class="">
+                                                            <thead class="bg-primary/5">
                                                                 <tr>
-                                                                    <th class="!text-center uppercase">SL No.</th>
+                                                                    <th class="!text-center uppercase" width="5%">SL No.</th>
                                                                     <th class="!text-center uppercase">ROUTE</th>
                                                                     <th class="!text-center uppercase">ACTIVITY</th>
                                                                     <th class="!text-center uppercase">SIGHTSEEINGS</th>
-                                                                    <th class="!text-center uppercase">
-                                                                        <button type="button" class="ti-btn ti-btn-sm ti-btn-soft-success !border !border-success/20">
+                                                                    <th class="!text-center uppercase" width="5%">
+                                                                        <button type="button" wire:click="OpenNewRouteModal({{$division_index}})" class="ti-btn ti-btn-sm ti-btn-soft-success !border !border-success/20">
                                                                             <i class="fa-solid fa-plus text-lg text-dark"></i>
                                                                         </button>
                                                                     </th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                <tr>
-                                                                    <td class="!text-center">
-                                                                        <span class="badge bg-primary/10 text-primary">1</span>
-                                                                    </td>
-                                                                    <td class="!text-center"></td>
-                                                                    <td class="!text-center"></td>
-                                                                    <td class="!text-center"></td>
-                                                                    <td class="!text-center">
-                                                                        <button type="button" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20">
-                                                                            <i class="ti ti-trash"></i>
-                                                                        </button>
-                                                                    </td>
-                                                                </tr>
+                                                                @forelse ($division_item['day_route'] as $route_index=>$division_route_item)
+                                                                    <tr wire:key="day-{{ $division_index }}-route-{{ $division_route_item['route_service_summary_id'] }}">
+                                                                        <td class="!text-center">
+                                                                            <span class="badge bg-primary/10 text-primary">{{$route_index+1}}</span>
+                                                                        </td>
+                                                                        <td class="!text-center">{{ $division_route_item['route_name'] }}</td>
+                                                                        <td class="!text-center">
+                                                                            <div class="form-check">
+                                                                                <ul class="space-y-3 text-sm">
+                                                                                    <li class="flex space-x-3 rtl:space-x-reverse !text-xs">
+                                                                                        <i class="far fa-check-circle text-success mt-1"></i>
+                                                                                        <span class="text-gray-600 dark:text-white/70">
+                                                                                            Guwahati City Heritage Tour
+                                                                                        </span>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td class="!text-center">
+                                                                            <div class="form-check">
+                                                                                <ul class="space-y-3 text-sm">
+                                                                                    <li class="flex space-x-3 rtl:space-x-reverse !text-xs">
+                                                                                        <i class="far fa-check-circle text-success mt-1"></i>
+                                                                                        <span class="text-gray-600 dark:text-white/70">
+                                                                                            Guwahati City Heritage Tour
+                                                                                        </span>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td class="!text-center">
+                                                                            <button type="button" wire:click="RemoveDayRoute({{$division_index}},'day_route', {{$division_route_item['route_service_summary_id']}})" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20">
+                                                                                <i class="ti ti-trash"></i>
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                @empty
+                                                                    <tr>
+                                                                        <td colspan="5">
+                                                                            <div class="alert alert-warning text-sm italic">
+                                                                                Routes not added yet!
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforelse
                                                             </tbody>
                                                         </table>
+
+                                                        {{-- Model For New Route  --}}
+                                                            <div class="hs-overlay {{$active_new_route_modal==$division_index?"":"hidden"}} fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                                                                <div class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_md_width bg-white rounded-lg">
+                                                                    <div class="ti-modal-content p-20">
+                                                                        <div class="ti-modal-header flex justify-between items-center">
+                                                                            <span class="badge gap-2 bg-danger/10 text-danger uppercase">
+                                                                                <span class="w-1.5 h-1.5 inline-block bg-danger rounded-full "></span>Day {{$division_index}} in {{$division_item['division_name']}}</span>
+                                                                            </span> 
+                                                                            <button type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none" wire:click="OpenNewRouteModal(0)">
+                                                                                <i class="fa-solid fa-xmark text-lg"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                        <div class="ti-modal-body text-start new-activity">
+                                                                            <div class="custom-hotel-container" wire:ignore>
+                                                                                <label for="">
+                                                                                    <span class="badge gap-2 bg-primary/10 text-primary uppercase">
+                                                                                        Routes
+                                                                                        </span>
+                                                                                </label>
+                                                                                <select
+                                                                                    class="placeholder:text-textmuted text-sm selected_seasion_type route_select2"
+                                                                                    wire:key="routes-{{ $division_index }}-100" wire:change="getRoute({{$division_index}},$event.target.value)">
+                                                                                    <option value="" hidden>Choose hotel</option>
+                                                                                    @if (!empty($division_item['division_routes']) && count($division_item['division_routes']) > 0)
+                                                                                        @foreach ($division_item['division_routes'] as $routes_index => $route_item)
+                                                                                            <option 
+                                                                                                value="{{ $route_item['id'] ?? '' }}"
+                                                                                                wire:key="routes-{{ $division_index }}-{{ $routes_index }}" {{$route_item['route']?"":"disabled"}}>
+                                                                                                {{ $route_item['route'] ? $route_item['route']['route_name']: 'No route found'}}
+                                                                                            </option>
+                                                                                        @endforeach
+                                                                                    @else
+                                                                                        <option value="" disabled>No hotels available</option>
+                                                                                    @endif
+                                                                                </select>
+                                                                                @error('errorRoute.{{$division_index}}') 
+                                                                                    <span class="text-red-500">{{ $message }}</span> 
+                                                                                @enderror
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        {{--End Model For New Route  --}}
                                                         <div class="mt-4">
                                                             <span class="badge gap-2 bg-danger/10 text-danger uppercase text-small m-2"><i class="fas fa-hotel"></i> Hotel  <span class="custom-header-separator">|</span> 1 Night<span class="custom-header-separator">|</span> in {{$division_item['division_name']}}</span>
                                                             <div class="grid grid-cols-12 sm:gap-x-6 sm:gap-y-4">
                                                                 <div class="md:col-span-8 col-span-12 mb-4 mx-2 itinerary-build">
-                                                                    <div class="custom-card">
-                                                                        
-                                                                        @if(count($division_item['day_hotel'])>0)
+                                                                    
+                                                                    @forelse ($division_item['day_hotel'] as $division_hotel_item)
+                                                                        <div class="custom-card mt-2" wire:key="day-{{ $division_index }}-hotel-{{ $division_hotel_item['hotel_id'] }}">
                                                                             <div class="custom-hotel-container relative !overflow-visible">
                                                                                 <div class="custom-hotel-content">
                                                                                     <div class="custom-hotel-image-container">
@@ -300,28 +377,28 @@
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
-                                                                                  
+                                                                                
                                                                                     <div class="custom-hotel-details">
                                                                                         <div class="custom-hotel-details-top">
-                                                                                            <p class="text-black-600 text-base italic">{{$division_item['day_hotel']['hotel_name']}}</p>
-                                                                                            <p class="text-gray-500 text-small">{{$division_item['day_hotel']['hotel_address']}}</p>
+                                                                                            <p class="text-black-600 text-base italic">{{$division_hotel_item['hotel_name']}}</p>
+                                                                                            <p class="text-gray-500 text-small">{{$division_hotel_item['hotel_address']}}</p>
                                                                                             <p class="badge gap-2 bg-danger/10 text-danger uppercase text-small my-2">Rooms</p>
                                                                                             <div>
-                                                                                                @forelse ($division_item['day_hotel']['hotel_rooms'] as $room)
+                                                                                                @forelse ($division_hotel_item['hotel_rooms'] as $room)
                                                                                                     <label class="hotel-preview-label relative cursor-pointer">
                                                                                                         <input 
                                                                                                             type="radio"
                                                                                                             name="selected_day_wise_itinerary_hotel.{{ $division_index }}.room" 
                                                                                                             value="{{ $room->id ?? '' }}" 
                                                                                                             class="hidden peer"
-                                                                                                            wire:click="getRoom({{$division_index}},{{ $room->id}})" 
-                                                                                                            wire:model="selected_day_wise_itinerary_hotel.{{ $division_index }}.room"
-                                                                                                            wire:key="hotel-{{ $division_index }}-room-{{ $room->id }}">
+                                                                                                            {{-- wire:model="selected_day_wise_itinerary_hotel.{{ $division_index }}.room"
+                                                                                                            wire:key="hotel-{{ $division_index }}-room-{{ $room->id }}" --}}
+                                                                                                            >
                                                                                                         <!-- Hotel Selection Box -->
                                                                                                         <div class="hotel-card">
                                                                                                             <span class="hotel-name">{{$room->room_name}}</span>
                                                                                                             <!-- Selected Indicator -->
-                                                                                                            <span class="checkmark">✓</span>
+                                                                                                            {{-- <span class="checkmark">✓</span> --}}
                                                                                                         </div>
                                                                                                     </label>
                                                                                                 @empty
@@ -333,27 +410,28 @@
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
-                                                                                <button type="button" wire:click="RemoveDayHotel({{$division_index}},'day_hotel', {{$division_item['day_hotel']['hotel_id']}})" class="delete-icon">✖
+                                                                                <button type="button" wire:click="RemoveDayHotel({{$division_index}},'day_hotel', {{$division_hotel_item['hotel_id']}})" class="delete-icon">✖
                                                                                 </button>
                                                                             </div>
-                                                                        @else
-                                                                             <div class="alert alert-warning text-sm italic">
-                                                                                Hotel not added
+                                                                        </div>
+                                                                    @empty
+                                                                        <div class="custom-card">
+                                                                            <div class="alert alert-warning text-sm italic">
+                                                                                Hotel not added yet!
                                                                             </div>
-                                                                        @endif
-                                                                    </div>
+                                                                        </div>
+                                                                    @endforelse
                                                                 </div>
                                                                 <div class="md:col-span-4 col-span-12 mb-4 mx-2 itinerary-build">
                                                                     <div class="custom-card">
-                                                                        <div class="custom-hotel-container">
+                                                                        <div class="custom-hotel-container" wire:ignore>
                                                                             <label for="">
                                                                                 <span class="badge gap-2 bg-primary/10 text-primary uppercase">
                                                                                     Hotels
                                                                                  </span>
                                                                             </label>
                                                                             <select
-                                                                                class="placeholder:text-textmuted text-sm selected_seasion_type"  
-                                                                                wire:change="getHotel({{$division_index}},$event.target.value)" 
+                                                                                class="placeholder:text-textmuted text-sm selected_seasion_type select2" data-id="{{$division_index}}" 
                                                                                 wire:key="hotel-{{ $division_index }}-100">
                                                                                 <option value="" hidden>Choose hotel</option>
                                                                                 @if (!empty($division_item['division_hotels']) && count($division_item['division_hotels']) > 0)
@@ -412,3 +490,13 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function () {
+        $('.select2').select2();
+        $('.select2').on('change', function (e) {
+            var value = $(this).select2("val");
+            var index = $(this).data("id");
+            @this.call('getHotel', index,value);
+        });
+    });
+</script>
