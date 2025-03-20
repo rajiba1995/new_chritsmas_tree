@@ -1,4 +1,5 @@
 <div>
+    <link rel="stylesheet" href="{{ asset('build/assets/libs/dragula/dragula.min.css') }}">
     <div class="grid grid-cols-12 gap-6">
         <div class="xl:col-span-12 col-span-12">
             <div class="box custom-box">
@@ -205,7 +206,7 @@
                                         <table class="table table-bordered table-bordered-primary border-primary/10 min-w-full new-activity">
                                             <thead class="bg-primary/20">
                                                 <tr>
-                                                    <th class="!text-center uppercase">Day {{$division_index}} ({{$division_item['division_name']}})</th>
+                                                    <th class="!text-center uppercase"><span class="text-xl">Day {{$division_index}} ({{$division_item['division_name']}})</span></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -266,40 +267,117 @@
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
+                                                             
                                                                 @forelse ($division_item['day_route'] as $route_index=>$division_route_item)
                                                                     <tr wire:key="day-{{ $division_index }}-route-{{ $division_route_item['route_service_summary_id'] }}">
-                                                                        <td class="!text-center">
+                                                                        <td class="!text-center" rowspan="2">
                                                                             <span class="badge bg-primary/10 text-primary">{{$route_index+1}}</span>
                                                                         </td>
                                                                         <td class="!text-center">{{ $division_route_item['route_name'] }}</td>
-                                                                        <td class="!text-center">
-                                                                            <div class="form-check">
-                                                                                <ul class="space-y-3 text-sm">
-                                                                                    <li class="flex space-x-3 rtl:space-x-reverse !text-xs">
-                                                                                        <i class="far fa-check-circle text-success mt-1"></i>
-                                                                                        <span class="text-gray-600 dark:text-white/70">
-                                                                                            Guwahati City Heritage Tour
-                                                                                        </span>
+                                                                        <td class="!text-center align-top">
+                                                                            <div class="small-btm">
+                                                                                <span class="badge gap-2 bg-primary/10 text-primary uppercase">Existing Activity</span>
+                                                                                <select wire:key="existing-activity-{{$route_index}}-{{ $division_index }}-100" 
+                                                                                wire:change="getActivity({{$division_index}},{{ $route_index }}, {{ $division_route_item['route_service_summary_id'] }}, $event.target.value, $event.target.selectedOptions[0].getAttribute('data-price'), $event.target.selectedOptions[0].getAttribute('data-ticket_price'))">
+                                                                                    <option value="" hidden>Choose an Existing Activity</option>
+                                                                                    @forelse ($division_route_item['existing_activities'] as $existing_activity)
+                                                                                        <option value="{{ $existing_activity['name'] }}" data-price="{{$existing_activity['price']}}" data-ticket_price="{{$existing_activity['ticket_price']}}">
+                                                                                            {{ $existing_activity['name'] }} - PP: {{env('DEFAULT_CURRENCY_SYMBOL')}}{{ round($existing_activity['price'] )}} - TP: {{env('DEFAULT_CURRENCY_SYMBOL')}}{{round($existing_activity['ticket_price']) }}
+                                                                                        </option>
+                                                                                    @empty
+                                                                                        <option value="" disabled>No activities available</option>
+                                                                                    @endforelse
+                                                                               </select>
+                                                                               {{-- <p>cgsjsdshj</p> --}}
+                                                                             
+                                                                            </div>
+                                                                            @error("errorActivity.$division_index.{$division_route_item['route_service_summary_id']}")
+                                                                                <span class="text-red-500">{{ $message }}</span>
+                                                                            @enderror
+                                                                            <!-- Drag & Drop List -->
+                                                                            @if(isset($division_route_item['day_activity']) && count($division_route_item['day_activity'])>0)
+                                                                                <div class="sortable-list border-2 border-dashed border-gray-400 p-4 rounded-lg bg-white dark:bg-gray-800 shadow-md">
+                                                                                    <ul id="draggable-list" class="space-y-3 text-xs">
+                                                                                        @foreach ($division_route_item['day_activity'] as $day_activity)
+                                                                                            <li class="draggable-item flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-2 rounded-md cursor-move">
+                                                                                                <span class="text-gray-600 dark:text-white/70">{{ucfirst($day_activity['value'])}} @if($day_activity['price']>0)({{env('DEFAULT_CURRENCY_SYMBOL')}}{{$day_activity['price']}})@endif</span>
+                                                                                                <i class="far fa-times-circle text-danger cursor-pointer"></i>
+                                                                                            </li>
+                                                                                        @endforeach
+                                                                                    </ul>
+                                                                                </div>
+                                                                            @endif
+                                                                            <div class="small-btm mt-1">
+                                                                                <button class="badge gap-2 bg-success/10 text-success uppercase"><i class="fa-solid fa-plus"></i> Add New Activity</button>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td class="!text-center align-top">
+                                                                            <div class="small-btm">
+                                                                                <span class="badge gap-2 bg-primary/10 text-primary uppercase">Existing Sightseeing</span>
+                                                                                <select>
+                                                                                     <option value="">Choose an Existing Sightseeing</option>
+                                                                                     @forelse ($division_route_item['existing_sightseeings'] as $existing_sightseeing)
+                                                                                         <option value="{{$existing_sightseeing['name']}}">{{$existing_sightseeing['name']}}</option>
+                                                                                     @empty
+                                                                                         <option value="" disabled>No sightseeings available</option>
+                                                                                     @endforelse
+                                                                                </select>
+                                                                             </div>
+                                                                             <!-- Drag & Drop List -->
+                                                                            <div class="sortable-list border-2 border-dashed border-gray-400 p-4 rounded-lg bg-white dark:bg-gray-800 shadow-md">
+                                                                                <ul id="draggable-list" class="space-y-3 text-xs">
+                                                                                    <li class="draggable-item flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-2 rounded-md cursor-move">
+                                                                                        <span class="text-gray-600 dark:text-white/70">Guwahati City Heritage Tour</span>
+                                                                                        <i class="far fa-times-circle text-danger cursor-pointer"></i>
+                                                                                    </li>
+                                                                                    <li class="draggable-item flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-2 rounded-md cursor-move">
+                                                                                        <span class="text-gray-600 dark:text-white/70">Guwahati City Heritage Tour 2</span>
+                                                                                        <i class="far fa-times-circle text-danger cursor-pointer"></i>
+                                                                                    </li>
+                                                                                    <li class="draggable-item flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-2 rounded-md cursor-move">
+                                                                                        <span class="text-gray-600 dark:text-white/70">Guwahati City Heritage Tour 3</span>
+                                                                                        <i class="far fa-times-circle text-danger cursor-pointer"></i>
                                                                                     </li>
                                                                                 </ul>
                                                                             </div>
-                                                                        </td>
-                                                                        <td class="!text-center">
-                                                                            <div class="form-check">
-                                                                                <ul class="space-y-3 text-sm">
-                                                                                    <li class="flex space-x-3 rtl:space-x-reverse !text-xs">
-                                                                                        <i class="far fa-check-circle text-success mt-1"></i>
-                                                                                        <span class="text-gray-600 dark:text-white/70">
-                                                                                            Guwahati City Heritage Tour
-                                                                                        </span>
-                                                                                    </li>
-                                                                                </ul>
+                                                                            <div class="small-btm mt-1">
+                                                                                <button class="badge gap-2 bg-success/10 text-success uppercase"><i class="fa-solid fa-plus"></i> Add New Sightseeing</button>
                                                                             </div>
                                                                         </td>
-                                                                        <td class="!text-center">
+                                                                        <td class="!text-center" rowspan="2">
                                                                             <button type="button" wire:click="RemoveDayRoute({{$division_index}},'day_route', {{$division_route_item['route_service_summary_id']}})" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20">
                                                                                 <i class="ti ti-trash"></i>
                                                                             </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td colspan="3" style="border-left: 1px solid;">
+                                                                            <div class="transport_cab">
+                                                                                <span class="badge gap-2 bg-primary/10 text-primary uppercase">Transport (Cab)</span>
+                                                                                <div class="image-preview-container">
+                                                                                    @if(isset($division_route_item['existing_cabs']))
+                                                                                        @forelse ($division_route_item['existing_cabs'] as $cab_index => $existing_cabs)
+                                                                                            <label class="image-preview-label px-1">
+                                                                                                <input type="checkbox" name="day_{{$division_index}}_cab" value="{{ $existing_cabs['name'] }}" class="hidden peer">
+                                                                                                <div class="image-preview relative peer-checked:border-blue-500">
+                                                                                                    <img src="{{ asset('assets/img/cab.png') }}" alt="Image Preview" class="image-thumbnail peer-checked:blur-md peer-checked:opacity-70">
+                                                                                                    
+                                                                                                </div>
+                                                                                                
+                                                                                            </label>
+                                                                                            {{-- <div class="absolute bottom-0 left-0 right-0 bg-white text-center text-sm font-semibold">
+                                                                                                <p>{{ $existing_cabs['name'] }}</p>
+                                                                                                <p>{{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $existing_cabs['price'] }}</p>
+                                                                                            </div> --}}
+                                                                                        @empty
+                                                                                            <div class="alert alert-warning text-sm italic">
+                                                                                                Cab not added yet!
+                                                                                            </div>
+                                                                                        @endforelse
+                                                                                    @endif
+                                                                                </div>
+                                                                            </div>
+                                                                            
                                                                         </td>
                                                                     </tr>
                                                                 @empty
@@ -490,6 +568,14 @@
         </div>
     </div>
 </div>
+<!-- Include Dragula JS -->
+<script src="{{ asset('build/assets/libs/dragula/dragula.min.js') }}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Apply Dragula to the list
+        dragula([document.getElementById('draggable-list')]);
+    });
+</script>
 <script>
     $(document).ready(function () {
         $('.select2').select2();

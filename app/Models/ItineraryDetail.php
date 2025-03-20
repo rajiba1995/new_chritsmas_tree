@@ -16,6 +16,7 @@ class ItineraryDetail extends Model
         'header',
         'field',
         'value',
+        'price',
     ];
      // Relationship with Itinerary model
      public function itinerary()

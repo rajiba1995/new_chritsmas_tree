@@ -54,6 +54,7 @@ class CreatePresetItinerary extends Component
 
     public $errorHotel = [];
     public $errorRoute = [];
+    public $errorActivity = [];
     public function mount($encryptedId){
         $itineraryExists = Itinerary::find($encryptedId);
         $this->itinerary_id =$encryptedId;
@@ -241,14 +242,57 @@ class CreatePresetItinerary extends Component
         $results = [];
        // Loop through each itinerary detail and extract hotel data
         foreach ($data as $item) {
+            $day_activity = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+            ->where('route_service_summary_id', $item->route_service_summary_id)
+            ->where('header', 'day_' . $index)
+            ->where('field', 'day_activity')
+            ->get()->toArray();
+
             if ($item->route_service) {
+                $RouteServiceSummary = RouteServiceSummary::with('activities', 'sightseeings', 'cabs')->find($item->route_service_summary_id);
+                $existing_activities = [];
+                $existing_sightseeings = [];
+                $existing_cabs = [];
+                if($RouteServiceSummary){
+                    // Existing Activities
+                    foreach($RouteServiceSummary->activities as $act_index =>$act_item){
+                        $existing_activities[] = [
+                            'name'         => optional($act_item->activity)->name,
+                            'type'         => optional($act_item->activity)->type,
+                            'price'        => optional($act_item->activity)->price,
+                            'ticket_price' => optional($act_item->activity)->ticket_price,
+                        ];
+                    }
+
+                    // // Existing Sightsiings
+                    foreach($RouteServiceSummary->sightseeings as $sight_index =>$sight_item){
+                        $existing_sightseeings[] = [
+                            'name'=> optional($sight_item->sightseeing)->name,
+                            'type'         => optional($sight_item->sightseeing)->type,
+                            'ticket_price' => optional($sight_item->sightseeing)->ticket_price,
+                        ];
+                    }
+
+                    // // Existing Cabs
+                    foreach($RouteServiceSummary->cabs as $cab_index =>$cab_item){
+                        $cab = optional(optional($cab_item->divisionCab)->cab);
+                        $existing_cabs[]=[
+                            'name'=> $cab->title ? $cab->title . ' (' . $cab->capacity . 'S)' : 'N/A',
+                            'price'=>$cab_item->cab_price ?? 0,
+                        ];
+                    }
+                }
                 $results[] = [
                     'route_service_summary_id'=> optional($item->route_service)->id,
-                    'route_name'    => $item->value,
+                    'route_name' => $item->value,
+                    'day_activity' => $day_activity,
+                    'existing_activities' => $existing_activities,
+                    'existing_sightseeings' => $existing_sightseeings,
+                    'existing_cabs' => $existing_cabs,
                 ];
             }
         }
-    
+        // dd($results);
         return $results;
         // Merge and assign the updated values
     }
@@ -264,10 +308,54 @@ class CreatePresetItinerary extends Component
         $results = [];
        // Loop through each itinerary detail and extract hotel data
         foreach ($data as $item) {
+            $day_activity = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+            ->where('route_service_summary_id', $item->route_service_summary_id)
+            ->where('header', 'day_' . $index)
+            ->where('field', 'day_activity')
+            ->get()->toArray();
+
             if ($item->route_service) {
+                $RouteServiceSummary = RouteServiceSummary::with('activities', 'sightseeings', 'cabs')->find($item->route_service_summary_id);
+                $existing_activities = [];
+                $existing_sightseeings = [];
+                $existing_cabs = [];
+
+                if($RouteServiceSummary){
+                    // Existing Activities
+                    foreach($RouteServiceSummary->activities as $act_index =>$act_item){
+                        $existing_activities[] = [
+                            'name'         => optional($act_item->activity)->name,
+                            'type'         => optional($act_item->activity)->type,
+                            'price'        => optional($act_item->activity)->price,
+                            'ticket_price' => optional($act_item->activity)->ticket_price,
+                        ];
+                    }
+
+                    // // Existing Sightsiings
+                    foreach($RouteServiceSummary->sightseeings as $sight_index =>$sight_item){
+                        $existing_sightseeings[] = [
+                            'name'=> optional($sight_item->sightseeing)->name,
+                            'type'         => optional($sight_item->sightseeing)->type,
+                            'ticket_price' => optional($sight_item->sightseeing)->ticket_price,
+                        ];
+                    }
+
+                    // // Existing Cabs
+                    foreach($RouteServiceSummary->cabs as $cab_index =>$cab_item){
+                        $cab = optional(optional($cab_item->divisionCab)->cab);
+                        $existing_cabs[]=[
+                            'name'=> $cab->title ? $cab->title . ' (' . $cab->capacity . 'S)' : 'N/A',
+                            'price'=>$cab_item->cab_price ?? 0,
+                        ];
+                    }
+                }
                 $results[] = [
                     'route_service_summary_id'=> optional($item->route_service)->id,
-                    'route_name'    => $item->value,
+                    'route_name' => $item->value,
+                    'day_activity' => $day_activity,
+                    'existing_activities' => $existing_activities,
+                    'existing_sightseeings' => $existing_sightseeings,
+                    'existing_cabs' => $existing_cabs,
                 ];
             }
         }
@@ -275,6 +363,18 @@ class CreatePresetItinerary extends Component
         $this->day_by_divisions[$index]['day_route'] = $results;
         // Merge and assign the updated values
     }
+
+    // public function ReloadDayActivity($index, $route_index, $route_service_summary_id){
+    //     // Fetch itinerary detail with hotel relation
+    //     $day_activity = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+    //     ->where('route_service_summary_id', $route_service_summary_id)
+    //     ->where('header', 'day_' . $index)
+    //     ->where('field', 'day_activity')
+    //     ->get()->toArray();
+
+    //     $this->day_by_divisions[$index]['day_route'][$route_index]['day_activity'] = $day_activity;
+        
+    // }
    
     public function updateduploadDestinationSlider()
     {
@@ -574,6 +674,46 @@ class CreatePresetItinerary extends Component
             DB::rollBack();
             // Store error message for Livewire validation
             $this->errorRoute[$index] = $e->getMessage();
+        }
+    }
+    public function getActivity($index, $route_index, $route_service_summary_id, $value, $price, $ticket_price){
+        try {
+            // Start database transaction
+            DB::beginTransaction();
+    
+            // Ensure price and ticket price are numeric
+            $totalPrice = round((float) $price + (float) $ticket_price);
+            
+            // Update or create itinerary detail
+            ItineraryDetail::updateOrCreate(
+                [
+                    'itinerary_id' => $this->itinerary_id,
+                    'route_service_summary_id' => $route_service_summary_id,
+                    'header' => "day_$index", // Using a dynamic day header
+                    'field' => 'day_activity',
+                    'value' => $value,
+                ],
+                [
+                    'value' => $value, // Store the activity name or ID
+                    'price' => $totalPrice, // Store calculated price
+                ]
+            );
+    
+            // Commit transaction
+            DB::commit();
+    
+            // Clear any previous error message for this index
+            if (isset($this->errorActivity[$index][$route_service_summary_id])) {
+                $this->errorActivity[$index][$route_service_summary_id] = '';
+            }
+    
+            // Reload day route after update
+            $this->ReloadDayRoute($index);
+        } catch (\Exception $e) {
+            // Rollback transaction if there's an error
+            DB::rollBack();
+            // Store error message for Livewire validation
+            $this->errorActivity[$index][$route_service_summary_id] = $e->getMessage();
         }
     }
    
