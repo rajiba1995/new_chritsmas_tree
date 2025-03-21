@@ -61,7 +61,7 @@
                         <div class="grid grid-cols-1 hover:grid-cols-6">
                             <label for="">
                                 <span class="badge gap-2 bg-danger/10 text-danger uppercase">
-                                    Category
+                                   Hotel Category
                                  </span>
                             </label>
                             <select 
@@ -97,7 +97,7 @@
                             <span>No of Result: {{count($preset_itineraries)}}</span>
                         </div>
                         <div>
-                            <input type="text" class="badge bg-outline-primary w-xs" placeholder="Quick Search..">
+                            <input type="text" class="badge bg-outline-primary w-xs" wire:keyup="QuickSearch($event.target.value)" placeholder="Quick Search..">
                             <a href="javascript:void(0)" class="badge bg-outline-danger cursor-pointer">
                                 Reset
                             </a>
@@ -111,6 +111,7 @@
                                     <tr class="border-b !border-primary/30">
                                         <th scope="col" class="!text-center">SL No.</th>
                                         <th scope="col" class="!text-center">Type</th>
+                                        <th scope="col" class="!text-center">Destination</th>
                                         <th scope="col" class="!text-center">H. Category</th>
                                         <th scope="col" class="!text-center">Name of Itinerary</th>
                                         <th scope="col" class="!text-center">Actions</th>
@@ -121,6 +122,7 @@
                                     <tr>
                                         <td class="!text-center"><span class="badge bg-primary/10 text-primary">{{$k+1}}</span> </td>
                                         <td class="!text-center">{{ucwords($pre_item->type)}}</td>
+                                        <td class="!text-center">{{$pre_item->destination->name}}</td>
                                         <td class="!text-center">{{$pre_item->hotelCategory->name}}</td>
                                         <td class="!text-center">
                                             {{$pre_item->itinerary_syntax}}
@@ -135,7 +137,7 @@
                                     </tr>
                                    @empty
                                    <tr>
-                                        <td colspan="5">
+                                        <td colspan="6">
                                             <div class="alert alert-danger">
                                                 Result not found
                                             </div>

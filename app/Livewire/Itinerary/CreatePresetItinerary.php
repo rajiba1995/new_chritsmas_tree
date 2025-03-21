@@ -55,6 +55,8 @@ class CreatePresetItinerary extends Component
     public $errorHotel = [];
     public $errorRoute = [];
     public $errorActivity = [];
+    public $errorSightSeeing = [];
+    public $errorCab = [];
     public function mount($encryptedId){
         $itineraryExists = Itinerary::find($encryptedId);
         $this->itinerary_id =$encryptedId;
@@ -242,10 +244,23 @@ class CreatePresetItinerary extends Component
         $results = [];
        // Loop through each itinerary detail and extract hotel data
         foreach ($data as $item) {
+
             $day_activity = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
             ->where('route_service_summary_id', $item->route_service_summary_id)
             ->where('header', 'day_' . $index)
             ->where('field', 'day_activity')
+            ->get()->toArray();
+
+            $day_sightseing = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+            ->where('route_service_summary_id', $item->route_service_summary_id)
+            ->where('header', 'day_' . $index)
+            ->where('field', 'day_sightseeing')
+            ->get()->toArray();
+
+            $day_cab = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+            ->where('route_service_summary_id', $item->route_service_summary_id)
+            ->where('header', 'day_' . $index)
+            ->where('field', 'day_cab')
             ->get()->toArray();
 
             if ($item->route_service) {
@@ -286,6 +301,8 @@ class CreatePresetItinerary extends Component
                     'route_service_summary_id'=> optional($item->route_service)->id,
                     'route_name' => $item->value,
                     'day_activity' => $day_activity,
+                    'day_sightseing' => $day_sightseing,
+                    'day_cab' => $day_cab,
                     'existing_activities' => $existing_activities,
                     'existing_sightseeings' => $existing_sightseeings,
                     'existing_cabs' => $existing_cabs,
@@ -314,6 +331,18 @@ class CreatePresetItinerary extends Component
             ->where('field', 'day_activity')
             ->get()->toArray();
 
+            $day_sightseing = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+            ->where('route_service_summary_id', $item->route_service_summary_id)
+            ->where('header', 'day_' . $index)
+            ->where('field', 'day_sightseeing')
+            ->get()->toArray();
+
+            $day_cab = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+            ->where('route_service_summary_id', $item->route_service_summary_id)
+            ->where('header', 'day_' . $index)
+            ->where('field', 'day_cab')
+            ->get()->toArray();
+
             if ($item->route_service) {
                 $RouteServiceSummary = RouteServiceSummary::with('activities', 'sightseeings', 'cabs')->find($item->route_service_summary_id);
                 $existing_activities = [];
@@ -353,6 +382,8 @@ class CreatePresetItinerary extends Component
                     'route_service_summary_id'=> optional($item->route_service)->id,
                     'route_name' => $item->value,
                     'day_activity' => $day_activity,
+                    'day_sightseing' => $day_sightseing,
+                    'day_cab' => $day_cab,
                     'existing_activities' => $existing_activities,
                     'existing_sightseeings' => $existing_sightseeings,
                     'existing_cabs' => $existing_cabs,
@@ -529,17 +560,46 @@ class CreatePresetItinerary extends Component
             ->where('field', $field)
             ->where('route_service_summary_id', $route_service_summary_id)
             ->first();
-    
+
+            $sub_items = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+            ->where('header', 'day_' . $index)
+            ->where('route_service_summary_id', $route_service_summary_id)
+            ->whereIn('field', ['day_cab', 'day_sightseeing', 'day_activity'])
+            ->get();
+
             if ($item) {
                 // Delete from database
                 $item->delete();
+                // Delete multiple records
+                $sub_items->each(function ($sub_item) {
+                    $sub_item->delete();
+                });
                 DB::commit();
                 session()->flash('success', 'Route deleted successfully!');
             } else {
                 session()->flash('error', 'Route not found in the database!');
             }
             $this->ReloadDayRoute($index);
-    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Deletion failed: ' . $e->getMessage());
+        }
+    }
+
+    public function RemoveDayRouteItem($index, $id){
+        DB::beginTransaction();
+        try {
+            $item = ItineraryDetail::find($id);
+            
+            if ($item) {
+                $item->delete();
+                DB::commit();
+                session()->flash('success', 'Item deleted successfully.');
+            } else {
+                DB::rollBack();
+                session()->flash('error', 'Item not found.');
+            }
+            $this->ReloadDayRoute($index);
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'Deletion failed: ' . $e->getMessage());
@@ -676,21 +736,29 @@ class CreatePresetItinerary extends Component
             $this->errorRoute[$index] = $e->getMessage();
         }
     }
-    public function getActivity($index, $route_index, $route_service_summary_id, $value, $price, $ticket_price){
+    public function getActivityOrSightseeing($field, $index, $route_index, $route_service_summary_id, $value, $price, $ticket_price){
         try {
             // Start database transaction
             DB::beginTransaction();
     
             // Ensure price and ticket price are numeric
-            $totalPrice = round((float) $price + (float) $ticket_price);
-            
+            if($field=='activity'){
+                $totalPrice = round((float) $price + (float) $ticket_price);
+            }
+            if($field=='sightseeing'){
+                $totalPrice = round((float) $ticket_price);
+            }
+            if($field=='cab'){
+                $totalPrice = round((float) $price);
+            }
+           
             // Update or create itinerary detail
             ItineraryDetail::updateOrCreate(
                 [
                     'itinerary_id' => $this->itinerary_id,
                     'route_service_summary_id' => $route_service_summary_id,
                     'header' => "day_$index", // Using a dynamic day header
-                    'field' => 'day_activity',
+                    'field' => "day_$field",
                     'value' => $value,
                 ],
                 [
@@ -703,17 +771,38 @@ class CreatePresetItinerary extends Component
             DB::commit();
     
             // Clear any previous error message for this index
-            if (isset($this->errorActivity[$index][$route_service_summary_id])) {
-                $this->errorActivity[$index][$route_service_summary_id] = '';
+            if($field=='activity'){
+                if (isset($this->errorActivity[$index][$route_index])) {
+                    $this->errorActivity[$index][$route_index] = '';
+                }
             }
-    
+            if($field=='sightseeing'){
+                if (isset($this->errorSightSeeing[$index][$route_index])) {
+                    $this->errorSightSeeing[$index][$route_index] = '';
+                }
+            }
+            if($field=='cab'){
+                if (isset($this->errorCab[$index][$route_index])) {
+                    $this->errorCab[$index][$route_index] = '';
+                }
+            }
+        
             // Reload day route after update
             $this->ReloadDayRoute($index);
         } catch (\Exception $e) {
             // Rollback transaction if there's an error
             DB::rollBack();
             // Store error message for Livewire validation
-            $this->errorActivity[$index][$route_service_summary_id] = $e->getMessage();
+            // dd($e->getMessage());
+            if($field=='activity'){
+                $this->errorActivity[$index][$route_index] = $e->getMessage();
+            }
+            if($field=='sightseeing'){
+                $this->errorSightSeeing[$index][$route_index] = $e->getMessage();
+            }
+            if($field=='cab'){
+                $this->errorCab[$index][$route_index] = $e->getMessage();
+            }
         }
     }
    

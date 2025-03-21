@@ -751,68 +751,15 @@
   border-radius: 0 0 5px 5px;
 }
 
-.transport_cab .image-preview-label {
-  display: inline-block;
-  cursor: pointer;
-}
-.transport_cab .image-preview-label {
-  display: inline-block;
-  cursor: pointer;
-}
-
-.transport_cab .image-preview {
-  margin-top: 10px;
-  width: 130px;
-  height: 65px;
-  border: 2px solid #ddd;
-  border-radius: 5px;
-  overflow: hidden;
-  position: relative;
-  transition: border-color 0.3s ease-in-out, filter 0.3s ease-in-out, opacity 0.3s ease-in-out;
-}
-
-.transport_cab .image-thumbnail {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: filter 0.3s ease-in-out, opacity 0.3s ease-in-out;
-}
-
-.transport_cab input[type="checkbox"] {
-  display: none; /* Hide the checkbox */
-}
-
-/* When checked, blur the image and reduce opacity */
-/* .transport_cab input[type="checkbox"]:checked + .image-preview img {
-  filter: blur(3px);
-  opacity: 0.7;
-} */
-
-/* Blue border when selected */
-.transport_cab input[type="checkbox"]:checked + .image-preview {
-  border-color: #007bff !important;
-}
-
-/* "SELECTED" label when checked */
-.transport_cab input[type="checkbox"]:checked + .image-preview::after {
-  content: "SELECTED";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: rgba(255, 255, 255, 0.8);
-  color: #007bff;
-  font-size: 12px;
-  font-weight: bold;
-  text-align: center;
-  padding: 3px 0;
-  border-radius: 0 0 5px 5px;
-}
-
 /* For Hotel by radio */
 .hotel-preview-label {
   display: inline-block;
   min-width: 130px;
+  position: relative;
+}
+.cab-preview-label {
+  display: inline-block;
+  min-width: 50px;
   position: relative;
 }
 
@@ -841,6 +788,25 @@
   border-color: #007bff;
   box-shadow: 3px 3px 12px rgba(0, 123, 255, 0.2);
 }
+.cab-card {
+  margin-bottom: 5px;
+  border: 1px solid #ddd;
+  border-radius: 7px;
+  text-align: center;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: #f9f9f9;
+  transition: all 0.3s ease-in-out;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 
 input[type="radio"]:checked + .hotel-card {
   border-color: #007bff;
@@ -916,6 +882,10 @@ input[type="radio"]:checked + .hotel-card .checkmark {
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
   background: #fff;
 }
+.cab-card{
+  padding: 3px;
+  margin: 0px 5px 5px 0px !important;
+}
 
 .custom-hotel-container {
   display: flex;
@@ -950,6 +920,10 @@ input[type="radio"]:checked + .hotel-card .checkmark {
 .custom-hotel-content {
   display: flex;
 }
+.custom-cab-content {
+  display: flex;
+  padding: 5px;
+}
 
 .custom-hotel-image-container {
   position: relative;
@@ -978,6 +952,10 @@ input[type="radio"]:checked + .hotel-card .checkmark {
 
 .custom-hotel-details {
   margin-left: 15px;
+}
+.custom-cab-details {
+  margin-left: 6px;
+  margin-right: 6px;
 }
 
 .small-btm {

@@ -17,6 +17,8 @@ class PresetItineraryList extends Component
     public $categories =[];
     public $selectedDestination = null;
     public $selectedCategory =null;
+    public $search ="";
+    public $selectedType =null;
     public $active_assign_new_modal = 0;
     public $active_night_distribution = 0;
     public $day;
@@ -39,7 +41,21 @@ class PresetItineraryList extends Component
             ->when($this->selectedDestination, function ($query) {
                 $query->where('destination_id', $this->selectedDestination); // Use '=' for exact match
             })
-            ->orderBy('id', 'DESC')
+            ->when($this->selectedCategory, function ($query) {
+                $query->where('hotel_category', $this->selectedCategory); // Use '=' for exact match
+            })
+            ->when($this->selectedType, function ($query) {
+                $query->where('type', $this->selectedType); // Use '=' for exact match
+            })
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('itinerary_syntax', 'like', "%{$this->search}%")
+                      ->orWhere('itinerary_journey', 'like', "%{$this->search}%")
+                      ->orWhere('type', 'like', "%{$this->search}%");
+                });
+            })
+            // ->orderBy('id', 'DESC')
+            ->orderBy('total_days', 'DESC')
             ->get();
     }
 
@@ -58,6 +74,16 @@ class PresetItineraryList extends Component
     public function GetCategory($value){
         $this->selectedCategory = $value;
         $this->active_night_distribution = 1;
+        $this->preset_itineraries = $this->getItinerary();
+    }
+    public function filterType($value){
+        $this->selectedType = $value;
+        $this->preset_itineraries = $this->getItinerary();
+    }
+
+    public function QuickSearch($value){
+        $this->search = $value;
+        $this->preset_itineraries = $this->getItinerary();
     }
     public function validateDaysAndNights($value){
 
