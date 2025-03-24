@@ -49,7 +49,7 @@
                 <h6 class="uppercase text-black">Update {{$childHeader}}</h6>
             </div>
             <div class="box-body">
-                <form action="{{route('admin.cab.update')}}" method="post" id="update_plan">
+                <form action="{{route('admin.cab.update')}}" method="post" id="update_plan" enctype="multipart/form-data">
                     @csrf
                     <div class="xl:col-span-4 lf:col-span-6 md:col-span-6 sm:col-span-12 col-span-12">
                         <x-form-field 
@@ -63,7 +63,7 @@
                             <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror
                     </div>
-                    <div class="xl:col-span-4 lf:col-span-6 md:col-span-6 sm:col-span-12 col-span-12">
+                    <div class="xl:col-span-4 lf:col-span-6 md:col-span-6 sm:col-span-12 col-span-12 mt-0">
                         <x-form-field 
                             type="number" 
                             name="capacity" 
@@ -71,8 +71,20 @@
                             :options="[]"
                             :value="old('capacity', $update_item->capacity?? '')"
                             />
-                            <span class="text-gray-500 text-sm">Just add the number of seats.</span><br>
+                            <span class="text-gray-500 text-xs">Just add the number of seats.</span><br>
                         @error('capacity')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="xl:col-span-4 lf:col-span-6 md:col-span-6 sm:col-span-12 col-span-12 my-2">
+                        <label for="image" class="block text-gray-700 font-medium">Image</label>
+                        <div>
+                            <label for="image" class="sr-only">Choose file</label>
+                            <input type="file" name="image" id="image" class="block w-full border border-gray-200 focus:shadow-sm dark:focus:shadow-white/10 rounded-sm text-sm focus:z-10 focus:outline-0 focus:border-gray-200 dark:focus:border-white/10 dark:border-white/10 dark:text-white/50 file:border-0  file:bg-light file:me-4 file:py-2 file:px-4 dark:file:bg-black/20 dark:file:text-white/50">
+                        </div>
+                        <span class="text-gray-500 text-xs">Expected size:	130 × 80 px Approx</span><br>
+                        @error('image')
                             <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror
                     </div>
@@ -92,7 +104,7 @@
                 <h6 class="uppercase">New Cab</h6>
             </div>
             <div class="box-body">
-                <form action="{{route('admin.cab.store')}}" method="post">
+                <form action="{{route('admin.cab.store')}}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="xl:col-span-4 lf:col-span-6 md:col-span-6 sm:col-span-12 col-span-12">
                     <x-form-field 
@@ -107,15 +119,21 @@
                         @enderror
                     </div>
                     <div class="xl:col-span-4 lf:col-span-6 md:col-span-6 sm:col-span-12 col-span-12">
-                    <x-form-field 
-                            type="number" 
-                            name="capacity" 
-                            label="Capacity(Seat)" 
-                            :options="[]"
-                            :value="old('capacity')"
-                            />
-                        <span class="text-gray-500 text-sm">Just add the number of seats.</span><br>
+                        <label for="capacity" class="block text-gray-700 font-medium">Capacity</label>
+                        <input type="number" class="form-control" name="capacity" id="capacity" value="{{old('capacity')}}" placeholder="Enter capacity">
+                        <span class="text-gray-500 text-xs">Just add the number of seats.</span><br>
                         @error('capacity')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="xl:col-span-4 lf:col-span-6 md:col-span-6 sm:col-span-12 col-span-12 my-2">
+                        <label for="image" class="block text-gray-700 font-medium">Image</label>
+                        <div>
+                            <label for="image" class="sr-only">Choose file</label>
+                            <input type="file" name="image" id="image" class="block w-full border border-gray-200 focus:shadow-sm dark:focus:shadow-white/10 rounded-sm text-sm focus:z-10 focus:outline-0 focus:border-gray-200 dark:focus:border-white/10 dark:border-white/10 dark:text-white/50 file:border-0  file:bg-light file:me-4 file:py-2 file:px-4 dark:file:bg-black/20 dark:file:text-white/50">
+                        </div>
+                        <span class="text-gray-500 text-xs">Expected size:	130 × 80 px Approx</span><br>
+                        @error('image')
                             <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror
                     </div>

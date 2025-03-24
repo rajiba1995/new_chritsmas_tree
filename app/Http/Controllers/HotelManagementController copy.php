@@ -69,14 +69,14 @@ class HotelManagementController extends Controller
     }
 
     public function create() {
-        // $destinations = $this->commonRepository->getAllActiveState();
-        // $seasion_types = $this->commonRepository->getAllActiveSeasionType();
-        // $divisions = $this->commonRepository->getAllActiveCity();
-        // $hotel_categories = $this->commonRepository->getAllActiveCategory();
-        // $hotel_ammenities = $this->commonRepository->getAllActiveAmmenity();
-        // $room_categories = $this->commonRepository->getAllActiveRoomCategory();
+        $destinations = $this->commonRepository->getAllActiveState();
+        $seasion_types = $this->commonRepository->getAllActiveSeasionType();
+        $divisions = $this->commonRepository->getAllActiveCity();
+        $hotel_categories = $this->commonRepository->getAllActiveCategory();
+        $hotel_ammenities = $this->commonRepository->getAllActiveAmmenity();
+        $room_categories = $this->commonRepository->getAllActiveRoomCategory();
         $common = CustomHelper::setHeadersAndTitle('Hotel Management', 'New Hotel');
-        return view('admin.hotel.create',compact('common'));
+        return view('admin.hotel.create',compact('destinations', 'divisions', 'hotel_categories','common','hotel_ammenities','room_categories','seasion_types'));
     }
     public function store(Request $request){
         

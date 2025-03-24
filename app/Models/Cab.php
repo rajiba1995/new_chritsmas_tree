@@ -9,6 +9,5 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Cab extends Model
 {
     use HasFactory, SoftDeletes;
-
-    protected $fillable = ['title','capacity', 'status'];
+    protected $fillable = ['title','capacity', 'image', 'status'];
 }

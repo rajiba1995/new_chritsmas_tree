@@ -124,7 +124,7 @@
                     <td scope="row" class="" width="4%">
                         <span class="ti-btn ti-btn-sm ti-btn-soft-info"><strong>{{ $index + 1 }}</strong></span></td>
                     <td scope="row" class="!p-1" width="20%">
-                        <img src="{{asset('assets/img/cab.png')}}" alt="Cab Image" width="90%">
+                        <img src="{{$item->image?asset($item->image):asset('assets/img/cab.png')}}" alt="Cab Image" width="90%">
                     </td>
                     <td scope="row" class="!p-1">{{$item->title}}</td>
                     <td scope="row" class="!p-1">{{$item->capacity?$item->capacity.' Seat':""}}</td>

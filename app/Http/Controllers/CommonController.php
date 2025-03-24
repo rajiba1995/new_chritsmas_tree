@@ -377,12 +377,15 @@ class CommonController extends Controller
                     Rule::unique('cabs', 'title')->where('capacity', $request->capacity)->whereNull('deleted_at'),
                 ],
                 'capacity' => 'required|integer|min:1', // Ensures capacity is a number and at least 1
+                'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg,webp|max:5120', 
             ], [
                 'title.required' => 'Please enter cab title.',
                 'title.unique' => 'This cab already exists for the given capacity🚀',
                 'capacity.required' => 'Please enter cab capacity.',
                 'capacity.integer' => 'Capacity must be a number.',
                 'capacity.min' => 'Capacity must be at least 1.',
+                'image.mimes' => 'The image must be a file of type: jpeg, png, jpg, gif, svg, webp.',
+                'image.max' => 'The image size must not exceed 5MB.',
             ]);
             try {
                 $this->commonRepository->createCab($validatedData);
@@ -401,12 +404,15 @@ class CommonController extends Controller
                     Rule::unique('cabs', 'title')->where('capacity', $request->capacity)->ignore($request->id)->whereNull('deleted_at'),
                 ],
                 'capacity' => 'required|integer|min:1', // Ensures capacity is a number and at least 1
+                 'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg,webp|max:5120',
             ], [
                 'title.required' => 'Please enter cab title.',
                 'title.unique' => 'This cab already exists for the given capacity🚀',
                 'capacity.required' => 'Please enter cab capacity.',
                 'capacity.integer' => 'Capacity must be a number.',
                 'capacity.min' => 'Capacity must be at least 1.',
+                'image.mimes' => 'The image must be a file of type: jpeg, png, jpg, gif, svg, webp.',
+                'image.max' => 'The image size must not exceed 5MB.',
             ]);
             // After validation, proceed to save the data
             try {

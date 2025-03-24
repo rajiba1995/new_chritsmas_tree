@@ -13,6 +13,7 @@ use App\Models\Ammenity;
 use App\Models\RoomCategory;
 use App\Models\CountryCode;
 use App\Models\Cab;
+use App\Helpers\CustomHelper;
 use Illuminate\Support\Facades\Log;
 use Exception;
 
@@ -125,11 +126,17 @@ class CommonRepository
         return $state;
     }
     public function createCab(array $data){
-        $state = new Cab;
-        $state->title = ucwords($data['title']);
-        $state->capacity = $data['capacity'];
-        $state->save();
-        return $state;
+        $cab = new Cab;
+        $cab->title = ucwords($data['title']);
+        $cab->capacity = $data['capacity'];
+        $uploadedPath = 'assets/img/cab.png';
+        if(isset($data['image'])){
+            $dynamicText = rand(1111, 9999);
+            $uploadedPath = CustomHelper::uploadImage($data['image'], $dynamicText, $data['title'], 'cabs');
+        }
+        $cab->image = $uploadedPath;
+        $cab->save();
+        return $cab;
     }
 
     public function getStateById($id){
@@ -150,6 +157,12 @@ class CommonRepository
         $cab  = Cab::findOrFail($data['id']);
         $cab->title = $data['title'];
         $cab->capacity = $data['capacity'];
+        $uploadedPath = 'assets/img/cab.png';
+        if(isset($data['image'])){
+            $dynamicText = rand(1111, 9999);
+            $uploadedPath = CustomHelper::uploadImage($data['image'], $dynamicText, $data['title'], 'cabs');
+        }
+        $cab->image = $uploadedPath;
         $cab->save();
         return $cab;
     }

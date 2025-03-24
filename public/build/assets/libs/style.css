@@ -971,6 +971,15 @@ input[type="radio"]:checked + .hotel-card .checkmark {
   border-color: #ccc;
 }
 
+.form_custom_lable{
+  color: #031b4e;
+  display: inline-flex;
+  align-items: center;
+  padding: 0px;
+  font-size: .75em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
 /* Hotel Design List End */
 
 

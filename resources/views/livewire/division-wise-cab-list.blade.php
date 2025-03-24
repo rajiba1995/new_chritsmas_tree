@@ -65,7 +65,7 @@
                     </div>
                     <div class="grid grid-cols-12 gap-6 mt-2">
                         @forelse($division_wise_cabs as $cab_item)
-                            <div class="xl:col-span-2 col-span-2">
+                            <div class="xl:col-span-2 col-span-2" wire:key="delete-item-{{$cab_item->division_id}}-{{$cab_item->id}}">
                                 <div class="box">
                                     <div class="box-header text-center">
                                         <h5 class="box-title">{{$cab_item->cab?$cab_item->cab->title.'('.$cab_item->cab->capacity.')':"....."}}</h5>
@@ -73,17 +73,18 @@
                                     <div class="box-body cab-card !p-0">
                                         <div class="items-center mb-2">
                                             <span class="cab-avatar">
-                                                <img src="{{asset('assets/img/cab.png')}}"alt="img" width="100%">
+                                                @if($cab_item->cab)
+                                                <img src="{{$cab_item->cab->image?asset($cab_item->cab->image):asset('assets/img/cab.png')}}"alt="img" width="100%">
+                                                @endif
                                             </span>
                                         </div>
                                         <div class="flex justify-between items-center px-1 cab_status_activity">
                                             <livewire:master-status-toggle 
                                                 modelName="DivisionWiseCab" 
-                                                :item="$cab_item" 
-                                                wire:key="status-toggle-{{$cab_item->division_id}}-{{$cab_item->seasion_type_id}}-{{$cab_item->id}}" 
+                                                :item="$cab_item"
                                             />
                                             <div>
-                                                <button type="button" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20" wire:click="DeleteCabItem({{$cab_item->id}})" wire:key="delete-item-{{$cab_item->division_id}}-{{$cab_item->seasion_type_id}}-{{$cab_item->id}}" itemId="{{$cab_item->id}}">
+                                                <button type="button" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20" wire:click="DeleteCabItem({{$cab_item->id}})" itemId="{{$cab_item->id}}">
                                                     <i class="ti ti-trash"></i>
                                                 </button>
                                             </div>
