@@ -225,7 +225,7 @@
                         <div class="flex items-center">
                             <div class="me-4">
                                 <span class="avatar avatar-xxl bg-light">
-                                    <img src="{{asset('build/assets/images/logo/hotel.jpg')}}" alt="">
+                                    <img src="{{$item->image?asset($item->image):asset('build/assets/images/logo/hotel.jpg')}}" alt="">
                                 </span>
                             </div>
                             <div>

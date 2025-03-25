@@ -981,7 +981,9 @@ input[type="radio"]:checked + .hotel-card .checkmark {
   font-weight: 600;
 }
 /* Hotel Design List End */
-
+#swal2-html-container{
+  display: flex !important;
+}
 
 
 

@@ -15,10 +15,11 @@
                                         @enderror
                                     </div>
                                 </div>
-                                <div class="col-span-1 space-y-2" wire:ignore>
+                                <div class="col-span-1 space-y-2">
                                     <div class="form-group">
                                         <label for="hotel_category" class="form_custom_lable">hotel category<span class="text-danger">*</span></label>
-                                        <select id="hotel_category" class="form-select w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500 form-control-sm select2" wire:model="hotel_category">
+                                        <select id="hotel_category" class="form-select w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500 form-control-sm" wire:model="hotel_category">
+                                            <option value="" selected hidden>Select category..</option>
                                             @foreach ($hotel_categories as $category_item)
                                                 <option value="{{$category_item->id}}">{{$category_item->name}}</option>
                                             @endforeach
@@ -34,6 +35,7 @@
                                     <div class="form-group">
                                         <label for="destination" class="form_custom_lable">Destinations<span class="text-danger">*</span></label>
                                         <select id="destination" class="form-select w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500 form-control-sm" wire:model="destination" wire:change="ChangeDestination($event.target.value)">
+                                            <option value="" selected hidden>Select destination..</option>
                                             @foreach ($destinations as $dest_item)
                                                 <option value="{{$dest_item->id}}">{{$dest_item->name}}</option>
                                             @endforeach
@@ -311,6 +313,11 @@
                                 @endif
                             </div>
                         @endforeach
+                        @if (session('error'))
+                            <div class="alert alert-danger">
+                                {!! session('error') !!}
+                            </div>
+                        @endif
                         <div class="flex justify-end">
                             <button type="submit" class="change-text-button ti-btn ti-btn-primary-full !py-1 !px-2 ti-btn-wave me-[0.375rem]"> Save Hotel </button>
                         </div>
@@ -319,10 +326,7 @@
             </div>
         </div>
         <!-- Second Section: 4 Columns -->
-        @if (session()->has('error'))
-            <div class="text-danger-500 text-sm mt-3">{{ session('error') }}</div>
-        @endif
-        <div wire:loading class="loader" wire:target="ChangeDestination,image,images,removeImage,addRoom,removeRoom,saveHotel">
+        <div wire:loading class="loader" wire:target="ChangeDestination,removeImage,addRoom,removeRoom,saveHotel">
             <div class="spinner">
             <img src="{{asset('build/assets/images/media/loader.svg')}}" alt="">
             </div>

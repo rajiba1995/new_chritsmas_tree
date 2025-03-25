@@ -130,7 +130,7 @@
 
     // Map the images into HTML img elements with the correct asset path
     const imagesList = images.map(filePath => {
-        const imageUrl = "{{ asset('storage/') }}/" + filePath; // Combine the asset URL with the file path
+        const imageUrl = "{{ asset('') }}" + filePath; // Combine the asset URL with the file path
         return `<img src="${imageUrl}" class="container mx-auto px-4" style="max-width: 150px;">`;
     }).join('');
 

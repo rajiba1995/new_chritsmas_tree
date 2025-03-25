@@ -147,22 +147,33 @@ class HotelCreate extends Component
         ]);
         
         // Now pass only the validated data to the repository
-        dd('here');
-        $hotelRepository = app(HotelRepository::class);
-        $hotelRepository->storeHotel([
-            'name' => $this->name,
-            'destination' => $this->destination,
-            'division' => $this->division,
-            'hotel_category' => $this->hotel_category,
-            'mobile' => $this->mobile,
-            'whatsapp' => $this->whatsapp,
-            'email' => $this->email,
-            'secndary_email' => $this->secndary_email,
-        ]);
-        
+        // dd($this->all());
+        try {
+            $hotelRepository = app(HotelRepository::class);
+            $hotelRepository->storeHotel([
+                'name' => $this->name,
+                'destination' => $this->destination,
+                'division' => $this->division,
+                'hotel_category' => $this->hotel_category,
+                'mobile' => $this->mobile,
+                'whatsapp' => $this->whatsapp,
+                'email' => $this->email,
+                'address' => $this->address,
+                'secndary_email' => $this->secndary_email,
+                'rooms' => $this->rooms,
+                'image' => $this->image,
+                'images' => $this->images,
+            ]);
+            
 
-        session()->flash('message', 'Hotel created successfully.');
-        return redirect()->route('hotel.index'); // Redirect to the hotel listing page
+            session()->flash('message', 'Hotel created successfully.');
+            return redirect()->route('admin.hotel.index'); // Redirect to the hotel listing page
+        } catch (\Exception $e) {
+            // dd($e->getMessage());
+            session()->flash('error', $e->getMessage());
+            // return redirect()->back()->with('error', $e->getMessage());
+        }
+       
     }
 
     public function render()

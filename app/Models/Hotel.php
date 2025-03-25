@@ -15,6 +15,7 @@ class Hotel extends Model
 
     protected $fillable = [
         'name', 
+        'image', 
         'destination', 
         'division', 
         'hotel_category', 

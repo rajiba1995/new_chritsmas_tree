@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\ItineraryBanner;
 use App\Models\Itinerary;
+use App\Models\ItineraryTemplate;
 use App\Models\Category;
 use App\Helpers\CustomHelper;
 
@@ -34,6 +35,27 @@ class ItineraryController extends Controller
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
             abort(403, 'Invalid request.');
         }
-       
+    }
+    
+
+    public function DestinationWiseItineraryTemplate(){
+        $common = CustomHelper::setHeadersAndTitle('Itinerary Management', 'Itinerary Templates');
+        return view('admin.itinerary.destination-wise-itinerary-template-list', compact('common'));
+    }
+
+    public function DestinationWiseItineraryTemplateBuilder($encryptedId){
+        try {
+            $id = Crypt::decrypt($encryptedId);
+            $itineraryExists = ItineraryTemplate::find($id);
+    
+            if (!$itineraryExists) {
+                abort(404, 'Itinerary template not found.');
+            }
+    
+            $common = CustomHelper::setHeadersAndTitle('Itinerary Management', 'Itinerary Template');
+            return view('admin.itinerary.destination-wise-itinerary-template-builder', compact('common','itineraryExists', 'id'));
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            abort(403, 'Invalid request.');
+        }
     }
 }

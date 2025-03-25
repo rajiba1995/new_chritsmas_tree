@@ -178,6 +178,8 @@ Route::get('dashboard', [DashboardsController::class, 'index'])->name('admin.das
                 Route::get('build/{encryptedId}', [ItineraryController::class, 'DestinationWisePresetItineraryBuilder'])->name('admin.itinerary.preset.build');
                 Route::get('/list', [ItineraryController::class, 'DestinationWisePresetItineraryList'])->name('admin.itinerary.preset.list');
             });
+            Route::get('/template/list', [ItineraryController::class, 'DestinationWiseItineraryTemplate'])->name('admin.itinerary.template.list');
+            Route::get('template/build/{encryptedId}', [ItineraryController::class, 'DestinationWiseItineraryTemplateBuilder'])->name('admin.itinerary.template.build');
         });
     });
 

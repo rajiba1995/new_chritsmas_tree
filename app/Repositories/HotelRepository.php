@@ -92,67 +92,57 @@ class HotelRepository
             $hotel->destination = $data['destination'];
             $hotel->division = $data['division'];
             $hotel->hotel_category = $data['hotel_category'];
-            $hotel->phone_code = $data['mobile-country'];
+            $hotel->phone_code = "+91";
             $hotel->mobile_number = $data['mobile'];
             $hotel->whatsapp_number = $data['whatsapp'];
             $hotel->email1 = $data['email'];
             $hotel->email2 = $data['secndary_email'];
             $hotel->address = $data['address'];
-    
-            if (isset($data['no_of_room']) && is_array($data['no_of_room'])) {
-                $hotel->number_of_rooms = array_sum($data['no_of_room']);
-            } else {
-                $hotel->number_of_rooms = 0; 
-            }
+            $hotel->number_of_rooms = 0; // Initialize
     
             $hotel->save();
 
-            // Hotel Seasion Time
-            // foreach($data['seasion_type'] as $type_key=>$type){
-            //     if(!empty($data['seasion_start_date'][$type_key]) && !empty($data['seasion_end_date'][$type_key])){
-            //         $seasion_time = new HotelSeasionTime;
-            //         $seasion_time->seasion_type_id = $type;
-            //         $seasion_time->hotel_id =$hotel->id;
-            //         $seasion_time->seasion_type = $data['seasion_type_title'][$type_key];
-            //         $seasion_time->start_date = $data['seasion_start_date'][$type_key];
-            //         $seasion_time->end_date = $data['seasion_end_date'][$type_key];
-            //         $seasion_time->save();
-            //     }
-            // }
-
             // Create New hotel Rooms
-          
-            if (isset($data['room']) && is_array($data['room'])) {
-                foreach ($data['room'] as $key => $roomData) {
+            // dd($data['rooms']);
+            if (isset($data['rooms']) && is_array($data['rooms'])) {
+                foreach ($data['rooms'] as $key => $roomData) {
                     $room = new Room;
-                    $room->room_category = $roomData;
-                    $room->room_type = $data['room_type'][$key];
-                    $room->room_name = ucfirst($data['room'][$key]) . ' - ' . ucfirst($data['room_type'][$key]);
+                    $room->room_category = $roomData['room'];
+                    $room->room_type = $roomData['room_type'];
+                    $room->room_name = ucfirst($roomData['room']) . ' - ' . ucfirst($roomData['room_type']);
                     $room->hotel_id = $hotel->id; // Associate with the newly created hotel
-                    $room->no_of_rooms = $data['no_of_room'][$key];
-                    $room->capacity = $data['capacity'][$key];
-                    $room->no_of_beds = $data['no_of_bed'][$key];
-                    $room->mattress = $data['mattress'][$key];
-                    if (isset($data['ammenity'][$key]) && is_array($data['ammenity'][$key])) {
-                        $room->ammenities = implode(',', $data['ammenity'][$key]);
-                    }
+                    $room->no_of_rooms = $roomData['no_of_room'];
+                    $room->capacity = $roomData['capacity'];
+                    $room->no_of_beds = $roomData['no_of_bed'];
+                    $room->mattress = $roomData['mattress'];
+                    
+                      // Safely handle amenities (ensure it's an array)
+                    $room->ammenities = isset($roomData['amenities']) ? implode(',', (array) $roomData['amenities']) : null;
                     $room->save();
+                    
+                  // Update hotel room count
+                    $hotel->number_of_rooms += $roomData['no_of_room'];
                 }
+                
+                $hotel->save(); // Save updated room count
             }
 
             $imageData = [];
+         
+            // Main Image
+            if (isset($data['image'])) {
+                // Generate a unique filename
+                $dynamicText = rand(1111, 9999);
+                $uploadedPath = CustomHelper::uploadImage($data['image'], $dynamicText, $hotel->name, 'hotel');
+                $hotel->image = $uploadedPath;
+                $hotel->save();
+            }
 
-            // Check if 'images' is present and is an array
+            // Additional Images
             if (isset($data['images']) && is_array($data['images'])) {
+              
                 foreach ($data['images'] as $image) {
                     // Generate a unique filename
-                    // $timestamp = now()->format('YmdHis'); // Format: YYYYMMDDHHMMSS
-                    // $randomNumber = rand(100000, 999999); // Generate a 6-digit random number
-                    // $extension = $image->getClientOriginalExtension(); // Get the original file extension
-                    // $uniqueFilename = "{$timestamp}_{$randomNumber}.{$extension}";
-            
-                    // // Store the image with the unique filename
-                    // $path = $image->storeAs('hotel_images', $uniqueFilename, 'public');
                     $dynamicText = rand(1111, 9999);
                     $uploadedPath = CustomHelper::uploadImage($image, $dynamicText, $hotel->name, 'hotel');
             

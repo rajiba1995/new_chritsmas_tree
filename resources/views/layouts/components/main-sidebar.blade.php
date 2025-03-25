@@ -161,12 +161,15 @@
 									<i class="fe fe-chevron-right side-menu__angle"></i>
 								</a>
 								<ul class="slide-menu child1 {{ request()->is('admin/itinerary*') ? 'active' : '' }}">
-										<li class="slide {{ request()->is('admin/itinerary/division/banners')? 'active' : '' }}">
-											<a href="{{route('admin.itinerary.division.banners')}}" class="side-menu__item">Division Wise Banners</a>
-										</li>
-										<li class="slide {{ request()->is('admin/itinerary/preset/list')? 'active' : '' }}">
-											<a href="{{route('admin.itinerary.preset.list')}}" class="side-menu__item">Preset Itinerary List</a>
-										</li>
+									<li class="slide {{ request()->is('admin/itinerary/division/banners')? 'active' : '' }}">
+										<a href="{{route('admin.itinerary.division.banners')}}" class="side-menu__item">Division Wise Banners</a>
+									</li>
+									<li class="slide {{ request()->is('admin/itinerary/template/list')? 'active' : '' }}">
+										<a href="{{route('admin.itinerary.template.list')}}" class="side-menu__item">Itinerary Templates</a>
+									</li>
+									<li class="slide {{ request()->is('admin/itinerary/preset/list')? 'active' : '' }}">
+										<a href="{{route('admin.itinerary.preset.list')}}" class="side-menu__item">Preset Itinerary List</a>
+									</li>
 								</ul>
 							</li>
 							<!-- End::slide -->
