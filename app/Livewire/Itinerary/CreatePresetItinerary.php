@@ -300,6 +300,7 @@ class CreatePresetItinerary extends Component
                 $results[] = [
                     'route_service_summary_id'=> optional($item->route_service)->id,
                     'route_name' => $item->value,
+                    'route_way_points' => optional(optional($item->route_service)->route)->waypoints?->toArray() ?? [],
                     'day_activity' => $day_activity,
                     'day_sightseing' => $day_sightseing,
                     'day_cab' => $day_cab,
@@ -381,6 +382,7 @@ class CreatePresetItinerary extends Component
                 $results[] = [
                     'route_service_summary_id'=> optional($item->route_service)->id,
                     'route_name' => $item->value,
+                    'route_way_points' => optional(optional($item->route_service)->route)->waypoints?->toArray() ?? [],
                     'day_activity' => $day_activity,
                     'day_sightseing' => $day_sightseing,
                     'day_cab' => $day_cab,

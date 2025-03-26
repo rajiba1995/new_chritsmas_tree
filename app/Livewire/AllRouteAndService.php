@@ -164,7 +164,8 @@ class AllRouteAndService extends Component
     }
     
     public function submitNewService()
-    {
+    {   
+        // dd($this->all());
         $this->resetErrorBag();
         if($this->active_tab==1){ // For Route Wise
             if (count($this->new_service) == 0) {
@@ -290,8 +291,8 @@ class AllRouteAndService extends Component
             $this->destination_wise_route_and_service  = $this->GetRouteAndService();
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback transaction on error
-            session()->flash('new-route-error', 'Error: ' . $e->getMessage());
-            return; // Stop further execution
+            session()->flash('error', 'Error: ' . $e->getMessage());
+            return redirect()->route('admin.route.all_services');
         }
 
         // Success message
@@ -405,7 +406,7 @@ class AllRouteAndService extends Component
         $this->destination_wise_route_and_service  = $this->GetRouteAndService();
     }
     public function GetRoute($destination_id){
-        return DestinationWiseRoute::where('destination_id', $destination_id)
+        return DestinationWiseRoute::with('waypoints')->where('destination_id', $destination_id)
         // ->whereNotIn('id', $exsiting_service_summaries) // Missing -> fixed
         ->get();
     }

@@ -1,4 +1,4 @@
-<table class="table whitespace-nowrap min-w-full" id="draggable-table">
+<table class="table whitespace-nowrap table-bordered table-bordered-primary border-primary/10 min-w-full" id="draggable-table">
     <thead>
         <tr>
             <th>SL</th>
@@ -20,10 +20,12 @@
                 @endphp
                 @if(count($planItemsArray)>0)
                 @foreach ($planItemsArray as $plan_item)
-                <span class="badge gap-2 bg-primary/10 text-primary">
-                    <span class="w-1.5 h-1.5 inline-block bg-primary rounded-full"></span>
-                    {{$plan_item}}
-                </span>
+                    <div>
+                        <span class="badge gap-2 bg-primary/10 text-primary">
+                            <span class="w-1.5 h-1.5 inline-block bg-primary rounded-full"></span>
+                            {{$plan_item}}
+                        </span>
+                    </div>
                 @endforeach
                 @endif
             </td>

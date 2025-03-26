@@ -15,7 +15,7 @@
         
         <div class="xl:col-span-12 col-span-12">
             <div class="box custom-box">
-                <div class="mt-2 mx-2 mb-1">
+                {{-- <div class="mt-2 mx-2 mb-1">
                     @if (session('success'))
                         <div id="success-message" class="alert alert-success">
                             {{ session('success') }}
@@ -26,7 +26,7 @@
                             {!! session('error') !!}
                         </div>
                     @endif
-                </div>
+                </div> --}}
                 <div class="box-header flex justify-end">
                     <div>
                        <div class="grid grid-cols-1 hover:grid-cols-6">
@@ -136,7 +136,62 @@
                                                 </th>
                                                 <td>
                                                     <!-- Route Name -->
-                                                    <p class="mb-1">{{ $route_item->route?ucwords($route_item->route->route_name):"N/A" }}</p>
+                                                    <p class="mb-1 uppercase">{{ $route_item->route?ucwords($route_item->route->route_name):"N/A" }}</p>
+                                                    @if (!empty($route_item->route) && !empty($route_item->route->waypoints))
+                                                        <ul class="list-none">
+                                                            @foreach ($route_item->route->waypoints as $way_index => $waypoint)
+                                                                <li class="items-center text-gray-600 dark:text-white/70">
+                                                                    @if ($way_index == 0)
+                                                                        <span class="text-green-600 mx-2">
+                                                                            <i class="ri-map-pin-2-fill"></i>
+                                                                        </span>
+                                                                    @endif
+                                                                    @if (!$loop->last && $way_index != 0)
+                                                                        <span class="mx-2 text-red-600">→</span> <!-- Arrow between waypoints -->
+                                                                    @endif
+                                                                    @if ($loop->last)
+                                                                        <span class="text-blue-600 mx-2">
+                                                                            <i class="ri-flag-fill"></i> <!-- Remix Icon for End -->
+                                                                        </span>
+                                                                    @endif
+                                                                    {{ ucwords($waypoint->point_name) }}
+                                                                </li>
+                                                            @endforeach
+                                                        </ul>
+                                                        {{-- @foreach ($route_item->route->waypoints as $way_index => $waypoint)
+                                                            @if ($way_index % 3 == 0) <!-- Start a new line after every 3 items -->
+                                                                <div class="flex items-center space-x-2">
+                                                            @endif
+                                                            <!-- Start Icon for First Waypoint -->
+                                                            @if ($way_index == 0)
+                                                                <span class="text-green-600">
+                                                                    <i class="ri-map-pin-2-fill"></i> <!-- Remix Icon for Start -->
+                                                                </span>
+                                                            @endif
+                                                    
+                                                            <!-- Waypoint Name -->
+                                                            <span class="text-[12px]">{{ ucwords($waypoint->point_name) }}</span>
+                                                    
+                                                            @if (!$loop->last)
+                                                                <span class="text-red-600">
+                                                                    <x-icon-tooltip icon="ri-arrow-right-s-line" tooltip="{{ $waypoint->distance_from_previous_km }}, ({{ $waypoint->travel_time_from_previous }})"/>
+                                                                </span>
+                                                            @endif
+    
+                                                            
+                                                    
+                                                            <!-- End Icon for Last Waypoint -->
+                                                            @if ($loop->last)
+                                                                <span class="text-blue-600">
+                                                                    <i class="ri-flag-fill"></i> <!-- Remix Icon for End -->
+                                                                </span>
+                                                            @endif
+                                                    
+                                                            @if (($way_index + 1) % 3 == 0 || $loop->last) <!-- Close the div after 3 items or at the end -->
+                                                                </div>
+                                                            @endif
+                                                        @endforeach --}}
+                                                    @endif
                                                 </td>
                                                 <td class="align-top !text-center">
                                                         @forelse ($route_item->activities as $akey=> $act_item)
@@ -230,7 +285,7 @@
                                                                     <tr>
                                                                         @foreach ($route_item->cabs as $cabs_key=> $cabs_item)
                                                                             <td class="text-center route_details">
-                                                                                <input type="text" class="form-control form-control-sm text-center border-none" placeholder="Price" value="{{$cabs_item->cab_price?env('DEFAULT_CURRENCY_SYMBOL'):''}}{{$cabs_item->cab_price}}" onkeyup="validateCabPrice(this, {{$cabs_item->id}})">          
+                                                                                <input type="text" class="form-control !p-0 text-center border-none" placeholder="Price" value="{{$cabs_item->cab_price?env('DEFAULT_CURRENCY_SYMBOL'):''}}{{$cabs_item->cab_price}}" onkeyup="validateCabPrice(this, {{$cabs_item->id}})">          
                                                                             </td>
                                                                         @endforeach
                                                                     </tr>
@@ -378,7 +433,7 @@
                                                                     <tr>
                                                                         @foreach ($route_item->cabs as $cabs_key=> $cabs_item)
                                                                             <td class="text-center route_details">
-                                                                                <input type="text" class="form-control form-control-sm text-center border-none" placeholder="Price" value="{{$cabs_item->cab_price?env('DEFAULT_CURRENCY_SYMBOL'):''}}{{$cabs_item->cab_price}}" onkeyup="validateCabPrice(this, {{$cabs_item->id}})">          
+                                                                                <input type="text" class="form-control !p-0 text-center border-none" placeholder="Price" value="{{$cabs_item->cab_price?env('DEFAULT_CURRENCY_SYMBOL'):''}}{{$cabs_item->cab_price}}" onkeyup="validateCabPrice(this, {{$cabs_item->id}})">          
                                                                             </td>
                                                                         @endforeach
                                                                     </tr>
@@ -501,6 +556,7 @@
                                     <tbody>
                                         @forelse ($destination_wise_route as $rindex => $r_items)
                                             <tr>
+                                               
                                                 <td class="!text-center" width="6%">
                                                     <div class="form-check form-check-lg d-flex align-items-center">
                                                         <input type="checkbox" class="form-check-input border-sky-500 new_service_checkbox"
@@ -512,6 +568,43 @@
                                                 </td>
                                                 <td> 
                                                     <p class="mb-1">{{ ucwords($r_items->route_name) }}</p>
+                                                    <div class="text-gray-600 text-sm">
+                                                        @if(count($r_items->waypoints)>0)
+                                                            @foreach ($r_items->waypoints as $way_index => $waypoint)
+                                                                @if ($way_index % 3 == 0) <!-- Start a new line after every 3 items -->
+                                                                    <div class="flex items-center space-x-2">
+                                                                @endif
+                                                                <!-- Start Icon for First Waypoint -->
+                                                                @if ($way_index == 0)
+                                                                    <span class="text-green-600">
+                                                                        <i class="ri-map-pin-2-fill"></i> <!-- Remix Icon for Start -->
+                                                                    </span>
+                                                                @endif
+                                                        
+                                                                <!-- Waypoint Name -->
+                                                                <span class="text-[12px]">{{ ucwords($waypoint->point_name) }}</span>
+                                                        
+                                                                @if (!$loop->last)
+                                                                    <span class="text-red-600">
+                                                                        <x-icon-tooltip icon="ri-arrow-right-s-line" tooltip="{{ $waypoint->distance_from_previous_km }}, ({{ $waypoint->travel_time_from_previous }})"/>
+                                                                    </span>
+                                                                @endif
+        
+                                                                
+                                                        
+                                                                <!-- End Icon for Last Waypoint -->
+                                                                @if ($loop->last)
+                                                                    <span class="text-blue-600">
+                                                                        <i class="ri-flag-fill"></i> <!-- Remix Icon for End -->
+                                                                    </span>
+                                                                @endif
+                                                        
+                                                                @if (($way_index + 1) % 3 == 0 || $loop->last) <!-- Close the div after 3 items or at the end -->
+                                                                    </div>
+                                                                @endif
+                                                            @endforeach
+                                                        @endif
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     {{-- For Activities --}}

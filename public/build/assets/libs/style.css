@@ -143,6 +143,7 @@
   }
 
   .show-btm {
+    padding: 5px 24px;
     max-width: 148px;
     height: 29px;
     font-size: 12px;
@@ -554,7 +555,7 @@
   }
   .route_details{
     font-size: x-small !important;
-    padding: 10px 1px !important;
+    padding: 10px 10px !important;
     text-align: center !important;
   }
 

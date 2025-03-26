@@ -184,7 +184,8 @@ class PresetItineraryList extends Component
                     'destination_id' => $this->selectedDestination, 
                     'hotel_category' => $this->selectedCategory,
                     'total_days' => $this->day,
-                    'total_nights' => $this->night
+                    'total_nights' => $this->night,
+                    'itinerary_journey' => $formattedString
                 ], // Search Conditions (Ensuring uniqueness)
                 [
                     'type' => 'preset',

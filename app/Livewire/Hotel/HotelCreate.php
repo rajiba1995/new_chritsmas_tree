@@ -32,6 +32,7 @@ class HotelCreate extends Component
 
     public function mount(){
         $this->hotel_categories = Category::where('status', 1)->get();
+        $this->division = "";
         $this->hotel_ammenities = Ammenity::where('status', 1)->get();
         $this->room_categories = RoomCategory::where('status', 1)->orderBy('name','ASC')->get();
         $this->destinations = State::where('status', 1)->orderBy('name', 'ASC')->get();

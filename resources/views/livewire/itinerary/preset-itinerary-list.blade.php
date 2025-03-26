@@ -301,7 +301,7 @@
     </div>
     {{-- Model --}}
 
-    <div wire:loading class="loader">
+    <div wire:loading class="loader" wire:target="getDestination,GetCategory,submitForm,NewPresetItinerary,filterType">
         <div class="spinner">
         <img src="{{asset('build/assets/images/media/loader.svg')}}" alt="">
         </div>

@@ -310,15 +310,15 @@
                                         {{-- Modal for Price Chart --}}
                                         <div id="price-chart{{$room->id}}" class="hs-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" onclick="closeModal('price-chart{{$room->id}}')">
                                             <div class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_lg_width bg-white rounded-lg" onclick="event.stopPropagation()">
-                                                <div class="ti-modal-content p-20">
-                                                    <div class="ti-modal-header">
-                                                        <h6 class="ti-modal-title">
-                                                           Price Chart For <span class="badge gap-2 bg-primary/10 text-primary">{{$room->room_name}}</span>
-                                                        </h6>
-                                                    </div>
-                                                    <div class="ti-modal-body text-start">
-                                                        <form method="POST" id="hotelPriceForm{{ $room->id }}">
-                                                            @csrf
+                                                <form method="POST" id="hotelPriceForm{{ $room->id }}">
+                                                    @csrf
+                                                    <div class="ti-modal-content p-20">
+                                                        <div class="ti-modal-header">
+                                                            <h6 class="ti-modal-title">
+                                                            Price Chart For <span class="badge gap-2 bg-primary/10 text-primary">{{$room->room_name}}</span>
+                                                            </h6>
+                                                        </div>
+                                                        <div class="ti-modal-body text-start">
                                                             <p class="badge gap-2 bg-danger/10 text-danger">
                                                                 <span class="w-1.5 h-1.5 inline-block bg-danger rounded-full"></span> Actual Price Chart
                                                                 <x-input-field type="hidden" name="title[]" value="Actual Price Chart" />
@@ -400,7 +400,7 @@
                                                                                 @if(isset($plan_item->plan_item))
                                                                                 @php
                                                                                     $plan_items = explode(', ',$plan_item->plan_item);
-                                                                                   
+                                                                                    
                                                                                 @endphp
                                                                                 <td>
                                                                                     @foreach ($plan_items as $k=> $item_value)
@@ -421,17 +421,20 @@
                                                                     </tbody>
                                                                 </table>
                                                             </div>
-                                                            <div class="flex justify-end">
+                                                        </div>
+                                                        <div class="ti-modal-footer">
+                                                            <div class="flex justify-end mt-4">
+                                                                <div class="form-message mt-4 text-sm flex justify-end"></div>
                                                                 <button type="button" 
                                                                     class="ti-btn ti-btn-primary-full ti-btn-loader !py-1 !px-2" 
                                                                     onclick="PriceChartFormSubmit(this, {{ $room->id }})">
                                                                     <span>Update</span> <span class="loading"></span>
                                                                 </button>
                                                             </div>
-                                                            <div class="form-message mt-4 text-sm flex justify-end"></div>
-                                                        </form>
+                                                            
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                </form>
                                             </div>
                                         </div>
                                         

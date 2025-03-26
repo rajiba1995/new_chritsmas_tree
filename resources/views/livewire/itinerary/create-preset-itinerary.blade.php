@@ -257,8 +257,8 @@
                                                                 <tr>
                                                                     <th class="!text-center uppercase" width="5%">SL No.</th>
                                                                     <th class="!text-center uppercase">ROUTE</th>
-                                                                    <th class="!text-center uppercase">ACTIVITY</th>
                                                                     <th class="!text-center uppercase">SIGHTSEEINGS</th>
+                                                                    <th class="!text-center uppercase">ACTIVITY</th>
                                                                     <th class="!text-center uppercase" width="5%">
                                                                         <button type="button" wire:click="OpenNewRouteModal({{$division_index}})" class="ti-btn ti-btn-sm ti-btn-soft-success !border !border-success/20">
                                                                             <i class="fa-solid fa-plus text-lg text-dark"></i>
@@ -273,47 +273,32 @@
                                                                         <td class="!text-center" rowspan="2">
                                                                             <span class="badge bg-primary/10 text-primary">{{$route_index+1}}</span>
                                                                         </td>
-                                                                        <td class="!text-center">{{ $division_route_item['route_name'] }}</td>
-                                                                        <td class="!text-center align-top">
-                                                                            <div class="small-btm">
-                                                                                @php
-                                                                                    $dayActivities = isset($division_route_item['day_activity'])?collect($division_route_item['day_activity'])->pluck('value')->toArray():[];
-                                                                                @endphp
-                                                                                <span class="badge gap-2 bg-primary/10 text-primary uppercase">Existing Activity</span>
-                                                                                <select wire:key="existing-activity-{{$route_index}}-{{ $division_index }}-100" 
-                                                                                wire:change="getActivityOrSightseeing('activity', {{$division_index}},{{ $route_index }}, {{ $division_route_item['route_service_summary_id'] }}, $event.target.value, $event.target.selectedOptions[0].getAttribute('data-price'), $event.target.selectedOptions[0].getAttribute('data-ticket_price'))">
-                                                                                    <option value="" hidden>Choose an Existing Activity</option>
-                                                                                    @forelse ($division_route_item['existing_activities'] as $existing_activity)
-                                                                                    @if(!in_array($existing_activity['name'], $dayActivities))
-                                                                                        <option value="{{ $existing_activity['name'] }}" data-price="{{$existing_activity['price']}}" data-ticket_price="{{$existing_activity['ticket_price']}}">
-                                                                                            {{ $existing_activity['name'] }} - PP: {{env('DEFAULT_CURRENCY_SYMBOL')}}{{ round($existing_activity['price'] )}} - TP: {{env('DEFAULT_CURRENCY_SYMBOL')}}{{round($existing_activity['ticket_price']) }}
-                                                                                        </option>
-                                                                                        @endif
-                                                                                    @empty
-                                                                                        <option value="" disabled>No activities available</option>
-                                                                                    @endforelse
-                                                                               </select>
-                                                                               {{-- <p>cgsjsdshj</p> --}}
-                                                                            </div>
-                                                                            @if(isset($errorActivity[$division_index][$route_index]))
-                                                                                <span class="text-red-500">{{ $errorActivity[$division_index][$route_index] }}</span>
-                                                                            @endif
-                                                                            <!-- Drag & Drop List -->
-                                                                            @if(isset($division_route_item['day_activity']) && count($division_route_item['day_activity'])>0)
-                                                                                <div class="sortable-list border-2 border-dashed border-gray-400 p-4 rounded-lg bg-white dark:bg-gray-800 shadow-md">
-                                                                                    <ul id="draggable-list" class="space-y-3 text-xs">
-                                                                                        @foreach ($division_route_item['day_activity'] as $act_index=>$day_activity)
-                                                                                            <li class="draggable-item flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-2 rounded-md cursor-move"  wire:key="day-{{ $division_index }}-route-{{ $route_index }}-activity-{{$act_index}}">
-                                                                                                <span class="text-gray-600 dark:text-white/70">{{ucfirst($day_activity['value'])}} @if($day_activity['price']>0)({{env('DEFAULT_CURRENCY_SYMBOL')}}{{$day_activity['price']}})@endif</span>
-                                                                                                <i class="far fa-times-circle text-danger cursor-pointer" wire:click="RemoveDayRouteItem({{$division_index}},{{$day_activity['id']}})"></i>
+                                                                        <td class="!text-center">
+                                                                           <span class="uppercase"> {{ $division_route_item['route_name'] }}</span>
+                                                                           @if (!empty($division_route_item['route_way_points']))
+                                                                                <div class="sortable-list border-2 border-dashed border-gray-400 p-2 rounded-lg bg-white dark:bg-gray-800 shadow-md">
+                                                                                    <ul class="list-none space-y-2 space-x-1 text-xs">
+                                                                                        @foreach ($division_route_item['route_way_points'] as $way_index => $waypoint)
+                                                                                            <li class="draggable-item flex items-center justify-start bg-gray-100 dark:bg-gray-700 p-1 rounded-md cursor-move">
+                                                                                                @if ($way_index == 0)
+                                                                                                    <span class="text-green-600 mx-2">
+                                                                                                        <i class="ri-map-pin-2-fill"></i>
+                                                                                                    </span>
+                                                                                                @endif
+                                                                                                @if (!$loop->last && $way_index != 0)
+                                                                                                    <span class="mx-2 text-red-600">→</span> <!-- Arrow between waypoints -->
+                                                                                                @endif
+                                                                                                @if ($loop->last)
+                                                                                                    <span class="text-blue-600 mx-2">
+                                                                                                        <i class="ri-flag-fill"></i> <!-- Remix Icon for End -->
+                                                                                                    </span>
+                                                                                                @endif
+                                                                                                <span class="text-gray-600 dark:text-white/70 text-[10px] italic"> {{ ucwords($waypoint['point_name']) }}</span>
                                                                                             </li>
                                                                                         @endforeach
                                                                                     </ul>
                                                                                 </div>
                                                                             @endif
-                                                                            <div class="small-btm mt-1">
-                                                                                <button class="badge gap-2 bg-success/10 text-success uppercase"><i class="fa-solid fa-plus"></i> Add New Activity</button>
-                                                                            </div>
                                                                         </td>
                                                                         <td class="!text-center align-top">
                                                                             <div class="small-btm">
@@ -338,21 +323,63 @@
                                                                             @endif
                                                                              <!-- Drag & Drop List -->
                                                                              @if(isset($division_route_item['day_sightseing']) && count($division_route_item['day_sightseing'])>0)
-                                                                                <div class="sortable-list border-2 border-dashed border-gray-400 p-4 rounded-lg bg-white dark:bg-gray-800 shadow-md">
-                                                                                    <ul id="draggable-list" class="space-y-3 text-xs">
+                                                                                <div class="sortable-list border-2 border-dashed border-gray-400 p-2 rounded-lg bg-white dark:bg-gray-800 shadow-md">
+                                                                                    <ul id="draggable-list" class="space-y-2 space-x-1 text-xs">
                                                                                         @foreach ($division_route_item['day_sightseing'] as $sight_index=>$day_sightseing)
-                                                                                            <li class="draggable-item flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-2 rounded-md cursor-move"  wire:key="day-{{ $division_index }}-route-{{ $route_index }}-sightseeing-{{$sight_index}}">
-                                                                                                <span class="text-gray-600 dark:text-white/70">{{ucfirst($day_sightseing['value'])}} @if($day_sightseing['price']>0)({{env('DEFAULT_CURRENCY_SYMBOL')}}{{$day_sightseing['price']}})@endif</span>
-                                                                                                <i class="far fa-times-circle text-danger cursor-pointer" wire:click="RemoveDayRouteItem({{$division_index}},{{$day_sightseing['id']}})"></i>
+                                                                                            <li class="draggable-item flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-1 rounded-md cursor-move"  wire:key="day-{{ $division_index }}-route-{{ $route_index }}-sightseeing-{{$sight_index}}">
+                                                                                                <span class="text-gray-600 dark:text-white/70 text-[10px] italic">{{ucfirst($day_sightseing['value'])}} <strong class="text-blue-600">@if($day_sightseing['price']>0)({{env('DEFAULT_CURRENCY_SYMBOL')}}{{$day_sightseing['price']}})@endif</strong> </span>
+                                                                                                <i class="far fa-times-circle text-primary cursor-pointer" wire:click="RemoveDayRouteItem({{$division_index}},{{$day_sightseing['id']}})"></i>
                                                                                             </li>
                                                                                         @endforeach
                                                                                     </ul>
                                                                                 </div>
                                                                             @endif
                                                                             <div class="small-btm mt-1">
-                                                                                <button class="badge gap-2 bg-success/10 text-success uppercase"><i class="fa-solid fa-plus"></i> Add New Sightseeing</button>
+                                                                                <button class="badge gap-2 bg-primary/10 text-primary uppercase"><i class="fa-solid fa-plus"></i> Add New Sightseeing</button>
                                                                             </div>
                                                                         </td>
+                                                                        <td class="!text-center align-top">
+                                                                            <div class="small-btm">
+                                                                                @php
+                                                                                    $dayActivities = isset($division_route_item['day_activity'])?collect($division_route_item['day_activity'])->pluck('value')->toArray():[];
+                                                                                @endphp
+                                                                                <span class="badge gap-2 bg-success/10 text-success uppercase">Existing Activity</span>
+                                                                                <select wire:key="existing-activity-{{$route_index}}-{{ $division_index }}-100" 
+                                                                                wire:change="getActivityOrSightseeing('activity', {{$division_index}},{{ $route_index }}, {{ $division_route_item['route_service_summary_id'] }}, $event.target.value, $event.target.selectedOptions[0].getAttribute('data-price'), $event.target.selectedOptions[0].getAttribute('data-ticket_price'))">
+                                                                                    <option value="" hidden>Choose an Existing Activity</option>
+                                                                                    @forelse ($division_route_item['existing_activities'] as $existing_activity)
+                                                                                    @if(!in_array($existing_activity['name'], $dayActivities))
+                                                                                        <option value="{{ $existing_activity['name'] }}" data-price="{{$existing_activity['price']}}" data-ticket_price="{{$existing_activity['ticket_price']}}">
+                                                                                            {{ $existing_activity['name'] }} - PP: {{env('DEFAULT_CURRENCY_SYMBOL')}}{{ round($existing_activity['price'] )}} - TP: {{env('DEFAULT_CURRENCY_SYMBOL')}}{{round($existing_activity['ticket_price']) }}
+                                                                                        </option>
+                                                                                        @endif
+                                                                                    @empty
+                                                                                        <option value="" disabled>No activities available</option>
+                                                                                    @endforelse
+                                                                               </select>
+                                                                               {{-- <p>cgsjsdshj</p> --}}
+                                                                            </div>
+                                                                            @if(isset($errorActivity[$division_index][$route_index]))
+                                                                                <span class="text-red-500">{{ $errorActivity[$division_index][$route_index] }}</span>
+                                                                            @endif
+                                                                            <!-- Drag & Drop List -->
+                                                                            @if(isset($division_route_item['day_activity']) && count($division_route_item['day_activity'])>0)
+                                                                                <div class="sortable-list border-2 border-dashed border-gray-400 p-2 rounded-lg bg-white dark:bg-gray-800 shadow-md">
+                                                                                    <ul id="draggable-list" class="space-y-2 space-x-1 text-xs">
+                                                                                        @foreach ($division_route_item['day_activity'] as $act_index=>$day_activity)
+                                                                                            <li class="draggable-item flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-1 rounded-md cursor-move"  wire:key="day-{{ $division_index }}-route-{{ $route_index }}-activity-{{$act_index}}">
+                                                                                                <span class="text-gray-600 dark:text-white/70 text-[10px] italic">{{ucfirst($day_activity['value'])}} <strong class="text-green-600">@if($day_activity['price']>0)({{env('DEFAULT_CURRENCY_SYMBOL')}}{{$day_activity['price']}})@endif</strong> </span>
+                                                                                                <i class="far fa-times-circle text-success cursor-pointer" wire:click="RemoveDayRouteItem({{$division_index}},{{$day_activity['id']}})"></i>
+                                                                                            </li>
+                                                                                        @endforeach
+                                                                                    </ul>
+                                                                                </div>
+                                                                            @endif
+                                                                            <div class="small-btm mt-1">
+                                                                                <button class="badge gap-2 bg-success/10 text-success uppercase"><i class="fa-solid fa-plus"></i> Add New Activity</button>
+                                                                            </div>
+                                                                        </td>
+                                                                        
                                                                         <td class="!text-center" rowspan="2">
                                                                             <button type="button" wire:click="RemoveDayRoute({{$division_index}},'day_route', {{$division_route_item['route_service_summary_id']}})" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20">
                                                                                 <i class="ti ti-trash"></i>
@@ -365,7 +392,7 @@
                                                                                 @php
                                                                                     $dayCabs = isset($division_route_item['day_cab'])?collect($division_route_item['day_cab'])->pluck('value')->toArray():[];
                                                                                 @endphp
-                                                                                <span class="badge gap-2 bg-primary/10 text-primary uppercase">Existing Cabs</span>
+                                                                                <span class="badge gap-2 bg-warning/10 text-warning uppercase">Existing Cabs</span>
                                                                                 <select wire:key="existing-cab-{{$route_index}}-{{ $division_index }}-100" 
                                                                                 wire:change="getActivityOrSightseeing('cab',{{$division_index}},{{ $route_index }}, {{ $division_route_item['route_service_summary_id'] }}, $event.target.value, $event.target.selectedOptions[0].getAttribute('data-price'), '0')">
                                                                                     <option value="">Choose an Existing Cab</option>
@@ -397,17 +424,17 @@
                                                                                                     </div>
                                                                                                     <div class="custom-cab-details">
                                                                                                         <div class="custom-hotel-details-top">
-                                                                                                            <p class="text-black-600 text-xs italic">{{ $day_cab['value'] }}</p>
+                                                                                                            <p class="text-black-600 text-xs">{{ $day_cab['value'] }}</p>
                                                                                                             <div>
                                                                                                                     <label class="cab-preview-label relative cursor-pointer">
                                                                                                                     <div class="cab-card">
-                                                                                                                        <span class="hotel-name">{{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_cab['price'] }}</span>
+                                                                                                                        <span class="hotel-name italic text-yellow-600">{{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_cab['price'] }}</span>
                                                                                                                     </div>
                                                                                                                 </label>
                                                                                                             </div>
                                                                                                         </div>
                                                                                                     </div>
-                                                                                                    <i class="far fa-times-circle text-danger cursor-pointer text-xs" wire:click="RemoveDayRouteItem({{$division_index}},{{$day_cab['id']}})"></i>
+                                                                                                    <i class="far fa-times-circle text-warning cursor-pointer text-xs" wire:click="RemoveDayRouteItem({{$division_index}},{{$day_cab['id']}})"></i>
                                                                                                 </div>
                                                                                             </div>
                                                                                         </div>
@@ -456,7 +483,7 @@
                                                                                 <select
                                                                                     class="placeholder:text-textmuted text-sm selected_seasion_type route_select2"
                                                                                     wire:key="routes-{{ $division_index }}-100" wire:change="getRoute({{$division_index}},$event.target.value)">
-                                                                                    <option value="" hidden>Choose hotel</option>
+                                                                                    <option value="" hidden>Choose route</option>
                                                                                     @if (!empty($division_item['division_routes']) && count($division_item['division_routes']) > 0)
                                                                                         @foreach ($division_item['division_routes'] as $routes_index => $route_item)
                                                                                             <option 

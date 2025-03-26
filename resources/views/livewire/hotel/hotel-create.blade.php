@@ -48,7 +48,7 @@
                                 <div class="space-y-2">
                                     <div class="form-group">
                                         <label for="division" class="form_custom_lable">Divisions<span class="text-danger">*</span></label>
-                                        <select id="division" class="form-select w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500 form-control-sm select2" wire:model="division">
+                                        <select id="division" class="form-select w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500 form-control-sm" wire:model="division">
                                             <option value="" selected disabled>Select division</option>
                                             @foreach ($divisions as $div_item)
                                                 <option value="{{$div_item->id}}">{{$div_item->name}}</option>
@@ -271,7 +271,7 @@
                                     @enderror
                                 </div>
                         
-                                <div class="w-full sm:w-auto w-11">
+                                <div class="w-full sm:w-auto w-12">
                                     <label class="form_custom_lable"> Ammenity </label>
                                     <div class="select-group">
                                         <button type="button"
@@ -295,7 +295,7 @@
                                 </div>
                         
                                 @if ($index == 0)
-                                    <div class="w-full sm:w-auto w-10 mt-22">
+                                    <div class="w-full sm:w-auto w-8 mt-22">
                                         <button type="button" wire:click="addRoom"
                                             class="change-text-button ti-btn ti-btn-secondary !py-1 !px-2 ti-btn-wave me-[0.375rem]">
                                             <i class="ri-add-circle-line"></i> Add
@@ -304,7 +304,7 @@
                                 @endif
                         
                                 @if ($index > 0)
-                                    <div class="w-full sm:w-auto w-10">
+                                    <div class="w-full sm:w-auto w-8">
                                         <button type="button" wire:click="removeRoom({{ $index }})"
                                             class="change-text-button ti-btn ti-btn-danger !py-1 !px-2 ti-btn-wave me-[0.375rem]">
                                             <i class="ri-delete-bin-line"></i> Remove

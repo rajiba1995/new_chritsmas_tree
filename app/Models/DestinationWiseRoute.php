@@ -21,6 +21,6 @@ class DestinationWiseRoute extends Model
     }
     public function waypoints ()
     {
-        return $this->hasMany(DestinationWiseRouteWaypoint::class, 'route_id', 'id');
+        return $this->hasMany(DestinationWiseRouteWaypoint::class, 'route_id', 'id')->orderBy('positions', 'ASC');;
     }
 }

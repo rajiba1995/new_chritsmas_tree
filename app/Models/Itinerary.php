@@ -13,11 +13,11 @@ class Itinerary extends Model
         'type', 'destination_id', 'hotel_category', 'total_days', 'total_nights', 'itinerary_journey', 'night_journey', 'divisions_journey','itinerary_syntax','stay_by_journey'
    ];
 
-   public function destination()
+    public function destination()
     {
         return $this->belongsTo(State::class, 'destination_id');
     }
-   public function hotelCategory()
+    public function hotelCategory()
     {
         return $this->belongsTo(Category::class, 'hotel_category');
     }
