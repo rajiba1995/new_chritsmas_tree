@@ -158,39 +158,6 @@
                                                                 </li>
                                                             @endforeach
                                                         </ul>
-                                                        {{-- @foreach ($route_item->route->waypoints as $way_index => $waypoint)
-                                                            @if ($way_index % 3 == 0) <!-- Start a new line after every 3 items -->
-                                                                <div class="flex items-center space-x-2">
-                                                            @endif
-                                                            <!-- Start Icon for First Waypoint -->
-                                                            @if ($way_index == 0)
-                                                                <span class="text-green-600">
-                                                                    <i class="ri-map-pin-2-fill"></i> <!-- Remix Icon for Start -->
-                                                                </span>
-                                                            @endif
-                                                    
-                                                            <!-- Waypoint Name -->
-                                                            <span class="text-[12px]">{{ ucwords($waypoint->point_name) }}</span>
-                                                    
-                                                            @if (!$loop->last)
-                                                                <span class="text-red-600">
-                                                                    <x-icon-tooltip icon="ri-arrow-right-s-line" tooltip="{{ $waypoint->distance_from_previous_km }}, ({{ $waypoint->travel_time_from_previous }})"/>
-                                                                </span>
-                                                            @endif
-    
-                                                            
-                                                    
-                                                            <!-- End Icon for Last Waypoint -->
-                                                            @if ($loop->last)
-                                                                <span class="text-blue-600">
-                                                                    <i class="ri-flag-fill"></i> <!-- Remix Icon for End -->
-                                                                </span>
-                                                            @endif
-                                                    
-                                                            @if (($way_index + 1) % 3 == 0 || $loop->last) <!-- Close the div after 3 items or at the end -->
-                                                                </div>
-                                                            @endif
-                                                        @endforeach --}}
                                                     @endif
                                                 </td>
                                                 <td class="align-top !text-center">

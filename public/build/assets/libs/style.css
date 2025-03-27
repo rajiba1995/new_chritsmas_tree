@@ -783,6 +783,17 @@
   gap: 5px;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
 }
+.room-details-card{
+  margin-bottom: 5px;
+  border: 1px solid #4181d5;
+  border-radius: 7px;
+  padding: 4px 4px 4px 4px;
+  font-size: 9px;
+  font-weight: 600;
+  background: #fff;
+  transition: all 0.3s ease-in-out;
+  align-items: center;
+}
 
 .hotel-card:hover {
   background: #eef6ff;

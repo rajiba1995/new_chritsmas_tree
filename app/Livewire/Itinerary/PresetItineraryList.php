@@ -18,7 +18,7 @@ class PresetItineraryList extends Component
     public $selectedDestination = null;
     public $selectedCategory =null;
     public $search ="";
-    public $selectedType =null;
+    public $selectedType ='preset';
     public $active_assign_new_modal = 0;
     public $active_night_distribution = 0;
     public $day;
@@ -74,10 +74,6 @@ class PresetItineraryList extends Component
     public function GetCategory($value){
         $this->selectedCategory = $value;
         $this->active_night_distribution = 1;
-        $this->preset_itineraries = $this->getItinerary();
-    }
-    public function filterType($value){
-        $this->selectedType = $value;
         $this->preset_itineraries = $this->getItinerary();
     }
 

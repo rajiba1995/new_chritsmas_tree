@@ -15,24 +15,7 @@
                     @endif
                 </div>
                 <div class="box-header flex justify-end">
-                    <div>
-                       <div class="grid grid-cols-1 hover:grid-cols-6">
-                            <label for="">
-                                <span class="badge gap-2 bg-danger/10 text-danger uppercase">
-                                    Type
-                                 </span>
-                            </label>
-                            <select 
-                                name="itinerary_type" 
-                                class="placeholder:text-textmuted text-sm selected_seasion_type"  
-                                wire:change="filterType($event.target.value)" 
-                                wire:key="itinerary-type-0">
-                                <option value="" hidden>Filter type</option>
-                                <option value="preset">Preset</option>
-                                <option value="post_inquiry">Post Inquiry</option>
-                            </select>
-                       </div>
-                    </div>
+                    
                     <div>
                        <div class="grid grid-cols-1 hover:grid-cols-6">
                             <label for="">
@@ -301,7 +284,7 @@
     </div>
     {{-- Model --}}
 
-    <div wire:loading class="loader" wire:target="getDestination,GetCategory,submitForm,NewPresetItinerary,filterType">
+    <div wire:loading class="loader" wire:target="getDestination,GetCategory,submitForm,NewPresetItinerary">
         <div class="spinner">
         <img src="{{asset('build/assets/images/media/loader.svg')}}" alt="">
         </div>

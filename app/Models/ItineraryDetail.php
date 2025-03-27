@@ -13,9 +13,11 @@ class ItineraryDetail extends Model
         'route_service_summary_id',
         'hotel_id',
         'room_id',
+        'cab_id',
         'header',
         'field',
         'value',
+        'value_quantity',
         'price',
     ];
      // Relationship with Itinerary model
@@ -26,6 +28,12 @@ class ItineraryDetail extends Model
 
     public function hotel(){
         return $this->belongsTo(Hotel::class, 'hotel_id', 'id');
+    }
+    public function room(){
+        return $this->belongsTo(Room::class, 'room_id', 'id');
+    }
+    public function cab(){
+        return $this->belongsTo(Cab::class, 'cab_id', 'id');
     }
     public function route_service(){
         return $this->belongsTo(RouteServiceSummary::class, 'route_service_summary_id', 'id');

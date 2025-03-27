@@ -307,7 +307,7 @@
                                                                                 @endphp
                                                                                 <span class="badge gap-2 bg-primary/10 text-primary uppercase">Existing Sightseeing</span>
                                                                                 <select wire:key="existing-sightseeing-{{$route_index}}-{{ $division_index }}-100" 
-                                                                                wire:change="getActivityOrSightseeing('sightseeing',{{$division_index}},{{ $route_index }}, {{ $division_route_item['route_service_summary_id'] }}, $event.target.value, '0', $event.target.selectedOptions[0].getAttribute('data-ticket_price'))">
+                                                                                wire:change="getActivityOrSightseeing('sightseeing',{{$division_index}},{{ $route_index }}, {{ $division_route_item['route_service_summary_id'] }}, $event.target.value, '0', $event.target.selectedOptions[0].getAttribute('data-ticket_price'),'')">
                                                                                      <option value="">Choose an Existing Sightseeing</option>
                                                                                      @forelse ($division_route_item['existing_sightseeings'] as $existing_sightseeing)
                                                                                         @if(!in_array($existing_sightseeing['name'], $daySightseeings))
@@ -345,7 +345,7 @@
                                                                                 @endphp
                                                                                 <span class="badge gap-2 bg-success/10 text-success uppercase">Existing Activity</span>
                                                                                 <select wire:key="existing-activity-{{$route_index}}-{{ $division_index }}-100" 
-                                                                                wire:change="getActivityOrSightseeing('activity', {{$division_index}},{{ $route_index }}, {{ $division_route_item['route_service_summary_id'] }}, $event.target.value, $event.target.selectedOptions[0].getAttribute('data-price'), $event.target.selectedOptions[0].getAttribute('data-ticket_price'))">
+                                                                                wire:change="getActivityOrSightseeing('activity', {{$division_index}},{{ $route_index }}, {{ $division_route_item['route_service_summary_id'] }}, $event.target.value, $event.target.selectedOptions[0].getAttribute('data-price'), $event.target.selectedOptions[0].getAttribute('data-ticket_price'),'')">
                                                                                     <option value="" hidden>Choose an Existing Activity</option>
                                                                                     @forelse ($division_route_item['existing_activities'] as $existing_activity)
                                                                                     @if(!in_array($existing_activity['name'], $dayActivities))
@@ -394,11 +394,11 @@
                                                                                 @endphp
                                                                                 <span class="badge gap-2 bg-warning/10 text-warning uppercase">Existing Cabs</span>
                                                                                 <select wire:key="existing-cab-{{$route_index}}-{{ $division_index }}-100" 
-                                                                                wire:change="getActivityOrSightseeing('cab',{{$division_index}},{{ $route_index }}, {{ $division_route_item['route_service_summary_id'] }}, $event.target.value, $event.target.selectedOptions[0].getAttribute('data-price'), '0')">
+                                                                                wire:change="getActivityOrSightseeing('cab',{{$division_index}},{{ $route_index }}, {{ $division_route_item['route_service_summary_id'] }}, $event.target.value, $event.target.selectedOptions[0].getAttribute('data-price'), '0', $event.target.selectedOptions[0].getAttribute('data-id'))">
                                                                                     <option value="">Choose an Existing Cab</option>
                                                                                     @forelse ($division_route_item['existing_cabs'] as $existing_cabs)
                                                                                         @if(!in_array($existing_cabs['name'], $dayCabs))
-                                                                                            <option value="{{$existing_cabs['name']}}" data-price="{{$existing_cabs['price']}}">{{$existing_cabs['name']}} </option>
+                                                                                            <option value="{{$existing_cabs['name']}}" data-id="{{$existing_cabs['id']}}" data-price="{{$existing_cabs['price']}}">{{$existing_cabs['name']}} </option>
                                                                                         @endif
                                                                                     @empty
                                                                                         <option value="" disabled>No cabs available</option>
@@ -418,19 +418,29 @@
                                                                                                 <div class="custom-cab-content">
                                                                                                     <div class="custom-hotel-image-container">
                                                                                                         <div class="custom-image-wrapper" style="width: 95px; height: 50px;">
-                                                                                                            <img class="custom-hotel-image" width="95" height="50"
-                                                                                                                src="{{asset('assets/img/cab.png')}}" alt="Cab Image">
+                                                                                                            <img class="custom-hotel-image" width="95" height="50" src="{{ isset($day_cab['cab']['image']) && $day_cab['cab']['image'] ? asset($day_cab['cab']['image']) : asset('assets/img/cab.png') }}" 
+                                                                                                            alt="Cab Image">
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     <div class="custom-cab-details">
                                                                                                         <div class="custom-hotel-details-top">
                                                                                                             <p class="text-black-600 text-xs">{{ $day_cab['value'] }}</p>
                                                                                                             <div>
-                                                                                                                    <label class="cab-preview-label relative cursor-pointer">
+                                                                                                                <label class="cab-preview-label relative cursor-pointer">
                                                                                                                     <div class="cab-card">
                                                                                                                         <span class="hotel-name italic text-yellow-600">{{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_cab['price'] }}</span>
                                                                                                                     </div>
                                                                                                                 </label>
+                                                                                                            </div>
+                                                                                                            <!-- Quantity Controls -->
+                                                                                                            <div class="flex items-center space-x-2 justify-center">
+                                                                                                                <i class="fas fa-minus-circle text-red-500 cursor-pointer text-base"
+                                                                                                                    wire:click="decreaseQuantity({{$division_index}},{{$day_cab['id']}})"></i>
+                                                                                                                
+                                                                                                                <span class="text-sm font-bold">{{$day_cab['value_quantity']}}</span>
+                                                                                                                
+                                                                                                                <i class="fas fa-plus-circle text-green-500 cursor-pointer text-base"
+                                                                                                                    wire:click="increaseQuantity({{$division_index}},{{$day_cab['id']}})"></i>
                                                                                                             </div>
                                                                                                         </div>
                                                                                                     </div>
@@ -505,102 +515,127 @@
                                                                 </div>
                                                             </div>
                                                         {{--End Model For New Route  --}}
-                                                        <div class="mt-4">
-                                                            <span class="badge gap-2 bg-danger/10 text-danger uppercase text-small m-2"><i class="fas fa-hotel"></i> Hotel  <span class="custom-header-separator">|</span> 1 Night<span class="custom-header-separator">|</span> in {{$division_item['division_name']}}</span>
-                                                            <div class="grid grid-cols-12 sm:gap-x-6 sm:gap-y-4">
-                                                                <div class="md:col-span-8 col-span-12 mb-4 mx-2 itinerary-build">
-                                                                    
-                                                                    @forelse ($division_item['day_hotel'] as $division_hotel_item)
-                                                                        <div class="custom-card mt-2" wire:key="day-{{ $division_index }}-hotel-{{ $division_hotel_item['hotel_id'] }}">
-                                                                            <div class="custom-hotel-container relative !overflow-visible">
-                                                                                <div class="custom-hotel-content">
-                                                                                    <div class="custom-hotel-image-container">
-                                                                                        {{-- <p class="custom-hotel-rating">4.2<small>/5</small></p> --}}
-                                                                                        <div class="custom-image-carousel">
-                                                                                            <div class="custom-image-wrapper" style="width: 225px; height: 120px;">
-                                                                                                <img class="custom-hotel-image" width="225" height="120" 
-                                                                                                    src="{{asset('build/assets/images/logo/hotel.jpg')}}" 
-                                                                                                    alt="Hotel Image">
+
+                                                        {{-- If Itinerary is Post Lead then will show Hotel --}}
+                                                        @if($itineraryType=="post_inquiry")
+                                                            <div class="mt-4">
+                                                                <span class="badge gap-2 bg-danger/10 text-danger uppercase text-small m-2"><i class="fas fa-hotel"></i> Hotel  <span class="custom-header-separator">|</span> 1 Night<span class="custom-header-separator">|</span> in {{$division_item['division_name']}}</span>
+                                                                <div class="grid grid-cols-12 sm:gap-x-6 sm:gap-y-4">
+                                                                    <div class="md:col-span-8 col-span-12 mb-4 mx-2 itinerary-build">
+                                                                        
+                                                                        @forelse ($division_item['day_hotel'] as $division_hotel_item)
+                                                                            <div class="custom-card mt-2" wire:key="day-{{ $division_index }}-hotel-{{ $division_hotel_item['hotel_id'] }}">
+                                                                                <div class="custom-hotel-container relative !overflow-visible">
+                                                                                    <div class="custom-hotel-content">
+                                                                                        <div class="custom-hotel-image-container">
+                                                                                            {{-- <p class="custom-hotel-rating">4.2<small>/5</small></p> --}}
+                                                                                            <div class="custom-image-carousel">
+                                                                                                <div class="custom-image-wrapper" style="width: 225px; height: 120px;">
+                                                                                                    <img class="custom-hotel-image" width="225" height="120" 
+                                                                                                        src="{{$division_hotel_item['hotel_image']?asset($division_hotel_item['hotel_image']):asset('build/assets/images/logo/hotel.jpg')}}" 
+                                                                                                        alt="Hotel Image">
+                                                                                                </div>
                                                                                             </div>
                                                                                         </div>
-                                                                                    </div>
-                                                                                
-                                                                                    <div class="custom-hotel-details">
-                                                                                        <div class="custom-hotel-details-top">
-                                                                                            <p class="text-black-600 text-base italic">{{$division_hotel_item['hotel_name']}}</p>
-                                                                                            <p class="text-gray-500 text-small">{{$division_hotel_item['hotel_address']}}</p>
-                                                                                            <p class="badge gap-2 bg-danger/10 text-danger uppercase text-small my-2">Rooms</p>
-                                                                                            <div>
-                                                                                                @forelse ($division_hotel_item['hotel_rooms'] as $room)
-                                                                                                    <label class="hotel-preview-label relative cursor-pointer">
-                                                                                                        <input 
-                                                                                                            type="radio"
-                                                                                                            name="selected_day_wise_itinerary_hotel.{{ $division_index }}.room" 
-                                                                                                            value="{{ $room->id ?? '' }}" 
-                                                                                                            class="hidden peer"
-                                                                                                            {{-- wire:model="selected_day_wise_itinerary_hotel.{{ $division_index }}.room"
-                                                                                                            wire:key="hotel-{{ $division_index }}-room-{{ $room->id }}" --}}
-                                                                                                            >
-                                                                                                        <!-- Hotel Selection Box -->
-                                                                                                        <div class="hotel-card">
-                                                                                                            <span class="hotel-name">{{$room->room_name}}</span>
-                                                                                                            <!-- Selected Indicator -->
-                                                                                                            {{-- <span class="checkmark">✓</span> --}}
+                                                                                    
+                                                                                        <div class="custom-hotel-details">
+                                                                                            <div class="custom-hotel-details-top">
+                                                                                                <p class="text-black-600 text-base italic">{{$division_hotel_item['hotel_name']}}</p>
+                                                                                                <p class="text-gray-500 text-small">{{$division_hotel_item['hotel_address']}}</p>
+                                                                                                <p class="badge gap-2 bg-danger/10 text-danger uppercase text-small my-2">Rooms</p>
+                                                                                                <div>
+                                                                                                    @forelse ($division_hotel_item['hotel_rooms'] as $room_index=> $room)
+                                                                                                        <label class="hotel-preview-label relative cursor-pointer">
+                                                                                                            <input 
+                                                                                                                type="radio"
+                                                                                                                name="selected_day_wise_itinerary_hotel.{{ $division_index }}.room"
+                                                                                                                value="{{ $room->id ?? '' }}" 
+                                                                                                                class="hidden peer"
+                                                                                                                wire:change="updateSelectedRoom({{$division_hotel_item['hotel_id']}},{{ $division_index }}, {{ $room->id }})">
+                                                                                                            <!-- Hotel Selection Box -->
+                                                                                                            <div class="hotel-card">
+                                                                                                                <span class="hotel-name">{{$room->room_name}}</span>
+                                                                                                                <!-- Selected Indicator -->
+                                                                                                                <span class="checkmark">✓</span>
+                                                                                                            </div>
+                                                                                                        </label>
+                                                                                                    @empty
+                                                                                                        <div class="alert alert-warning text-sm italic">
+                                                                                                            rooms not added on this hotel
                                                                                                         </div>
-                                                                                                    </label>
-                                                                                                @empty
-                                                                                                    <div class="alert alert-warning text-sm italic">
-                                                                                                        rooms not added on this hotel
-                                                                                                    </div>
-                                                                                                @endforelse
+                                                                                                    @endforelse
+                                                                                                </div>
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
+                                                                                    <button type="button" wire:click="RemoveDayHotel({{$division_index}},'day_hotel', {{$division_hotel_item['hotel_id']}})" class="delete-icon">✖
+                                                                                    </button>
                                                                                 </div>
-                                                                                <button type="button" wire:click="RemoveDayHotel({{$division_index}},'day_hotel', {{$division_hotel_item['hotel_id']}})" class="delete-icon">✖
-                                                                                </button>
-                                                                            </div>
-                                                                        </div>
-                                                                    @empty
-                                                                        <div class="custom-card">
-                                                                            <div class="alert alert-warning text-sm italic">
-                                                                                Hotel not added yet!
-                                                                            </div>
-                                                                        </div>
-                                                                    @endforelse
-                                                                </div>
-                                                                <div class="md:col-span-4 col-span-12 mb-4 mx-2 itinerary-build">
-                                                                    <div class="custom-card">
-                                                                        <div class="custom-hotel-container" wire:ignore>
-                                                                            <label for="">
-                                                                                <span class="badge gap-2 bg-primary/10 text-primary uppercase">
-                                                                                    Hotels
-                                                                                 </span>
-                                                                            </label>
-                                                                            <select
-                                                                                class="placeholder:text-textmuted text-sm selected_seasion_type select2" data-id="{{$division_index}}" 
-                                                                                wire:key="hotel-{{ $division_index }}-100">
-                                                                                <option value="" hidden>Choose hotel</option>
-                                                                                @if (!empty($division_item['division_hotels']) && count($division_item['division_hotels']) > 0)
-                                                                                    @foreach ($division_item['division_hotels'] as $hotel_index => $hotel_item)
-                                                                                        <option 
-                                                                                            value="{{ $hotel_item['id'] ?? '' }}"
-                                                                                            wire:key="hotel-{{ $division_index }}-{{ $hotel_index }}">
-                                                                                            {{ $hotel_item['name'] ?? 'No Name' }}
-                                                                                        </option>
-                                                                                    @endforeach
-                                                                                @else
-                                                                                    <option value="" disabled>No hotels available</option>
+                                                                                @if(isset($selected_rooms[$division_index]))
+                                                                                    @php
+                                                                                        $selectedRoomId = $selected_rooms[$division_index] ?? null;
+                                                                                        $selectedRoom = collect($division_hotel_item['hotel_rooms'])->firstWhere('id', $selectedRoomId);
+                                                                                    @endphp
+                                                                                    @if ($selectedRoom)
+                                                                                        <div class="room-details-card mt-2">
+                                                                                            <div class="text-center uppercase">
+                                                                                                <p class="">{{ $selectedRoom->room_name ?? 'N/A' }}</p>
+                                                                                            </div>
+
+                                                                                            {{-- Error  --}}
+                                                                                            @if(!empty($errorRoom[$division_index])) 
+                                                                                                <div class="alert alert-warning text-sm italic">
+                                                                                                    {{ $errorRoom[$division_index] }}
+                                                                                                </div>
+                                                                                            @endif
+                                                                                        </div>
+                                                                                    @endif
                                                                                 @endif
-                                                                            </select>
-                                                                            @error('errorHotel.{{$division_index}}') 
-                                                                                <span class="text-red-500">{{ $message }}</span> 
-                                                                            @enderror
+                                                                                
+                                                                            </div>
+                                                                        @empty
+                                                                            <div class="custom-card">
+                                                                                <div class="alert alert-warning text-sm italic">
+                                                                                    Hotel not added yet!
+                                                                                </div>
+                                                                            </div>
+                                                                        @endforelse
+                                                                        
+                                                                        
+                                                                    </div>
+                                                                    <div class="md:col-span-4 col-span-12 mb-4 mx-2 itinerary-build">
+                                                                        <div class="custom-card">
+                                                                            <div class="custom-hotel-container" wire:ignore>
+                                                                                <label for="">
+                                                                                    <span class="badge gap-2 bg-primary/10 text-primary uppercase">
+                                                                                        Hotels
+                                                                                    </span>
+                                                                                </label>
+                                                                                <select
+                                                                                    class="placeholder:text-textmuted text-sm selected_seasion_type select2" data-id="{{$division_index}}" 
+                                                                                    wire:key="hotel-{{ $division_index }}-100">
+                                                                                    <option value="" hidden>Choose hotel</option>
+                                                                                    @if (!empty($division_item['division_hotels']) && count($division_item['division_hotels']) > 0)
+                                                                                        @foreach ($division_item['division_hotels'] as $hotel_index => $hotel_item)
+                                                                                            <option 
+                                                                                                value="{{ $hotel_item['id'] ?? '' }}"
+                                                                                                wire:key="hotel-{{ $division_index }}-{{ $hotel_index }}">
+                                                                                                {{ $hotel_item['name'] ?? 'No Name' }}
+                                                                                            </option>
+                                                                                        @endforeach
+                                                                                    @else
+                                                                                        <option value="" disabled>No hotels available</option>
+                                                                                    @endif
+                                                                                </select>
+                                                                                @error('errorHotel.{{$division_index}}') 
+                                                                                    <span class="text-red-500">{{ $message }}</span> 
+                                                                                @enderror
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
+                                                        @endif
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -630,7 +665,7 @@
         </div>
     @endif
 
-    <div wire:loading class="loader" wire:target="addAboutDescHighlight, ItineraryImageDelete, deleteDayImage, showImageModal, OpenNewRouteModal, RemoveDayRouteItem,RemoveDayRoute,RemoveDayHotel, closeModal, getActivityOrSightseeing, getRoute, uploadMainBanner, main_banner, uploadDestinationSlider, removeAboutDescHighlight">
+    <div wire:loading class="loader" wire:target="addAboutDescHighlight, ItineraryImageDelete, deleteDayImage, showImageModal, OpenNewRouteModal, RemoveDayRouteItem,RemoveDayRoute,RemoveDayHotel, closeModal, getActivityOrSightseeing, getRoute, uploadMainBanner, main_banner, uploadDestinationSlider, removeAboutDescHighlight,getHotel,updateSelectedRoom,decreaseQuantity,increaseQuantity">
         <div class="spinner">
         <img src="{{asset('build/assets/images/media/loader.svg')}}" alt="">
         </div>

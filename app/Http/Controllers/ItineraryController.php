@@ -20,6 +20,10 @@ class ItineraryController extends Controller
         $common = CustomHelper::setHeadersAndTitle('Itinerary Management', 'Preset Itinerary');
         return view('admin.itinerary.destination-wise-preset-itinerary-list', compact('common'));
     }
+    public function DestinationWisePostLeadItineraryList(){
+        $common = CustomHelper::setHeadersAndTitle('Itinerary Management', 'Post Lead Itinerary');
+        return view('admin.itinerary.destination-wise-post-lead-itinerary-list', compact('common'));
+    }
 
     public function DestinationWisePresetItineraryBuilder($encryptedId){
         try {
@@ -30,7 +34,11 @@ class ItineraryController extends Controller
                 abort(404, 'Itinerary not found.');
             }
     
-            $common = CustomHelper::setHeadersAndTitle('Itinerary Management', 'Preset Itinerary Build');
+            if ($itineraryExists->type == "preset") {
+                $common = CustomHelper::setHeadersAndTitle('Itinerary Management', 'Build Preset Itinerary');
+            } else {
+                $common = CustomHelper::setHeadersAndTitle('Itinerary Management', 'Customize Post-Lead Itinerary');
+            }
             return view('admin.itinerary.destination-wise-preset-itinerary-builder', compact('common','itineraryExists', 'id'));
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
             abort(403, 'Invalid request.');

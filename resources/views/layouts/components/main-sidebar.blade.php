@@ -164,11 +164,14 @@
 									<li class="slide {{ request()->is('admin/itinerary/division/banners')? 'active' : '' }}">
 										<a href="{{route('admin.itinerary.division.banners')}}" class="side-menu__item">Division Wise Banners</a>
 									</li>
-									<li class="slide {{ request()->is('admin/itinerary/template/list')? 'active' : '' }}">
+									{{-- <li class="slide {{ request()->is('admin/itinerary/template/list')? 'active' : '' }}">
 										<a href="{{route('admin.itinerary.template.list')}}" class="side-menu__item">Itinerary Templates</a>
-									</li>
+									</li> --}}
 									<li class="slide {{ request()->is('admin/itinerary/preset/list')? 'active' : '' }}">
 										<a href="{{route('admin.itinerary.preset.list')}}" class="side-menu__item">Preset Itinerary List</a>
+									</li>
+									<li class="slide {{ request()->is('admin/itinerary/post-lead/list')? 'active' : '' }}">
+										<a href="{{route('admin.itinerary.postlead.list')}}" class="side-menu__item">Post Lead Itinerary List</a>
 									</li>
 								</ul>
 							</li>

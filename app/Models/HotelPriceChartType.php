@@ -24,6 +24,11 @@ class HotelPriceChartType extends Model
         return $this->belongsTo(Hotel::class);
     }
 
+    public function room_price ()
+    {
+        return $this->hasMany(HotelPriceChart::class, 'price_chart_type_id', 'id');
+    }
+
     public function room()
     {
         return $this->belongsTo(Room::class);

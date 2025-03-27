@@ -13,6 +13,7 @@ use App\Models\DivisionWiseActivityImage;
 use App\Models\Itinerary;
 use App\Models\RouteServiceSummary;
 use App\Models\ItineraryDetail;
+use App\Models\HotelPriceChartType;
 use App\Helpers\CustomHelper;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +25,7 @@ class CreatePresetItinerary extends Component
 {
     use WithFileUploads;
     public $destinationId;
+    public $itineraryType;
     public $itinerary_id;
     public $active_new_route_modal;
     public $selectedDivision;
@@ -38,6 +40,9 @@ class CreatePresetItinerary extends Component
     public $uploadDestinationSlider = []; 
     public $uploadDayImages = [];
     public $day_by_divisions = [];
+
+    public $selected_rooms = [];
+
     public $showModal = false;
     public $modalImage = '';
     
@@ -52,14 +57,18 @@ class CreatePresetItinerary extends Component
     public $selected_about_desc_banners = [];
     public $trip_highlights = []; // Array to store trip highlights
 
+    public $errorRoom = [];
     public $errorHotel = [];
     public $errorRoute = [];
     public $errorActivity = [];
     public $errorSightSeeing = [];
     public $errorCab = [];
+    public $leadData;
     public function mount($encryptedId){
         $itineraryExists = Itinerary::find($encryptedId);
         $this->itinerary_id =$encryptedId;
+        $this->leadData = $itineraryExists->lead;
+        $this->itineraryType =$itineraryExists->type;
         $categoryExists = Category::where('id', $itineraryExists->hotel_category)->first();
         $this->destinationName = $itineraryExists->destination->name;
         $this->categoryName = $categoryExists->name;
@@ -78,7 +87,9 @@ class CreatePresetItinerary extends Component
             $days_journey = [];
             foreach($stay_by_journey as $k=>$journey){
 
-                $hotels = Hotel::select('id', 'name')->where('hotel_category', $this->categoryId)->where('division', $journey)->orderBy('name', 'ASC')->get()->toArray();
+                $hotels = Hotel::select('id', 'name')
+                // ->where('hotel_category', $this->categoryId)
+                ->where('division', $journey)->orderBy('name', 'ASC')->get()->toArray();
 
                 $destination_route = RouteServiceSummary::with('route')->where('destination_id', $this->destinationId)->where('service_type', 'Route Wise')->get()->toArray();
 
@@ -195,15 +206,22 @@ class CreatePresetItinerary extends Component
        // Loop through each itinerary detail and extract hotel data
         foreach ($data as $item) {
             if ($item->hotel) {
+                $room = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+                ->where('hotel_id', $item->hotel)
+                ->where('header', 'day_' . $index)
+                ->where('field', 'day_room')
+                ->first();
                 $results[] = [
                     'hotel_id'      => optional($item->hotel)->id,
                     'hotel_name'    => optional($item->hotel)->name,
+                    'hotel_image'    => optional($item->hotel)->image,
                     'hotel_address' => optional($item->hotel)->address,
                     'hotel_rooms'   => optional($item->hotel)->rooms,
+                    'selected_hotel_room'   => $room?"checked":"",
                 ];
             }
         }
-    
+        dd($results);
         return $results;
         // Merge and assign the updated values
     }
@@ -220,15 +238,24 @@ class CreatePresetItinerary extends Component
        // Loop through each itinerary detail and extract hotel data
         foreach ($data as $item) {
             if ($item->hotel) {
+                $room = ItineraryDetail::with('hotel')
+                ->where('itinerary_id', $this->itinerary_id)
+                ->where('hotel_id', $item->hotel)
+                ->where('header', 'day_' . $index)
+                ->where('field', 'day_room')
+                ->first();
                 $results[] = [
                     'hotel_id'      => optional($item->hotel)->id,
                     'hotel_name'    => optional($item->hotel)->name,
+                    'hotel_image'    => optional($item->hotel)->image,
                     'hotel_address' => optional($item->hotel)->address,
                     'hotel_rooms'   => optional($item->hotel)->rooms,
+                    'selected_hotel_room'   => $room?$room->room_id:null,
                 ];
             }
         }
 
+       
         $this->day_by_divisions[$index]['day_hotel'] = $results;
         // Merge and assign the updated values
     }
@@ -257,7 +284,7 @@ class CreatePresetItinerary extends Component
             ->where('field', 'day_sightseeing')
             ->get()->toArray();
 
-            $day_cab = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+            $day_cab = ItineraryDetail::with('cab')->where('itinerary_id', $this->itinerary_id)
             ->where('route_service_summary_id', $item->route_service_summary_id)
             ->where('header', 'day_' . $index)
             ->where('field', 'day_cab')
@@ -293,6 +320,7 @@ class CreatePresetItinerary extends Component
                         $cab = optional(optional($cab_item->divisionCab)->cab);
                         $existing_cabs[]=[
                             'name'=> $cab->title ? $cab->title . ' (' . $cab->capacity . 'S)' : 'N/A',
+                            'id'=> $cab->id ? $cab->id:"",
                             'price'=>$cab_item->cab_price ?? 0,
                         ];
                     }
@@ -338,7 +366,7 @@ class CreatePresetItinerary extends Component
             ->where('field', 'day_sightseeing')
             ->get()->toArray();
 
-            $day_cab = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+            $day_cab = ItineraryDetail::with('cab')->where('itinerary_id', $this->itinerary_id)
             ->where('route_service_summary_id', $item->route_service_summary_id)
             ->where('header', 'day_' . $index)
             ->where('field', 'day_cab')
@@ -375,6 +403,7 @@ class CreatePresetItinerary extends Component
                         $cab = optional(optional($cab_item->divisionCab)->cab);
                         $existing_cabs[]=[
                             'name'=> $cab->title ? $cab->title . ' (' . $cab->capacity . 'S)' : 'N/A',
+                            'id'=> $cab->id ? $cab->id : '',
                             'price'=>$cab_item->cab_price ?? 0,
                         ];
                     }
@@ -530,17 +559,18 @@ class CreatePresetItinerary extends Component
             ->where('field', $field)
             ->where('hotel_id', $hotel_id)
             ->first();
-            $room = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+            $hotel_details = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
             ->where('header', 'day_' . $index)
-            ->where('field', 'day_room')
             ->where('hotel_id', $hotel_id)
-            ->first();
+            ->get();
     
             if ($item) {
                 // Delete from database
                 $item->delete();
-                if ($room) {
-                    $room->delete();
+                if ($hotel_details) {
+                    $hotel_details->each(function ($detail) {
+                        $detail->delete();
+                    });
                 }
                 DB::commit();
                 session()->flash('success', 'Hotel deleted successfully!');
@@ -667,6 +697,16 @@ class CreatePresetItinerary extends Component
                 throw new \Exception("Hotel not found");
             }
     
+            // Delete Existing Another Hotel Details
+            $hotel_details = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+            ->where('header', 'day_' . $index)
+            ->whereNotNull('hotel_id')
+            ->get();
+            if ($hotel_details) {
+                $hotel_details->each(function ($detail) {
+                    $detail->delete();
+                });
+            }
             // Start database transaction
             DB::beginTransaction();
     
@@ -674,17 +714,17 @@ class CreatePresetItinerary extends Component
             ItineraryDetail::updateOrCreate(
                 [
                     'itinerary_id' => $this->itinerary_id,
-                    'hotel_id' => $hotel->id,
                     'header' => "day_$index", // Assuming you meant to use 'day_{index}'
                     'field' => 'day_hotel',
                 ],
                 [
                     'value' => $hotel->name, // Store the hotel ID
+                    'hotel_id' => $hotel->id,
                 ]
             );
     
             // Commit transaction
-            
+
             DB::commit();
             $this->ReloadDayHotels($index);
             $this->errorHotel[$index] = '';
@@ -738,11 +778,10 @@ class CreatePresetItinerary extends Component
             $this->errorRoute[$index] = $e->getMessage();
         }
     }
-    public function getActivityOrSightseeing($field, $index, $route_index, $route_service_summary_id, $value, $price, $ticket_price){
+    public function getActivityOrSightseeing($field, $index, $route_index, $route_service_summary_id, $value, $price, $ticket_price,$cab_id){
         try {
             // Start database transaction
             DB::beginTransaction();
-    
             // Ensure price and ticket price are numeric
             if($field=='activity'){
                 $totalPrice = round((float) $price + (float) $ticket_price);
@@ -766,6 +805,7 @@ class CreatePresetItinerary extends Component
                 [
                     'value' => $value, // Store the activity name or ID
                     'price' => $totalPrice, // Store calculated price
+                    'cab_id' => $cab_id?$cab_id:NULL,
                 ]
             );
     
@@ -828,6 +868,77 @@ class CreatePresetItinerary extends Component
                 'value' => $value,
             ]
         );
+    }
+
+    public function updateSelectedRoom($hotel_id, $index, $roomId)
+    {
+        // Store selected room details dynamically
+        $this->selected_rooms[$index] = $roomId;
+        try {
+            // Start database transaction
+            DB::beginTransaction();
+            $room = Room::find($roomId);
+            // Update or create itinerary detail
+            ItineraryDetail::updateOrCreate(
+                [
+                    'itinerary_id' => $this->itinerary_id,
+                    'header' => "day_$index", // Assuming you meant to use 'day_{index}'
+                    'hotel_id' => $hotel_id,
+                    'field' => 'day_room',
+                ],
+                [
+                    'value' => $room->room_name, // Store the hotel ID
+                    'room_id' => $roomId,
+                ]
+            );
+    
+            // Commit transaction
+            
+            DB::commit();
+
+            $HotelPriceChartType = HotelPriceChartType::with('room_price')->where('room_id', $roomId)->where('title', 'Selling Price Chart')->first();
+            // dd($roomId);
+            $this->ReloadDayHotels($index);
+            $this->errorRoom[$index] = '';
+        } catch (\Exception $e) {
+            // Rollback transaction if there's an error
+            DB::rollBack();
+            // dd($e->getMessage());
+            // Store error message for Livewire validation
+            $this->errorRoom[$index] = $e->getMessage();
+        }
+    }
+
+    public function decreaseQuantity($index,$id){
+        $ItineraryDetail = ItineraryDetail::find($id);
+        if (!$ItineraryDetail) {
+            return; // Exit if the item is not found
+        }
+        $updated_quantity = $ItineraryDetail->value_quantity - 1;
+        
+        if ($updated_quantity >= 1) {
+            $piece_price = $ItineraryDetail->price / $ItineraryDetail->value_quantity;
+
+            $ItineraryDetail->price = $piece_price * $updated_quantity;
+            $ItineraryDetail->value_quantity = $updated_quantity;
+            $ItineraryDetail->save();
+        }
+        $this->ReloadDayRoute($index);
+    }
+    public function increaseQuantity($index,$id){
+        $ItineraryDetail = ItineraryDetail::find($id);
+      
+        if (!$ItineraryDetail) {
+            return; // Exit if the item is not found
+        }
+        $updated_quantity = $ItineraryDetail->value_quantity + 1; 
+        if ($updated_quantity >= 1) {
+            $piece_price = $ItineraryDetail->price / $ItineraryDetail->value_quantity;
+            $ItineraryDetail->price = $piece_price * $updated_quantity;
+            $ItineraryDetail->value_quantity = $updated_quantity;
+            $ItineraryDetail->save();
+        }
+        $this->ReloadDayRoute($index);
     }
     public function render()
     {

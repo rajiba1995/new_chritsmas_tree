@@ -3,14 +3,8 @@
 @section('styles')
 @endsection
 @section('content')
-<!-- Select2 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
 
-<!-- jQuery (Required for Select2) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- Select2 JS -->
-<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
 <div class="md:flex block items-center justify-between mb-6 mt-1  page-header-breadcrumb">
     <div class="my-auto">
@@ -26,18 +20,9 @@
             </ol>
         </nav>
     </div>
-    <div class="ti-btn-list">
-        @if($itineraryExists->type=="preset")
-            <a href="{{route('admin.itinerary.preset.list')}}" class="ti-btn ti-btn-danger-full !py-1 !px-2 ti-btn-wave  me-[0.375rem]"><i class="fa-solid fa-caret-left"></i>Back</a>
-        @else
-            <a href="{{route('admin.itinerary.postlead.list')}}" class="ti-btn ti-btn-danger-full !py-1 !px-2 ti-btn-wave  me-[0.375rem]"><i class="fa-solid fa-caret-left"></i>Back</a>
-        @endif
-    </div>
 </div>
     <!-- Start:: row-10 -->
-    <livewire:itinerary.create-preset-itinerary :encryptedId="$id" />
-
-
+    <livewire:itinerary.post-lead-itinerary-list />
 <!-- End:: row-10 -->
 @endsection
 
