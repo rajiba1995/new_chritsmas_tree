@@ -12,6 +12,7 @@ class SeasionPlan extends Model
     protected $table = 'seasion_plans';
     protected $fillable = [
         'id',
+        'type',
         'title',
         'position',
         'positions',

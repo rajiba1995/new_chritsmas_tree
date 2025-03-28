@@ -6,6 +6,8 @@ use Livewire\Component;
 use App\Models\State;
 use App\Models\City;
 use App\Models\Room;
+use App\Models\SeasionPlan;
+use App\Models\HotelPriceChart;
 use App\Models\Hotel;
 use App\Models\Category;
 use App\Models\DivisionWiseSightseeingImage;
@@ -18,6 +20,7 @@ use App\Helpers\CustomHelper;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Crypt;
 
 use App\Models\ItineraryBanner;
 
@@ -31,6 +34,7 @@ class CreatePresetItinerary extends Component
     public $selectedDivision;
     public $categoryId;
     public $mainBanner = [];
+    public $hotel_room_price = [];
     public $destinationName;
     public $categoryName;
     public $itinerary_syntax;
@@ -42,6 +46,7 @@ class CreatePresetItinerary extends Component
     public $day_by_divisions = [];
 
     public $selected_rooms = [];
+    public $selected_room_plan = [];
 
     public $showModal = false;
     public $modalImage = '';
@@ -64,6 +69,7 @@ class CreatePresetItinerary extends Component
     public $errorSightSeeing = [];
     public $errorCab = [];
     public $leadData;
+    public $total_amount = 0;
     public function mount($encryptedId){
         $itineraryExists = Itinerary::find($encryptedId);
         $this->itinerary_id =$encryptedId;
@@ -207,21 +213,33 @@ class CreatePresetItinerary extends Component
         foreach ($data as $item) {
             if ($item->hotel) {
                 $room = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
-                ->where('hotel_id', $item->hotel)
+                ->where('hotel_id', $item->hotel_id)
                 ->where('header', 'day_' . $index)
                 ->where('field', 'day_room')
                 ->first();
+                $selected_room_main_plan = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+                ->where('hotel_id', $item->hotel_id)
+                ->where('header', 'day_' . $index)
+                ->where('field', 'day_room_main_plan')
+                ->first();
+
+                if($room){
+                    $this->selected_rooms[$index] = $room->room_id;
+                    $this->FetchRoomPlan($index, $room->room_id);
+                }
+
                 $results[] = [
                     'hotel_id'      => optional($item->hotel)->id,
                     'hotel_name'    => optional($item->hotel)->name,
                     'hotel_image'    => optional($item->hotel)->image,
                     'hotel_address' => optional($item->hotel)->address,
                     'hotel_rooms'   => optional($item->hotel)->rooms,
-                    'selected_hotel_room'   => $room?"checked":"",
+                    'selected_room'   => $room?$room->room_id:null,
+                    'selected_room_main_plan' => $selected_room_main_plan?$selected_room_main_plan:null,
                 ];
             }
         }
-        dd($results);
+        // dd($results);
         return $results;
         // Merge and assign the updated values
     }
@@ -238,19 +256,34 @@ class CreatePresetItinerary extends Component
        // Loop through each itinerary detail and extract hotel data
         foreach ($data as $item) {
             if ($item->hotel) {
+
                 $room = ItineraryDetail::with('hotel')
                 ->where('itinerary_id', $this->itinerary_id)
-                ->where('hotel_id', $item->hotel)
+                ->where('hotel_id', $item->hotel_id)
                 ->where('header', 'day_' . $index)
                 ->where('field', 'day_room')
                 ->first();
+
+                $selected_room_main_plan = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+                ->where('hotel_id', $item->hotel_id)
+                ->where('header', 'day_' . $index)
+                ->where('field', 'day_room_main_plan')
+                ->first();
+
+
+                if($room){
+                    $this->selected_rooms[$index] = $room->room_id;
+                    $this->FetchRoomPlan($index, $room->room_id);
+                }
+                
                 $results[] = [
                     'hotel_id'      => optional($item->hotel)->id,
                     'hotel_name'    => optional($item->hotel)->name,
                     'hotel_image'    => optional($item->hotel)->image,
                     'hotel_address' => optional($item->hotel)->address,
                     'hotel_rooms'   => optional($item->hotel)->rooms,
-                    'selected_hotel_room'   => $room?$room->room_id:null,
+                    'selected_room'   => $room?$room->room_id:null,
+                    'selected_room_main_plan'   => $selected_room_main_plan?$selected_room_main_plan:null,
                 ];
             }
         }
@@ -425,6 +458,7 @@ class CreatePresetItinerary extends Component
         $this->day_by_divisions[$index]['day_route'] = $results;
         // Merge and assign the updated values
     }
+
 
     // public function ReloadDayActivity($index, $route_index, $route_service_summary_id){
     //     // Fetch itinerary detail with hotel relation
@@ -632,6 +666,9 @@ class CreatePresetItinerary extends Component
                 session()->flash('error', 'Item not found.');
             }
             $this->ReloadDayRoute($index);
+            if(isset($item->room_id)){
+                $this->ReloadDayHotels($index);
+            }
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'Deletion failed: ' . $e->getMessage());
@@ -847,6 +884,38 @@ class CreatePresetItinerary extends Component
             }
         }
     }
+    public function GetRoomAddonPlan($field, $index, $hotel_id, $room_id, $value, $price){
+        try {
+            // Start database transaction
+            DB::beginTransaction();
+            // Update or create itinerary detail
+            $field_data = "day_room_addon_plan_" . str_replace(' ', '_', strtolower($field));
+            ItineraryDetail::updateOrCreate(
+                [
+                    'itinerary_id' => $this->itinerary_id,
+                    'hotel_id' => $hotel_id,
+                    'room_id' => $room_id,
+                    'header' => "day_$index", // Using a dynamic day header
+                    'field' => $field_data, // Fixing field name
+                    'value' => $value, // Store the activity name or ID
+                ],
+                [
+                    'price' => $price?$price:0, // Store calculated price
+                ]
+            );
+    
+            // Commit transaction
+            DB::commit();
+    
+            // Reload day route after update
+            $this->ReloadDayHotels($index);
+            $this->errorRoom[$index] = "";
+        } catch (\Exception $e) {
+            // Rollback transaction if there's an error
+            DB::rollBack();
+            $this->errorRoom[$index] = $e->getMessage();
+        }
+    }
    
     public function OpenNewRouteModal($index){
         $this->active_new_route_modal = $index;
@@ -854,7 +923,6 @@ class CreatePresetItinerary extends Component
     public function submitForm(){
         dd($this->all());
     }
-
 
     // Update Itinerary Data
     public function UpdateByKeyUp($header, $field, $value){
@@ -873,10 +941,17 @@ class CreatePresetItinerary extends Component
     public function updateSelectedRoom($hotel_id, $index, $roomId)
     {
         // Store selected room details dynamically
+        // dd($roomId);
         $this->selected_rooms[$index] = $roomId;
         try {
             // Start database transaction
             DB::beginTransaction();
+            $room_data = ItineraryDetail::where('itinerary_id', $this->itinerary_id)->where('hotel_id', $hotel_id)->where('header', 'day_' . $index)->whereNotNull('room_id')->get();
+            if (count($room_data)>0) {
+                $room_data->each(function ($detail) {
+                    $detail->delete();
+                });
+            }
             $room = Room::find($roomId);
             // Update or create itinerary detail
             ItineraryDetail::updateOrCreate(
@@ -891,13 +966,129 @@ class CreatePresetItinerary extends Component
                     'room_id' => $roomId,
                 ]
             );
-    
             // Commit transaction
             
             DB::commit();
 
-            $HotelPriceChartType = HotelPriceChartType::with('room_price')->where('room_id', $roomId)->where('title', 'Selling Price Chart')->first();
-            // dd($roomId);
+
+            $this->ReloadDayHotels($index);
+            $this->errorRoom[$index] = '';
+        } catch (\Exception $e) {
+            // Rollback transaction if there's an error
+            DB::rollBack();
+            // dd($e->getMessage());
+            // Store error message for Livewire validation
+            $this->errorRoom[$index] = $e->getMessage();
+        }
+    }
+
+    public function FetchRoomPlan($index, $roomId){
+        // Main Plan
+        $MainSeasionPlan = SeasionPlan::where('type', 'main')
+        ->where('title', 'Normal Season')
+        ->get()
+        ->toArray();
+
+        if(count($MainSeasionPlan)>0){
+            $main_plans = [];
+            foreach ($MainSeasionPlan as $item) {
+                $plan_types = explode(', ', $item['plan_item']); // Split plan types
+
+                // Fetch all prices at once (avoiding N+1 queries)
+                $prices = HotelPriceChart::where('room_id', $roomId)
+                ->where('plan_title', $item['title'])
+                ->whereIn('plan_item', $plan_types) // Get all matching plan_items
+                ->pluck('item_price', 'plan_item') // Fetch as key-value pair (plan_item => item_price)
+                ->toArray();
+
+                // Build the response array
+                $main_plans[] = [
+                    'title' => $item['title'],
+                    'plan_type' => array_map(function ($plan_type) use ($prices) {
+                        return [
+                        'name' => $plan_type,
+                        'price' => $prices[$plan_type] ?? null // Assign price if found, else null
+                        ];
+                    }, $plan_types),
+                ];
+            }
+        }
+
+        // Addon Plan
+        $AddonSeasionPlan = SeasionPlan::where('type', 'addon')->orderBy('position', 'ASC')
+        ->get()
+        ->toArray();
+
+        if(count($AddonSeasionPlan)>0){
+            $addon_plans = [];
+            foreach ($AddonSeasionPlan as $item) {
+                $plan_types = explode(', ', $item['plan_item']); // Split plan types
+
+                // Fetch all prices at once (avoiding N+1 queries)
+                $prices = HotelPriceChart::where('room_id', $roomId)
+                ->where('plan_title', $item['title'])
+                ->whereIn('plan_item', $plan_types) // Get all matching plan_items
+                ->pluck('item_price', 'plan_item') // Fetch as key-value pair (plan_item => item_price)
+                ->toArray();
+
+
+                
+                $field_data = "day_room_addon_plan_" . str_replace(' ', '_', strtolower($item['title']));
+
+                $selected_addon_plan = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
+                ->where('header', 'day_' . $index)
+                ->where('room_id', $roomId)
+                ->where('field', $field_data)
+                ->get()->toArray();
+
+                // Build the response array
+                $addon_plans[] = [
+                'selected_addon_plan' => $selected_addon_plan,
+                'title' => $item['title'],
+                    'plan_type' => array_map(function ($plan_type) use ($prices) {
+                        return [
+                        'name' => $plan_type,
+                        'price' => $prices[$plan_type] ?? null // Assign price if found, else null
+                        ];
+                    }, $plan_types),
+                ];
+            }
+        }
+
+        
+
+        $this->hotel_room_price [$index]= [
+            'room_details' =>Room::find($roomId),
+            'main_seasion_plan' =>$main_plans,
+            'addon_seasion_plan' =>$addon_plans,
+        ];
+    }
+
+    public function updateSelectedRoomPlan($hotel_id, $roomId, $index, $plan_name, $price)
+    {
+        // Store selected room details dynamically
+        $this->selected_room_plan[$index] = $plan_name;
+        try {
+            // Start database transaction
+            DB::beginTransaction();
+            // Update or create itinerary detail
+            ItineraryDetail::updateOrCreate(
+                [
+                    'itinerary_id' => $this->itinerary_id,
+                    'header' => "day_$index", // Assuming you meant to use 'day_{index}'
+                    'hotel_id' => $hotel_id,
+                    'room_id' => $roomId,
+                    'field' => 'day_room_main_plan',
+                ],
+                [
+                    'value' => $plan_name, // Store the hotel ID
+                    'price' => $price?$price:0,
+                ]
+            );
+            // Commit transaction
+            
+            DB::commit();
+            
             $this->ReloadDayHotels($index);
             $this->errorRoom[$index] = '';
         } catch (\Exception $e) {
@@ -924,6 +1115,10 @@ class CreatePresetItinerary extends Component
             $ItineraryDetail->save();
         }
         $this->ReloadDayRoute($index);
+
+        if(isset($ItineraryDetail->room_id)){
+            $this->ReloadDayHotels($index);
+        }
     }
     public function increaseQuantity($index,$id){
         $ItineraryDetail = ItineraryDetail::find($id);
@@ -939,10 +1134,25 @@ class CreatePresetItinerary extends Component
             $ItineraryDetail->save();
         }
         $this->ReloadDayRoute($index);
+
+        if(isset($ItineraryDetail->room_id)){
+            $this->ReloadDayHotels($index);
+        }
+    }
+
+    public function ResetItinerary(){
+        $ItineraryDetail = ItineraryDetail::where('itinerary_id', $this->itinerary_id)->get();
+        if (count($ItineraryDetail)>0) {
+            $ItineraryDetail->each(function ($detail) {
+                $detail->delete();
+            });
+        }
+        $itinerary_id = Crypt::encrypt($this->itinerary_id);
+        return redirect()->route('admin.itinerary.preset.build', $itinerary_id);
     }
     public function render()
     {
-        // dd($this->day_by_divisions);
+        $this->total_amount = ItineraryDetail::where('itinerary_id', $this->itinerary_id)->sum('price');
         $this->mainBanner = ItineraryBanner::where('destination_id', $this->destinationId)->get();
         return view('livewire.itinerary.create-preset-itinerary');
     }

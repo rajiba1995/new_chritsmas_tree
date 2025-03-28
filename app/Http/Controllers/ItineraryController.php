@@ -10,6 +10,7 @@ use App\Helpers\CustomHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 
+
 class ItineraryController extends Controller
 {
     public function banners(){

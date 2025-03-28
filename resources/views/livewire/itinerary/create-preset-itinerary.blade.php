@@ -15,7 +15,7 @@
                         </div>
                     @endif
                 </div>
-                <div class="box-header">
+                <div class="box-header itinerary_box_header">
                     {{-- <div>
                         <a href="{{route('admin.itinerary.preset.builder',[$destinationId,$categoryId])}}" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20">
                             <i class="ri-refresh-line"></i>
@@ -34,6 +34,12 @@
                                 <div class="badge bg-outline-primary cursor-pointer !font-normal !text-sm uppercase">
                                     <span>    {{$categoryName}}</span>
                                 </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-center itinerary_total_amount">
+                               <p class="uppercase">Total Amount</p>
+                                <p class="text-2xl">{{env('DEFAULT_CURRENCY_SYMBOL')}}{{$total_amount}}</p>
                             </div>
                         </div>
                     </div>
@@ -58,7 +64,7 @@
                                             </div>
                                         </th>
                                         <th scope="col" class="!text-center w-1/5">
-                                            <button type="submit" class="ti-btn ti-btn-success-full !py-1 !px-4 ti-btn-wave  me-[0.375rem]">SAVE</button>
+                                            <a href="javascript:void(0)" wire:click="ResetItinerary" class="!px-4 badge bg-outline-danger cursor-pointer !font-normal !text-sm uppercase">RESET</button>
                                         </th>
                                     </tr>
                                 </thead>
@@ -427,7 +433,7 @@
                                                                                                             <p class="text-black-600 text-xs">{{ $day_cab['value'] }}</p>
                                                                                                             <div>
                                                                                                                 <label class="cab-preview-label relative cursor-pointer">
-                                                                                                                    <div class="cab-card">
+                                                                                                                    <div class="cab-card card-price">
                                                                                                                         <span class="hotel-name italic text-yellow-600">{{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_cab['price'] }}</span>
                                                                                                                     </div>
                                                                                                                 </label>
@@ -518,7 +524,7 @@
 
                                                         {{-- If Itinerary is Post Lead then will show Hotel --}}
                                                         @if($itineraryType=="post_inquiry")
-                                                            <div class="mt-4">
+                                                            <div class="mt-4"  wire:key="dayselectedHotel-{{ $division_index }}">
                                                                 <span class="badge gap-2 bg-danger/10 text-danger uppercase text-small m-2"><i class="fas fa-hotel"></i> Hotel  <span class="custom-header-separator">|</span> 1 Night<span class="custom-header-separator">|</span> in {{$division_item['division_name']}}</span>
                                                                 <div class="grid grid-cols-12 sm:gap-x-6 sm:gap-y-4">
                                                                     <div class="md:col-span-8 col-span-12 mb-4 mx-2 itinerary-build">
@@ -551,7 +557,9 @@
                                                                                                                 name="selected_day_wise_itinerary_hotel.{{ $division_index }}.room"
                                                                                                                 value="{{ $room->id ?? '' }}" 
                                                                                                                 class="hidden peer"
-                                                                                                                wire:change="updateSelectedRoom({{$division_hotel_item['hotel_id']}},{{ $division_index }}, {{ $room->id }})">
+                                                                                                                wire:change="updateSelectedRoom({{$division_hotel_item['hotel_id']}},{{ $division_index }}, {{ $room->id }})" 
+                                                                                                                {{$room->id==$division_hotel_item['selected_room']?"checked":""}}
+                                                                                                                >
                                                                                                             <!-- Hotel Selection Box -->
                                                                                                             <div class="hotel-card">
                                                                                                                 <span class="hotel-name">{{$room->room_name}}</span>
@@ -577,9 +585,9 @@
                                                                                         $selectedRoom = collect($division_hotel_item['hotel_rooms'])->firstWhere('id', $selectedRoomId);
                                                                                     @endphp
                                                                                     @if ($selectedRoom)
-                                                                                        <div class="room-details-card mt-2">
+                                                                                        <div class="room-details-card mt-2" wire:key="day-{{ $division_index }}-selectedRoom-{{ $selectedRoomId }}">
                                                                                             <div class="text-center uppercase">
-                                                                                                <p class="">{{ $selectedRoom->room_name ?? 'N/A' }}</p>
+                                                                                                <p class="">{{ $selectedRoom->room_name ?? 'N/A' }} <span class="text-danger">(Room Capacity:  {{$hotel_room_price[$division_index]['room_details']?$hotel_room_price[$division_index]['room_details']->capacity:"N/A"}} P)</span></p>
                                                                                             </div>
 
                                                                                             {{-- Error  --}}
@@ -588,6 +596,109 @@
                                                                                                     {{ $errorRoom[$division_index] }}
                                                                                                 </div>
                                                                                             @endif
+
+                                                                                            <table class="table table-bordered table-bordered-primary border-primary/10 min-w-full mt-4">
+                                                                                                <thead class="bg-primary/5">
+                                                                                                    <tr>
+                                                                                                        <th class="!text-center uppercase" style="width: 120px;">Plan</th>
+                                                                                                        @foreach ($hotel_room_price[$division_index]['addon_seasion_plan'] as $addon_seasion_plan)
+                                                                                                            <th class="!text-center uppercase">{{$addon_seasion_plan['title']}}
+                                                                                                            </th>
+                                                                                                        @endforeach
+                                                                                                    </tr>
+                                                                                                </thead>
+                                                                                                <tbody class="">
+                                                                                                    <tr>
+                                                                                                        <td class="align-top">
+                                                                                                            
+                                                                                                            <span class="badge gap-2 bg-danger/10 text-danger">
+                                                                                                                <span class="w-1.5 h-1.5 inline-block bg-danger rounded-full">
+                                                                                                                </span>
+                                                                                                                {{$hotel_room_price[$division_index]['main_seasion_plan'][0]['title']}}
+                                                                                                            </span>
+                                                                                                            
+                                                                                                            <div class="mt-2">
+                                                                                                                @foreach ($hotel_room_price[$division_index]['main_seasion_plan'][0]['plan_type'] as $plan_type_index=> $plan_type)
+                                                                                                                    <label class="plan-type-preview-label relative cursor-pointer" wire:key="day-{{ $division_index }}-room-plan-{{ $plan_type_index }}">
+                                                                                                                        <input type="radio" class="hidden peer" name="selected_day_wise_itinerary_hotel.{{ $division_index }}.room_plan"
+                                                                                                                        value="{{ $plan_type['name'] }}"
+                                                                                                                        wire:change="updateSelectedRoomPlan({{$division_hotel_item['hotel_id']}}, {{$selectedRoomId}}, {{ $division_index }}, '{{ $plan_type['name'] }}','{{$plan_type['price']}}')"
+                                                                                                                        @checked(optional($division_hotel_item['selected_room_main_plan'])->value == $plan_type['name'])
+                                                                                                                        >
+                                                                                                                        <div class="hotel-card">
+                                                                                                                            <span class="hotel-name">{{$plan_type['name']}}</span>
+                                                                                                                            <span class="checkmark">✓</span>
+                                                                                                                        </div>
+                                                                                                                    </label>
+                                                                                                                @endforeach
+                                                                                                            </div>
+                                                                                                            <div class="custom-hotel-details-top">
+                                                                                                                @if($division_hotel_item['selected_room_main_plan'])
+                                                                                                                    <div class="flex justify-center">
+                                                                                                                        <label class="cab-preview-label relative cursor-pointer">
+                                                                                                                            <div class="cab-card card-price">
+                                                                                                                                <span class="hotel-name italic text-yellow-600">{{env('DEFAULT_CURRENCY_SYMBOL')}}{{$division_hotel_item['selected_room_main_plan']->price}}</span>
+                                                                                                                            </div>
+                                                                                                                        </label>
+                                                                                                                    </div>
+                                                                                                                    <!-- Quantity Controls -->
+                                                                                                                    <div class="flex items-center space-x-2 justify-center">
+                                                                                                                        <i class="fas fa-minus-circle text-red-500 cursor-pointer text-base" wire:click="decreaseQuantity({{$division_index}},{{$division_hotel_item['selected_room_main_plan']->id}})"></i>
+
+                                                                                                                        <span class="text-sm font-bold">{{$division_hotel_item['selected_room_main_plan']->value_quantity}}</span>
+                                                                                                                        <i class="fas fa-plus-circle text-green-500 cursor-pointer text-base"  wire:click="increaseQuantity({{$division_index}},{{$division_hotel_item['selected_room_main_plan']->id}})"></i>
+                                                                                                                    </div>
+                                                                                                                    <div class="no_of_room">
+                                                                                                                        NO OF ROOM
+                                                                                                                    </div>
+                                                                                                                @endif
+                                                                                                            </div>
+                                                                                                        </td>
+                                                                                                        @foreach ($hotel_room_price[$division_index]['addon_seasion_plan'] as $index_addon_season_plan=>$addon_seasion_plan)
+                                                                                                            <td class="!text-center uppercase align-top !p-0">
+                                                                                                                <div class="small-btm">
+                                                                                                                    <select wire:key="existing-addon-plan-{{$division_index}}-{{$index_addon_season_plan}}-100" wire:change="GetRoomAddonPlan('{{$addon_seasion_plan['title']}}',{{$division_index}}, {{$division_hotel_item['hotel_id']}}, {{$selectedRoomId}}, $event.target.value, $event.target.selectedOptions[0].getAttribute('data-price'))">
+                                                                                                                        <option value="">Choose {{$addon_seasion_plan['title']}}</option>
+                                                                                                                        @foreach($addon_seasion_plan['plan_type'] as $addon_plan_index=> $addon_plan_type)
+                                                                                                                            <option value="{{$addon_plan_type['name']}}" data-price="{{$addon_plan_type['price']}}" wire:key="existing-addon-plan-{{$division_index}}-{{$index_addon_season_plan}}-{{$addon_plan_index}}">{{$addon_plan_type['name']}}</option>
+                                                                                                                        @endforeach
+                                                                                                                    </select>
+                                                                                                                </div>
+                                                                                                                @foreach ($addon_seasion_plan['selected_addon_plan'] as $index_selected_addon_plan =>$selected_addon_plan)
+                                                                                                                    <div class="addon_plan_item" wire:key="day-1-route-0-cab-0">
+                                                                                                                        <div class="custom-hotel-container relative !overflow-visible">
+                                                                                                                            <div class="custom-cab-content">
+                                                                                                                                <div class="custom-cab-details">
+                                                                                                                                    <div class="custom-hotel-details-top">
+                                                                                                                                        <p class="text-black-600 italic" style="font-size:10px;">{{$selected_addon_plan['value']}}</p>
+                                                                                                                                        <div>
+                                                                                                                                            <label class="cab-preview-label relative cursor-pointer">
+                                                                                                                                                <div class="cab-card card-price">
+                                                                                                                                                    <span class="hotel-name italic text-yellow-600">{{env('DEFAULT_CURRENCY_SYMBOL')}}{{$selected_addon_plan['price']}}</span>
+                                                                                                                                                </div>
+                                                                                                                                            </label>
+                                                                                                                                        </div>
+                                                                                                                                        <!-- Quantity Controls -->
+                                                                                                                                        <div class="flex items-center space-x-2 justify-center">
+                                                                                                                                            <i class="fas fa-minus-circle text-red-500 cursor-pointer text-base" wire:click="decreaseQuantity({{$division_index}},{{$selected_addon_plan['id']}})"></i>
+                                                                                                                                            
+                                                                                                                                            <span class="text-sm font-bold">{{$selected_addon_plan['value_quantity']}}</span>
+                                                                                                                                            
+                                                                                                                                            <i class="fas fa-plus-circle text-green-500 cursor-pointer text-base" wire:click="increaseQuantity({{$division_index}},{{$selected_addon_plan['id']}})"></i>
+                                                                                                                                        </div>
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                                <i class="far fa-times-circle text-warning cursor-pointer text-xs" wire:click="RemoveDayRouteItem({{$division_index}},{{$selected_addon_plan['id']}})"></i>
+                                                                                                                            </div>
+                                                                                                                        </div>
+                                                                                                                    </div>
+                                                                                                                @endforeach
+                                                                                                                
+                                                                                                            </td>
+                                                                                                        @endforeach
+                                                                                                    </tr>
+                                                                                                </tbody>
+                                                                                            </table>
                                                                                         </div>
                                                                                     @endif
                                                                                 @endif
@@ -665,7 +776,7 @@
         </div>
     @endif
 
-    <div wire:loading class="loader" wire:target="addAboutDescHighlight, ItineraryImageDelete, deleteDayImage, showImageModal, OpenNewRouteModal, RemoveDayRouteItem,RemoveDayRoute,RemoveDayHotel, closeModal, getActivityOrSightseeing, getRoute, uploadMainBanner, main_banner, uploadDestinationSlider, removeAboutDescHighlight,getHotel,updateSelectedRoom,decreaseQuantity,increaseQuantity">
+    <div wire:loading class="loader" wire:target="addAboutDescHighlight, ItineraryImageDelete, deleteDayImage, showImageModal, OpenNewRouteModal, RemoveDayRouteItem,RemoveDayRoute,RemoveDayHotel, closeModal, getActivityOrSightseeing, getRoute, uploadMainBanner, main_banner, uploadDestinationSlider, removeAboutDescHighlight,getHotel,updateSelectedRoom,decreaseQuantity,increaseQuantity,ResetItinerary,updateSelectedRoomPlan,GetRoomAddonPlan">
         <div class="spinner">
         <img src="{{asset('build/assets/images/media/loader.svg')}}" alt="">
         </div>

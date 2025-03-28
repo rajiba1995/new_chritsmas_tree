@@ -323,6 +323,10 @@
 .cab-card{
   background-color: #ecf0fa;
 }
+.card-price{
+  background: green !important;
+  color: #fff !important;
+}
 .cab-avatar img{
   padding: 0px 19px;
 }
@@ -758,6 +762,11 @@
   min-width: 130px;
   position: relative;
 }
+.plan-type-preview-label {
+  display: block;
+  min-width: 65px;
+  position: relative;
+}
 .cab-preview-label {
   display: inline-block;
   min-width: 50px;
@@ -781,7 +790,7 @@
   flex-direction: column;
   align-items: center;
   gap: 5px;
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1); */
 }
 .room-details-card{
   margin-bottom: 5px;
@@ -820,8 +829,9 @@
 }
 
 
-input[type="radio"]:checked + .hotel-card {
-  border-color: #007bff;
+input[type="radio"]:checked + .hotel-card,
+input[type="checkbox"]:checked + .hotel-card {
+    border-color: #007bff;
 }
 
 /* Hotel Icon */
@@ -856,8 +866,9 @@ input[type="radio"]:checked + .hotel-card {
   line-height: 15px;
 }
 
-input[type="radio"]:checked + .hotel-card .checkmark {
-  display: block;
+input[type="radio"]:checked + .hotel-card .checkmark,
+input[type="checkbox"]:checked + .hotel-card .checkmark {
+    display: block;
 }
 
 /* Custom Tooltip */
@@ -997,7 +1008,43 @@ input[type="radio"]:checked + .hotel-card .checkmark {
   display: flex !important;
 }
 
-
+.no_of_room{
+    padding: 5px;
+    font-size: 11px;
+    color: #0a336b;
+    font-weight: 700;
+    text-align: center;
+    background: #f2f7fe;
+}
+.addon_plan_item{
+    text-align: center;
+    font-size: 9px;
+    font-weight: 600;
+    border-bottom: 1px solid #066bd6;
+    text-transform: uppercase;
+    /* background: #f9f9f9; */
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+.itinerary_box_header{
+  position: sticky;
+  top: 64px;
+  background: #fff;
+  z-index: 99;
+}
+.itinerary_total_amount{
+  border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    background: #1e58a3;
+    color: #fff;
+}
 
 
 
